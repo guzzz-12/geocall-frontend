@@ -27,9 +27,8 @@ const FormSchema = z.object({
     .regex(PASSWORD_REGEX, {message: INVALID_PASSWORD_MSG})
     .min(6, "The password must contain at least 6 characters"),
   passwordConfirm: z
-    .string({required_error: "The password is required"})
-    .regex(PASSWORD_REGEX, {message: INVALID_PASSWORD_MSG})
-    .min(6, "The password must contain at least 6 characters")
+    .string()
+    .nonempty("You must confirm your password")
 })
 .refine((data) => data.password === data.passwordConfirm, {
   message: "Passwords don't match",
@@ -56,6 +55,7 @@ const SignupPage = () => {
       <FormProvider {...methods}>
         <form
           className="flex flex-col justify-between gap-5 w-[450px] mt-5 p-5 rounded bg-white shadow-lg"
+          noValidate
           onSubmit={methods.handleSubmit(onSubmitHandler)}
         >
           <h1 className="text-center text-lg font-bold">
@@ -122,7 +122,13 @@ const SignupPage = () => {
       <div className="flex flex-col justify-center items-center gap-2 mt-5">
         <p className="flex gap-1 text-center text-sm">
           Already have an account?
-          <Link className="underline" to="/login">Login instead</Link>
+          <Link
+            className="underline"
+            to="/login"
+            onClick={(e) => isLoading && e.preventDefault()}
+          >
+            Login instead
+          </Link>
         </p>
       </div>
 

@@ -39,6 +39,7 @@ const LoginPage = () => {
       <FormProvider {...methods}>
         <form
           className="flex flex-col justify-between gap-5 w-[450px] p-5 rounded bg-white shadow-lg"
+          noValidate
           onSubmit={methods.handleSubmit(onSubmitHandler)}
         >
           <h1 className="text-center text-lg font-bold">
@@ -76,11 +77,23 @@ const LoginPage = () => {
       <div className="flex flex-col justify-center items-center gap-2 mt-5">
         <p className="flex gap-1 text-center text-sm">
           Don't have an account?
-          <Link className="underline" to="/signup">Create account</Link>
+          <Link 
+            className="underline"
+            to="/signup"
+            onClick={(e) => isLoading && e.preventDefault()}
+          >
+            Create account
+          </Link>
         </p>
         <p className="flex gap-1 text-center text-sm">
           Forgot your password?
-          <Link className="underline" to="/forgot-password">Reset your password</Link>
+          <Link
+            className="underline"
+            to="/forgot-password"
+            onClick={(e) => isLoading && e.preventDefault()}
+          >
+            Reset your password
+          </Link>
         </p>
       </div>
     </section>
