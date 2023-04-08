@@ -1,7 +1,7 @@
-import {useState, ElementType } from "react";
+import {useState, useEffect, ElementType } from "react";
 import { useFormContext } from "react-hook-form";
-import { motion, AnimatePresence } from "framer-motion";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { motion } from "framer-motion";
+import { AiOutlineEye, AiOutlineEyeInvisible, AiFillCheckCircle } from "react-icons/ai";
 import { RiErrorWarningFill } from "react-icons/ri";
 import { FormSchemaType } from "../../pages/SignupPage";
 
@@ -16,9 +16,21 @@ interface Props {
 
 const Input = ({id, name, type, placeholder, disabled, Icon}: Props) => {
   const [showPassword, setShowPassword] = useState(false);
-  const {register, formState: {errors}} = useFormContext();
+  const [isFieldValidated, setIsFieldValidated] = useState(false);
+
+  const {register, watch, formState: {errors, isSubmitted}} = useFormContext();
 
   const isInvalid = !!errors[name];
+  const fieldValue = watch(name);
+  
+  // Verificar si el campo es válido
+  // El mecanismo de verificación toma en cuenta
+  // si el campo es inválido y si ya se intentó
+  // enviar el formulario
+  useEffect(() => {
+    const isValid = !isInvalid && isSubmitted;
+    setIsFieldValidated(isValid);
+  }, [isInvalid, name, fieldValue, isSubmitted]);
 
   return (
     <>
@@ -56,23 +68,40 @@ const Input = ({id, name, type, placeholder, disabled, Icon}: Props) => {
               )}
             </>
           }
-          <AnimatePresence>
-            {isInvalid && (
-              <motion.div
-                className="origin-center"
-                initial={{scale: 0, opacity: 0, rotateZ: 180}}
-                animate={{scale: 1, opacity: 1, rotateZ: 0}}
-                exit={{scale: 0, opacity: 0, rotateZ: 180}}
-              >
-                <RiErrorWarningFill
-                  className="w-6 h-6 text-sm text-red-700"
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          
+          {/* ícono para indicar error de validación */}
+          {isInvalid && (
+            <motion.div
+              key="invalidIcon"
+              className="origin-center"
+              initial={{scale: 0, opacity: 0, rotateZ: 180}}
+              animate={{scale: 1, opacity: 1, rotateZ: 0}}
+              exit={{scale: 0, opacity: 0, rotateZ: 180}}
+            >
+              <RiErrorWarningFill
+                className="w-6 h-6 text-sm text-red-700"
+              />
+            </motion.div>
+          )}
+          
+          {/* Ícono para indicar que el campo es válido */}
+          {isFieldValidated &&
+            <motion.div
+              key="validatedIcon"
+              className="origin-center"
+              initial={{scale: 0, opacity: 0, rotateZ: 180}}
+              animate={{scale: 1, opacity: 1, rotateZ: 0}}
+              exit={{scale: 0, opacity: 0, rotateZ: 180}}
+            >
+            <AiFillCheckCircle
+              className="w-6 h-6 text-sm text-green-500"
+            />
+          </motion.div>
+          }
         </div>
       </div>
       
+      {/* Mensaje de error de validación */}
       {isInvalid &&
         <motion.p
           className="-mt-3 text-xs font-bold text-red-700"
