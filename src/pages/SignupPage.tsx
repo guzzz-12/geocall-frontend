@@ -3,24 +3,32 @@ import { Link } from "react-router-dom"
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { AiOutlineMail } from "react-icons/ai";
+import { AiOutlineUser, AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
 import Input from "../components/AuthFormInputs/Input";
-
-const passwordRegexp = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_])(?!.*[\s\n]).{6,50}/;
-const invalidPasswordMsg = "The password must be at least 6 characters and must contain at least one uppercase, one lowercase, one number and one special character";
+import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
 
 const FormSchema = z.object({
+  firstName: z
+    .string()
+    .min(3, "The name must be at least 3 characters")
+    .max(32, "The name must be maximum 32 character")
+    .regex(NAME_REGEX, "The name can contain only letters without white spaces"),
+  lastName: z
+    .string()
+    .min(3, "The last name must be at least 3 characters")
+    .max(32, "The last name must be maximum 32 character")
+    .regex(NAME_REGEX, "The last name can contain only letters without white spaces"),
   email: z
     .string({required_error: "The email address is required"})
     .email("Invalid email address"),
   password: z
     .string({required_error: "The password is required"})
-    .regex(passwordRegexp, {message: invalidPasswordMsg})
+    .regex(PASSWORD_REGEX, {message: INVALID_PASSWORD_MSG})
     .min(6, "The password must contain at least 6 characters"),
   passwordConfirm: z
     .string({required_error: "The password is required"})
-    .regex(passwordRegexp, {message: invalidPasswordMsg})
+    .regex(PASSWORD_REGEX, {message: INVALID_PASSWORD_MSG})
     .min(6, "The password must contain at least 6 characters")
 })
 .refine((data) => data.password === data.passwordConfirm, {
@@ -44,15 +52,33 @@ const SignupPage = () => {
   };
 
   return (
-    <section className="flex flex-col justify-center items-center w-full h-screen py-3">
+    <section className="flex flex-col justify-start items-center w-full h-screen py-3">
       <FormProvider {...methods}>
         <form
-          className="flex flex-col justify-between gap-5 w-[450px] p-5 rounded bg-white shadow-lg"
+          className="flex flex-col justify-between gap-5 w-[450px] mt-5 p-5 rounded bg-white shadow-lg"
           onSubmit={methods.handleSubmit(onSubmitHandler)}
         >
           <h1 className="text-center text-lg font-bold">
             Signup to GeoCall App
           </h1>
+
+          <Input
+            id="firstName"
+            type="text"
+            name="firstName"
+            placeholder="Your first name"
+            disabled={isLoading}
+            Icon={AiOutlineUser}
+          />
+
+          <Input
+            id="lastName"
+            type="text"
+            name="lastName"
+            placeholder="Your last name"
+            disabled={isLoading}
+            Icon={AiOutlineUser}
+          />
 
           <Input
             id="email"

@@ -2,10 +2,11 @@ import {useState, ElementType } from "react";
 import { useFormContext } from "react-hook-form";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { RiErrorWarningFill } from "react-icons/ri";
+import { FormSchemaType } from "../../pages/SignupPage";
 
 interface Props {
   id: string;
-  name: "username" | "email" | "password" | "passwordConfirm";
+  name: keyof FormSchemaType;
   type: "text" | "email" | "password" | "number";
   placeholder: string;
   disabled: boolean;

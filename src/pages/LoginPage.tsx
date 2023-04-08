@@ -6,9 +6,7 @@ import { z } from "zod";
 import { AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
 import Input from "../components/AuthFormInputs/Input";
-
-const passwordRegexp = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_])(?!.*[\s\n]).{6,50}/;
-const invalidPasswordMsg = "The password must be at least 6 characters and must contain at least one uppercase, one lowercase, one number and one special character";
+import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
 
 const FormSchema = z.object({
   email: z
@@ -16,7 +14,7 @@ const FormSchema = z.object({
     .email("Invalid email address"),
   password: z
     .string({required_error: "The password is required"})
-    .regex(passwordRegexp, {message: invalidPasswordMsg})
+    .regex(PASSWORD_REGEX, {message: INVALID_PASSWORD_MSG})
     .min(6, "The password must contain at least 6 characters")
 });
 
