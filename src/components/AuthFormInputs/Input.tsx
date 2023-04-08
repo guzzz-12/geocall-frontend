@@ -1,5 +1,6 @@
 import {useState, ElementType } from "react";
 import { useFormContext } from "react-hook-form";
+import { motion, AnimatePresence } from "framer-motion";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { RiErrorWarningFill } from "react-icons/ri";
 import { FormSchemaType } from "../../pages/SignupPage";
@@ -55,16 +56,32 @@ const Input = ({id, name, type, placeholder, disabled, Icon}: Props) => {
               )}
             </>
           }
-          {isInvalid && (
-            <RiErrorWarningFill className="w-6 h-6 text-sm text-red-700" />
-          )}
+          <AnimatePresence>
+            {isInvalid && (
+              <motion.div
+                className="origin-center"
+                initial={{scale: 0, opacity: 0, rotateZ: 180}}
+                animate={{scale: 1, opacity: 1, rotateZ: 0}}
+                exit={{scale: 0, opacity: 0, rotateZ: 180}}
+              >
+                <RiErrorWarningFill
+                  className="w-6 h-6 text-sm text-red-700"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-
+      
       {isInvalid &&
-        <p className="-mt-3 text-xs font-bold text-red-700">
+        <motion.p
+          className="-mt-3 text-xs font-bold text-red-700"
+          initial={{translateY: -10, opacity: 0}}
+          animate={{translateY: 0, opacity: 1}}
+          exit={{translateY: -10, opacity: 0}}
+        >
           {`${errors[name]?.message}`}
-        </p>
+        </motion.p>
       }
     </>
   )
