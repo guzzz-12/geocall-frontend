@@ -1,11 +1,15 @@
 import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import axios from "axios";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import MapPage from "./pages/MapPage";
 import store from "./redux/store";
 import "./index.css";
+
+axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.withCredentials = true;
 
 const App = () => {
   return (
