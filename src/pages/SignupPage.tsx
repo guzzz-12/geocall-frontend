@@ -5,8 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AiOutlineUser, AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
+import axios, { AxiosError } from "axios";
+
 import Input from "../components/AuthFormInputs/Input";
-import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
+import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from "../utils/consts";
+import Alert from "../components/AuthFormInputs/Alert";
 
 const FormSchema = z.object({
   firstName: z
@@ -19,6 +22,11 @@ const FormSchema = z.object({
     .min(3, "The last name must be at least 3 characters")
     .max(32, "The last name must be maximum 32 character")
     .regex(NAME_REGEX, "The last name can contain only letters without white spaces"),
+  username: z
+    .string()
+    .min(3, "The username must be at least 3 characters")
+    .max(32, "The username must be maximum 32 character")
+    .regex(USERNAME_REGEX, "The username must start with a letter and can contain only alphanumeric characters, underscores (_) and hyphens (-)"),
   email: z
     .string({required_error: "The email address is required"})
     .email("Invalid email address"),
@@ -39,19 +47,41 @@ export type FormSchemaType = z.infer<typeof FormSchema>;
 
 const SignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [signupError, setSignupError] = useState<string | null>(null);
   const methods = useForm<FormSchemaType>({resolver: zodResolver(FormSchema)});
 
-  const onSubmitHandler = (values: FormSchemaType) => {
+  const onSubmitHandler = async (values: FormSchemaType) => {
     setIsLoading(true);
-    setTimeout(() => {
-      console.log(values);
-      setIsLoading(false);
+    setSignupError(null);
+
+    try {
+      const res = await axios({
+        method: "POST",
+        url: "/api/auth/signup",
+        data: values,
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      console.log(res.data.data);
       methods.reset();
-    }, 2500);
+
+    } catch (error: any) {
+      let msg = error.message;
+
+      if (error instanceof AxiosError) {
+        msg = error.response?.data.message;
+      };
+
+      setSignupError(msg);
+    } finally {
+      setIsLoading(false);
+    };
   };
 
   return (
-    <section className="flex flex-col justify-start items-center w-full h-screen py-3">
+    <section className="flex flex-col justify-start items-center w-full min-h-screen py-5">
       <FormProvider {...methods}>
         <form
           className="flex flex-col justify-between gap-5 w-[450px] mt-5 p-5 rounded bg-white shadow-lg"
@@ -61,6 +91,8 @@ const SignupPage = () => {
           <h1 className="text-center text-lg font-bold">
             Signup to GeoCall App
           </h1>
+
+          {signupError && <Alert type="error" message={signupError} />}
 
           <Input
             id="firstName"
@@ -76,6 +108,15 @@ const SignupPage = () => {
             type="text"
             name="lastName"
             placeholder="Your last name"
+            disabled={isLoading}
+            Icon={AiOutlineUser}
+          />
+
+          <Input
+            id="username"
+            type="text"
+            name="username"
+            placeholder="Your username"
             disabled={isLoading}
             Icon={AiOutlineUser}
           />

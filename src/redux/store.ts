@@ -1,8 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { mapReducer } from "./features/mapSlice";
+import { MapState, mapReducer } from "./features/mapSlice";
 
-export interface MapState {
-  map: MapState
+export interface MapRootState {
+  map: MapState;
 };
 
 const store = configureStore({
