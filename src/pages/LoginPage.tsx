@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,6 +8,8 @@ import { AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
 import Input from "../components/AuthFormInputs/Input";
 import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
+import { setMyLocation } from "../redux/features/mapSlice";
+import { getFakeLocation } from "../utils/dummyLocations";
 
 const FormSchema = z.object({
   email: z
@@ -21,9 +24,37 @@ const FormSchema = z.object({
 export type FormSchemaType = z.infer<typeof FormSchema>;
 
 const LoginPage = () => {
+  const dispatch = useDispatch();
+
   const [isLoading, setIsLoading] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   const methods = useForm<FormSchemaType>({resolver: zodResolver(FormSchema)});
+
+  useEffect(() => {
+    if ("navigator" in window) {
+      navigator.geolocation.getCurrentPosition(
+        (_position: GeolocationPosition) => {
+          //! Usar la posición real sólo en producción
+          // const {latitude, longitude} = position.coords;
+          // dispatch(setMyLocation({lat: latitude, lon: longitude}));
+  
+          const fakeLocation = getFakeLocation();
+          dispatch(setMyLocation(fakeLocation));
+        },
+        (err:GeolocationPositionError) => {
+          setLocationError(err.message)
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    } else {
+      setLocationError("This device is not compatible with the geolocation functionality")
+    }
+  }, []);
 
   const onSubmitHandler = (values: FormSchemaType) => {
     setIsLoading(true);

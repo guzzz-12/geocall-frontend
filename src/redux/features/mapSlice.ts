@@ -1,12 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+export interface UserLocation {
+  lat: number;
+  lon: number;
+}
+
 interface LocationAction {
   type: string;
-  payload: [number, number];
+  payload: UserLocation;
 };
 
 export interface MapState {
-  myLocation: [number, number] | null;
+  myLocation: UserLocation | null;
   onlineUsers: any[];
   cardChosenOption: any;
 };
