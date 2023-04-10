@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { MapState, mapReducer } from "./features/mapSlice";
+import { api } from "./api";
 
 export interface MapRootState {
   map: MapState;
@@ -7,8 +8,10 @@ export interface MapRootState {
 
 const store = configureStore({
   reducer: {
-    map: mapReducer
-  }
+    map: mapReducer,
+    [api.reducerPath]: api.reducer
+  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware)
 });
 
 export default store;
