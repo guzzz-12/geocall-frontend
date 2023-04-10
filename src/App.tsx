@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import MapPage from "./pages/MapPage";
+import ReconnectUser from "./components/ReconnectUser";
 import store from "./redux/store";
 import "./index.css";
 
@@ -15,6 +16,7 @@ const App = () => {
   return (
     <Provider store={store}>
       <main className="min-h-screen bg-slate-100">
+        <ReconnectUser />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />}  />
