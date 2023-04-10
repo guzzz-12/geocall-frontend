@@ -6,11 +6,11 @@ import { z } from "zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { AiOutlineUser, AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
-import axios, { AxiosError } from "axios";
 
 import Input from "../components/AuthFormInputs/Input";
 import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from "../utils/consts";
 import Alert from "../components/Alert";
+import { useSignupUserMutation } from "../redux/api";
 
 const FormSchema = z.object({
   firstName: z
@@ -44,42 +44,30 @@ const FormSchema = z.object({
   path: ["passwordConfirm"]
 });
 
-export type FormSchemaType = z.infer<typeof FormSchema>;
+export type SignupFormSchemaType = z.infer<typeof FormSchema>;
 
 const SignupPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [signupError, setSignupError] = useState<string | null>(null);
-  const methods = useForm<FormSchemaType>({resolver: zodResolver(FormSchema)});
 
-  const onSubmitHandler = async (values: FormSchemaType) => {
-    setIsLoading(true);
+  const methods = useForm<SignupFormSchemaType>({resolver: zodResolver(FormSchema)});
+
+  const [signupUser, {isLoading}] = useSignupUserMutation();
+
+
+  /*----------------------------------*/
+  // Procesar el registro del usuario
+  /*----------------------------------*/
+  const onSubmitHandler = async (values: SignupFormSchemaType) => {
     setSignupError(null);
-
-    try {
-      const res = await axios({
-        method: "POST",
-        url: "/api/auth/signup",
-        data: values,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-
-      console.log(res.data.data);
-      methods.reset();
-
-    } catch (error: any) {
-      let msg = error.message;
-
-      if (error instanceof AxiosError) {
-        msg = error.response?.data.message;
-      };
-
+    
+    signupUser(values)
+    .unwrap()
+    .catch((error) => {
+      const msg = typeof error === "string" ? error : "Something went wrong, try again later";
       setSignupError(msg);
-    } finally {
-      setIsLoading(false);
-    };
+    });
   };
+  
 
   return (
     <section className="flex flex-col justify-start items-center w-full min-h-screen py-10">

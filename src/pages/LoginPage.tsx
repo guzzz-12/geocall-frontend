@@ -5,7 +5,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AnimatePresence, motion } from "framer-motion";
-import axios, { AxiosError } from "axios";
 import { AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
 
@@ -16,6 +15,7 @@ import { setMyLocation } from "../redux/features/mapSlice";
 import { getFakeLocation } from "../utils/dummyLocations";
 import { MapRootState } from "../redux/store";
 import { connectWithSocketServer } from "../socket/socketConnection";
+import { useLoginUserMutation } from "../redux/api";
 
 const FormSchema = z.object({
   email: z
@@ -29,19 +29,22 @@ const FormSchema = z.object({
     .regex(PASSWORD_REGEX, {message: INVALID_PASSWORD_MSG})
 });
 
-export type FormSchemaType = z.infer<typeof FormSchema>;
+export type LoginFormSchemaType = z.infer<typeof FormSchema>;
 
 const LoginPage = () => {
   const dispatch = useDispatch();
   const {myLocation} = useSelector((state: MapRootState) => state.map);
-
-  const [isLoading, setIsLoading] = useState(false);
+  
   const [locationError, setLocationError] = useState<string | null>(null);
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  const methods = useForm<FormSchemaType>({resolver: zodResolver(FormSchema)});
+  const [userLogin, {isLoading}] = useLoginUserMutation();
+  const methods = useForm<LoginFormSchemaType>({resolver: zodResolver(FormSchema)});
 
+  
+  /*-------------------------------------*/
   // Determinar la ubicación del usuario
+  /*-------------------------------------*/
   useEffect(() => {
     if ("navigator" in window) {
       navigator.geolocation.getCurrentPosition(
@@ -67,43 +70,32 @@ const LoginPage = () => {
     }
   }, []);
 
+
+  /*------------------------------------------------*/
   // Inicializar conexión con el servidor de socket
+  // luego de determinar la ubicación del usuario
+  /*------------------------------------------------*/
   useEffect(() => {
     if (myLocation) {
       connectWithSocketServer();
     };
   }, [myLocation]);
 
-  const onSubmitHandler = async (values: FormSchemaType) => {
-    setIsLoading(true);
+
+  /*------------------------------*/
+  // Procesar el inicio de sesión
+  /*------------------------------*/
+  const onSubmitHandler = async (values: LoginFormSchemaType) => {
     setLoginError(null);
 
-    try {
-      const res = await axios({
-        method: "POST",
-        url: "/api/auth/login",
-        data: values,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-
-      console.log(res.data);
-      methods.reset();
-      
-    } catch (error: any) {
-      let msg = error.message;
-
-      if (error instanceof AxiosError) {
-        msg = error.response?.data.message;
-      };
-
+    userLogin(values)
+    .unwrap()
+    .catch((error: unknown) => {
+      const msg = typeof error === "string" ? error : "Something went wrong, try again later";
       setLoginError(msg);
-
-    } finally {
-      setIsLoading(false);
-    }
+    })
   };
+
 
   return (
     <section className="flex flex-col justify-start items-center w-full h-screen py-10">
