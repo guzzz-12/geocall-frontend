@@ -4,7 +4,7 @@ import { RiErrorWarningFill } from "react-icons/ri";
 interface Props {
   type: "success" | "error";
   message: string;
-  dismissAlert: () => void;
+  dismissAlert?: () => void;
 };
 
 const Alert = ({type, message, dismissAlert}: Props) => {
@@ -17,10 +17,12 @@ const Alert = ({type, message, dismissAlert}: Props) => {
       <span className="text-sm">
         {message}
       </span>
-      <AiOutlineClose
-        className="w-[30px] h-[30px] ml-auto p-2 cursor-pointer"
-        onClick={dismissAlert}
-      />
+      {dismissAlert && (
+        <AiOutlineClose
+          className="w-[30px] h-[30px] ml-auto p-2 cursor-pointer"
+          onClick={dismissAlert}
+        />
+      )}
     </div>
   )
 };
