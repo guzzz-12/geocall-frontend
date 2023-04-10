@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useDispatch } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import { AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
@@ -12,7 +13,8 @@ import Alert from "../components/Alert";
 import useGetUserLocation from "../hooks/useGetUserLocation";
 import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
 import { useLoginUserMutation } from "../redux/api";
-import { connectWithSocketServer } from "../socket/socketConnection";
+import { socketClient } from "../socket/socketClient";
+import { setMyLocation } from "../redux/features/mapSlice";
 
 const FormSchema = z.object({
   email: z
@@ -28,7 +30,8 @@ const FormSchema = z.object({
 
 export type LoginFormSchemaType = z.infer<typeof FormSchema>;
 
-const LoginPage = () => {  
+const LoginPage = () => { 
+  const dispatch = useDispatch();
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const [userLogin, {isLoading}] = useLoginUserMutation();
@@ -47,7 +50,7 @@ const LoginPage = () => {
   /*------------------------------------------------*/
   useEffect(() => {
     if (myLocation) {
-      connectWithSocketServer();
+      dispatch(setMyLocation(myLocation))
     };
   }, [myLocation]);
 
@@ -58,12 +61,20 @@ const LoginPage = () => {
   const onSubmitHandler = async (values: LoginFormSchemaType) => {
     setLoginError(null);
 
-    userLogin(values)
-    .unwrap()
-    .catch((error: unknown) => {
-      const msg = typeof error === "string" ? error : "Something went wrong, try again later";
-      setLoginError(msg);
-    })
+    if (!myLocation) {
+      return setLoginError("You need to grant us to get your location");
+    };
+
+    try {
+      const data = await userLogin(values).unwrap();
+      const {_id} = data.user;
+
+      const location = {lat: myLocation.lat, lon: myLocation.lon};
+      socketClient.userLogin(_id, location);
+
+    } catch (error: any) {
+      setLoginError(error.message);
+    };
   };
 
 

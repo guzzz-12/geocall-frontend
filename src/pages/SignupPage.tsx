@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useDispatch } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import { AiOutlineUser, AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
@@ -12,7 +13,8 @@ import Alert from "../components/Alert";
 import useGetUserLocation from "../hooks/useGetUserLocation";
 import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from "../utils/consts";
 import { useSignupUserMutation } from "../redux/api";
-import { connectWithSocketServer } from "../socket/socketConnection";
+import { setMyLocation } from "../redux/features/mapSlice";
+import { socketClient } from "../socket/socketClient";
 
 const FormSchema = z.object({
   firstName: z
@@ -49,6 +51,7 @@ const FormSchema = z.object({
 export type SignupFormSchemaType = z.infer<typeof FormSchema>;
 
 const SignupPage = () => {
+  const dispatch = useDispatch();
   const [signupError, setSignupError] = useState<string | null>(null);
 
   const methods = useForm<SignupFormSchemaType>({resolver: zodResolver(FormSchema)});
@@ -60,7 +63,6 @@ const SignupPage = () => {
   // Determinar la ubicación del usuario
   /*-------------------------------------*/
   const {myLocation} = useGetUserLocation();
-  
 
   /*------------------------------------------------*/
   // Inicializar conexión con el servidor de socket
@@ -68,7 +70,7 @@ const SignupPage = () => {
   /*------------------------------------------------*/
   useEffect(() => {
     if (myLocation) {
-      connectWithSocketServer();
+      dispatch(setMyLocation(myLocation))
     };
   }, [myLocation]);
 
@@ -78,13 +80,21 @@ const SignupPage = () => {
   /*----------------------------------*/
   const onSubmitHandler = async (values: SignupFormSchemaType) => {
     setSignupError(null);
+
+    if (!myLocation) {
+      return setSignupError("You need to grant us to get your location");
+    }
     
-    signupUser(values)
-    .unwrap()
-    .catch((error) => {
-      const msg = typeof error === "string" ? error : "Something went wrong, try again later";
-      setSignupError(msg);
-    });
+    try {
+      const data = await signupUser(values).unwrap();
+      const {_id} = data.user;
+
+      const location = {lat: myLocation.lat, lon: myLocation.lon};
+      socketClient.userLogin(_id, location);
+
+    } catch (error: any) {
+      setSignupError(error.message);
+    };
   };
 
 
