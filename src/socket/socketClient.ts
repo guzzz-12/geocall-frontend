@@ -15,7 +15,7 @@ class SocketClient {
     this.socketInstance = io("http://localhost:5000");
   };
 
-  userConnected(userId: string) {
+  userReconnected(userId: string) {
     this.socketInstance.emit(SocketEvents.USER_RECONNECTED, {userId})
   };
 

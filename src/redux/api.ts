@@ -24,7 +24,7 @@ export const api = createApi({
   endpoints: (build) => {
     return {
       getUser: build.query<User, void>({
-        query: () => "/users/me",
+        query: () => "/auth/me",
         providesTags: ["User"]
       }),
       loginUser: build.mutation<AuthResponse, LoginFormSchemaType>({

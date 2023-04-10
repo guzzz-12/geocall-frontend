@@ -1,13 +1,10 @@
 import {useState, useEffect} from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setMyLocation } from "../redux/features/mapSlice";
 import { getFakeLocation } from "../utils/dummyLocations";
-import { MapRootState } from "../redux/store";
 
 const useGetUserLocation = () => {
   const dispatch = useDispatch();
-  const {myLocation} = useSelector((state: MapRootState) => state.map);
-
   const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,7 +32,7 @@ const useGetUserLocation = () => {
     }
   }, []);
 
-  return {myLocation, locationError, setLocationError}
+  return {locationError, setLocationError}
 };
 
 export default useGetUserLocation;

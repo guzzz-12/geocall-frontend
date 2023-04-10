@@ -1,20 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom"
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import { AiOutlineUser, AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
 
 import Input from "../components/AuthFormInputs/Input";
 import Alert from "../components/Alert";
-import useGetUserLocation from "../hooks/useGetUserLocation";
 import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from "../utils/consts";
 import { useSignupUserMutation } from "../redux/api";
-import { setMyLocation } from "../redux/features/mapSlice";
 import { socketClient } from "../socket/socketClient";
+import { MapRootState } from "../redux/store";
 
 const FormSchema = z.object({
   firstName: z
@@ -51,28 +50,13 @@ const FormSchema = z.object({
 export type SignupFormSchemaType = z.infer<typeof FormSchema>;
 
 const SignupPage = () => {
-  const dispatch = useDispatch();
+  const {myLocation} = useSelector((state: MapRootState) => state.map);
+
   const [signupError, setSignupError] = useState<string | null>(null);
 
   const methods = useForm<SignupFormSchemaType>({resolver: zodResolver(FormSchema)});
 
   const [signupUser, {isLoading}] = useSignupUserMutation();
-
-
-  /*-------------------------------------*/
-  // Determinar la ubicación del usuario
-  /*-------------------------------------*/
-  const {myLocation} = useGetUserLocation();
-
-  /*------------------------------------------------*/
-  // Inicializar conexión con el servidor de socket
-  // luego de determinar la ubicación del usuario
-  /*------------------------------------------------*/
-  useEffect(() => {
-    if (myLocation) {
-      dispatch(setMyLocation(myLocation))
-    };
-  }, [myLocation]);
 
 
   /*----------------------------------*/
@@ -87,8 +71,8 @@ const SignupPage = () => {
     
     try {
       const data = await signupUser(values).unwrap();
-      const {_id} = data.user;
 
+      const {_id} = data.user;
       const location = {lat: myLocation.lat, lon: myLocation.lon};
       socketClient.userLogin(_id, location);
 
