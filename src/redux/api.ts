@@ -12,7 +12,7 @@ export interface User {
   createdAt: Date
 };
 
-interface AuthResponse {
+export interface AuthResponse {
   user: User;
   token: string;
 };
@@ -37,7 +37,8 @@ export const api = createApi({
           }
         }),
         transformErrorResponse: (response) => {
-          return (response.data as {message: string}).message
+          const message = (response.data as {message: string}).message;
+          return {message};
         },
         invalidatesTags: ["User"]
       }),
@@ -51,7 +52,8 @@ export const api = createApi({
           }
         }),
         transformErrorResponse: (response) => {
-          return (response.data as {message: string}).message
+          const message = (response.data as {message: string}).message;
+          return {message};
         },
         invalidatesTags: ["User"]
       }),
