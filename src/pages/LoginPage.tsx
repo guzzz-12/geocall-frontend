@@ -4,12 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { AnimatePresence, motion } from "framer-motion";
 import axios, { AxiosError } from "axios";
 import { AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
 
 import Input from "../components/AuthFormInputs/Input";
-import Alert from "../components/AuthFormInputs/Alert";
+import Alert from "../components/Alert";
 import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
 import { setMyLocation } from "../redux/features/mapSlice";
 import { getFakeLocation } from "../utils/dummyLocations";
@@ -105,7 +106,7 @@ const LoginPage = () => {
   };
 
   return (
-    <section className="flex flex-col justify-center items-center w-full h-screen py-3">
+    <section className="flex flex-col justify-start items-center w-full h-screen py-10">
       <FormProvider {...methods}>
         <form
           className="flex flex-col justify-between gap-5 w-[450px] p-5 rounded bg-white shadow-lg"
@@ -116,7 +117,25 @@ const LoginPage = () => {
             Log in to GeoCall App
           </h1>
 
-          {loginError && <Alert type="error" message={loginError}/>}
+          <AnimatePresence>
+            {loginError && (
+              <motion.div
+                key="alert"
+                className="-z-1"
+                initial={{height: 0, opacity: 0}}
+                animate={{height: "auto", opacity: 1}}
+                exit={{height: 0, opacity: 0}}
+                transition={{duration: 0.3}}
+              >
+                <Alert
+                  key="alert"
+                  type="error"
+                  message={loginError}
+                  dismissAlert={() => setLoginError(null)}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Email input */}
           <Input
@@ -127,7 +146,6 @@ const LoginPage = () => {
             disabled={isLoading}
             Icon={AiOutlineMail}
           />
-
           {/* Password input */}
           <Input
             id="password"
@@ -137,7 +155,6 @@ const LoginPage = () => {
             disabled={isLoading}
             Icon={HiOutlineKey}
           />
-
           <button
             className="auth-btn mt-3 text-black bg-white hover:bg-slate-300 disabled:bg-gray-300 disabled:text-gray-500"
             type="submit"

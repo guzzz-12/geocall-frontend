@@ -3,13 +3,14 @@ import { Link } from "react-router-dom"
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { AnimatePresence, motion } from "framer-motion";
 import { AiOutlineUser, AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
 import axios, { AxiosError } from "axios";
 
 import Input from "../components/AuthFormInputs/Input";
 import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from "../utils/consts";
-import Alert from "../components/AuthFormInputs/Alert";
+import Alert from "../components/Alert";
 
 const FormSchema = z.object({
   firstName: z
@@ -81,10 +82,10 @@ const SignupPage = () => {
   };
 
   return (
-    <section className="flex flex-col justify-start items-center w-full min-h-screen py-5">
+    <section className="flex flex-col justify-start items-center w-full min-h-screen py-10">
       <FormProvider {...methods}>
         <form
-          className="flex flex-col justify-between gap-5 w-[450px] mt-5 p-5 rounded bg-white shadow-lg"
+          className="flex flex-col justify-between gap-5 w-[450px] p-5 rounded bg-white shadow-lg"
           noValidate
           onSubmit={methods.handleSubmit(onSubmitHandler)}
         >
@@ -92,7 +93,25 @@ const SignupPage = () => {
             Signup to GeoCall App
           </h1>
 
-          {signupError && <Alert type="error" message={signupError} />}
+          <AnimatePresence>
+            {signupError && (
+              <motion.div
+                key="alert"
+                className="-z-1"
+                initial={{height: 0, opacity: 0}}
+                animate={{height: "auto", opacity: 1}}
+                exit={{height: 0, opacity: 0}}
+                transition={{duration: 0.3}}
+              >
+              <Alert
+                key="alert"
+                type="error"
+                message={signupError}
+                dismissAlert={() => setSignupError(null)}
+              />
+            </motion.div>
+            )}
+          </AnimatePresence>
 
           <Input
             id="firstName"

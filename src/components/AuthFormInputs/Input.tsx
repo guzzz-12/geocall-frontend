@@ -1,6 +1,6 @@
 import {useState, useEffect, ElementType } from "react";
 import { useFormContext } from "react-hook-form";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { AiOutlineEye, AiOutlineEyeInvisible, AiFillCheckCircle } from "react-icons/ai";
 import { RiErrorWarningFill } from "react-icons/ri";
 import { FormSchemaType } from "../../pages/SignupPage";
@@ -102,16 +102,19 @@ const Input = ({id, name, type, placeholder, disabled, Icon}: Props) => {
       </div>
       
       {/* Mensaje de error de validación */}
-      {isInvalid &&
-        <motion.p
-          className="-mt-3 text-xs font-bold text-red-700"
-          initial={{translateY: -10, opacity: 0}}
-          animate={{translateY: 0, opacity: 1}}
-          exit={{translateY: -10, opacity: 0}}
-        >
-          {`${errors[name]?.message}`}
-        </motion.p>
-      }
+      <AnimatePresence>
+        {isInvalid &&
+          <motion.p
+            key="validationErrorMessage"
+            className="-mt-3 text-xs font-bold text-red-700"
+            initial={{height: 0, opacity: 0}}
+            animate={{height: "auto", opacity: 1}}
+            exit={{height: 0, opacity: 0}}
+          >
+            {`${errors[name]?.message}`}
+          </motion.p>
+        }
+      </AnimatePresence>
     </>
   )
 };
