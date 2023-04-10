@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom"
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,9 +8,11 @@ import { AiOutlineUser, AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
 
 import Input from "../components/AuthFormInputs/Input";
-import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from "../utils/consts";
 import Alert from "../components/Alert";
+import useGetUserLocation from "../hooks/useGetUserLocation";
+import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from "../utils/consts";
 import { useSignupUserMutation } from "../redux/api";
+import { connectWithSocketServer } from "../socket/socketConnection";
 
 const FormSchema = z.object({
   firstName: z
@@ -54,6 +56,23 @@ const SignupPage = () => {
   const [signupUser, {isLoading}] = useSignupUserMutation();
 
 
+  /*-------------------------------------*/
+  // Determinar la ubicación del usuario
+  /*-------------------------------------*/
+  const {myLocation} = useGetUserLocation();
+  
+
+  /*------------------------------------------------*/
+  // Inicializar conexión con el servidor de socket
+  // luego de determinar la ubicación del usuario
+  /*------------------------------------------------*/
+  useEffect(() => {
+    if (myLocation) {
+      connectWithSocketServer();
+    };
+  }, [myLocation]);
+
+
   /*----------------------------------*/
   // Procesar el registro del usuario
   /*----------------------------------*/
@@ -67,7 +86,7 @@ const SignupPage = () => {
       setSignupError(msg);
     });
   };
-  
+
 
   return (
     <section className="flex flex-col justify-start items-center w-full min-h-screen py-10">

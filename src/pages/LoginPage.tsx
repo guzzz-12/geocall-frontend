@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,12 +9,10 @@ import { HiOutlineKey } from "react-icons/hi";
 
 import Input from "../components/AuthFormInputs/Input";
 import Alert from "../components/Alert";
+import useGetUserLocation from "../hooks/useGetUserLocation";
 import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
-import { setMyLocation } from "../redux/features/mapSlice";
-import { getFakeLocation } from "../utils/dummyLocations";
-import { MapRootState } from "../redux/store";
-import { connectWithSocketServer } from "../socket/socketConnection";
 import { useLoginUserMutation } from "../redux/api";
+import { connectWithSocketServer } from "../socket/socketConnection";
 
 const FormSchema = z.object({
   email: z
@@ -31,44 +28,17 @@ const FormSchema = z.object({
 
 export type LoginFormSchemaType = z.infer<typeof FormSchema>;
 
-const LoginPage = () => {
-  const dispatch = useDispatch();
-  const {myLocation} = useSelector((state: MapRootState) => state.map);
-  
-  const [locationError, setLocationError] = useState<string | null>(null);
+const LoginPage = () => {  
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const [userLogin, {isLoading}] = useLoginUserMutation();
   const methods = useForm<LoginFormSchemaType>({resolver: zodResolver(FormSchema)});
 
-  
+
   /*-------------------------------------*/
   // Determinar la ubicación del usuario
   /*-------------------------------------*/
-  useEffect(() => {
-    if ("navigator" in window) {
-      navigator.geolocation.getCurrentPosition(
-        (_position: GeolocationPosition) => {
-          //! Usar la posición real sólo en producción
-          // const {latitude, longitude} = position.coords;
-          // dispatch(setMyLocation({lat: latitude, lon: longitude}));
-  
-          const fakeLocation = getFakeLocation();
-          dispatch(setMyLocation(fakeLocation));
-        },
-        (err:GeolocationPositionError) => {
-          setLocationError(err.message)
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    } else {
-      setLocationError("This device is not compatible with the geolocation functionality")
-    }
-  }, []);
+  const {myLocation} = useGetUserLocation();
 
 
   /*------------------------------------------------*/
