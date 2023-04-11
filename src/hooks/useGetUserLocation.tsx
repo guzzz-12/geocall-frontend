@@ -8,15 +8,15 @@ const useGetUserLocation = () => {
   const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
+    const fakeLocation = getFakeLocation();
+    dispatch(setMyLocation(fakeLocation));
+    
+    //! Usar la posición real sólo en producción
     if ("navigator" in window) {
       navigator.geolocation.getCurrentPosition(
         (_position: GeolocationPosition) => {
-          //! Usar la posición real sólo en producción
           // const {latitude, longitude} = position.coords;
           // dispatch(setMyLocation({lat: latitude, lon: longitude}));
-  
-          const fakeLocation = getFakeLocation();
-          dispatch(setMyLocation(fakeLocation));
         },
         (err:GeolocationPositionError) => {
           setLocationError(err.message)

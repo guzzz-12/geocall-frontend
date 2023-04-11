@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useGetUserLocation from "../hooks/useGetUserLocation";
 import { socketClient, SocketEvents } from "../socket/socketClient";
-import { useGetUserQuery } from "../redux/api";
+import { useGetCurrentUserQuery } from "../redux/api";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
 import { MapRootState } from "../redux/store";
 import { setCurrentUser } from "../redux/features/userSlice";
@@ -17,7 +17,7 @@ const ReconnectUser = () => {
   const dispatch = useDispatch();
   const {myLocation} = useSelector((state: MapRootState) => state.map);
 
-  const {data: userData} = useGetUserQuery();
+  const {data: userData} = useGetCurrentUserQuery();
 
   // Obtener la ubicación del usuario
   useGetUserLocation();

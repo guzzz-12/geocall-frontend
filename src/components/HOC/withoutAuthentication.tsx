@@ -1,7 +1,7 @@
 import { ComponentType } from "react";
 import { Navigate } from "react-router-dom";
 import Spinner from "../Spinner";
-import { useGetUserQuery } from "../../redux/api";
+import { useGetCurrentUserQuery } from "../../redux/api";
 
 /**
  * HOC para no permitir acceder las rutas que NO requieran autenticación
@@ -9,7 +9,7 @@ import { useGetUserQuery } from "../../redux/api";
  */
 const withoutAuthentication = (Component: ComponentType) => {
   return () => {
-    const {data, isLoading} = useGetUserQuery();
+    const {data, isLoading} = useGetCurrentUserQuery();
 
     if(isLoading) {
       return (
