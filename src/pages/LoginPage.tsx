@@ -13,7 +13,6 @@ import Alert from "../components/Alert";
 import withoutAuthentication from "../components/HOC/withoutAuthentication";
 import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
 import { useLoginUserMutation } from "../redux/api";
-import { socketClient } from "../socket/socketClient";
 import { MapRootState } from "../redux/store";
 
 const FormSchema = z.object({
@@ -36,7 +35,7 @@ const LoginPage = () => {
 
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  const [userLogin, {isLoading}] = useLoginUserMutation();
+  const [loginUser, {isLoading}] = useLoginUserMutation();
   const methods = useForm<LoginFormSchemaType>({resolver: zodResolver(FormSchema)});
 
   /*------------------------------*/
@@ -50,17 +49,11 @@ const LoginPage = () => {
     };
 
     try {
-      const data = await userLogin(values).unwrap();
-
-      const {_id} = data.user;
-      const location = {lat: myLocation.lat, lon: myLocation.lon};
-      socketClient.userLogin(_id, location);
-
-      navigate("/", {replace: true});
-
-    } catch (error: any) {
+      await loginUser(values).unwrap();
+      navigate("/map", {replace: true});
+    } catch(error: any) {
       setLoginError(error.message);
-    };
+    }
   };
 
 

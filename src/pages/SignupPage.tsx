@@ -13,7 +13,6 @@ import Alert from "../components/Alert";
 import withoutAuthentication from "../components/HOC/withoutAuthentication";
 import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from "../utils/consts";
 import { useSignupUserMutation } from "../redux/api";
-import { socketClient } from "../socket/socketClient";
 import { MapRootState } from "../redux/store";
 
 const FormSchema = z.object({
@@ -72,13 +71,8 @@ const SignupPage = () => {
     }
     
     try {
-      const data = await signupUser(values).unwrap();
-
-      const {_id} = data.user;
-      const location = {lat: myLocation.lat, lon: myLocation.lon};
-      socketClient.userLogin(_id, location);
-
-      navigate("/", {replace: true});
+      await signupUser(values).unwrap();
+      navigate("/map", {replace: true});
 
     } catch (error: any) {
       setSignupError(error.message);
