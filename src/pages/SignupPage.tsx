@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,6 +10,7 @@ import { HiOutlineKey } from "react-icons/hi";
 
 import Input from "../components/AuthFormInputs/Input";
 import Alert from "../components/Alert";
+import withoutAuthentication from "../components/HOC/withoutAuthentication";
 import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from "../utils/consts";
 import { useSignupUserMutation } from "../redux/api";
 import { socketClient } from "../socket/socketClient";
@@ -50,6 +51,7 @@ const FormSchema = z.object({
 export type SignupFormSchemaType = z.infer<typeof FormSchema>;
 
 const SignupPage = () => {
+  const navigate = useNavigate();
   const {myLocation} = useSelector((state: MapRootState) => state.map);
 
   const [signupError, setSignupError] = useState<string | null>(null);
@@ -75,6 +77,8 @@ const SignupPage = () => {
       const {_id} = data.user;
       const location = {lat: myLocation.lat, lon: myLocation.lon};
       socketClient.userLogin(_id, location);
+
+      navigate("/", {replace: true});
 
     } catch (error: any) {
       setSignupError(error.message);
@@ -197,4 +201,4 @@ const SignupPage = () => {
   )
 };
 
-export default SignupPage;
+export default withoutAuthentication(SignupPage);

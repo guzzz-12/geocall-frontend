@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,6 +10,7 @@ import { HiOutlineKey } from "react-icons/hi";
 
 import Input from "../components/AuthFormInputs/Input";
 import Alert from "../components/Alert";
+import withoutAuthentication from "../components/HOC/withoutAuthentication";
 import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
 import { useLoginUserMutation } from "../redux/api";
 import { socketClient } from "../socket/socketClient";
@@ -30,6 +31,7 @@ const FormSchema = z.object({
 export type LoginFormSchemaType = z.infer<typeof FormSchema>;
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const {myLocation} = useSelector((state: MapRootState) => state.map);
 
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -53,6 +55,8 @@ const LoginPage = () => {
       const {_id} = data.user;
       const location = {lat: myLocation.lat, lon: myLocation.lon};
       socketClient.userLogin(_id, location);
+
+      navigate("/", {replace: true});
 
     } catch (error: any) {
       setLoginError(error.message);
@@ -148,4 +152,4 @@ const LoginPage = () => {
   )
 };
 
-export default LoginPage;
+export default withoutAuthentication(LoginPage);
