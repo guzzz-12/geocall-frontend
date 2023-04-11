@@ -5,6 +5,7 @@ export enum SocketEvents {
   USER_RECONNECTED = "USER_RECONNECTED",
   USER_LOGIN = "USER_LOGIN",
   USER_LOGOUT = "USER_LOGOUT",
+  GET_ONLINE_USERS = "GET_ONLINE_USERS",
   DISCONNECT = "DISCONNECT"
 };
 
@@ -25,6 +26,10 @@ class SocketClient {
 
   userLogout(userId: string) {
     this.socketInstance.emit(SocketEvents.USER_LOGOUT, {userId})
+  };
+
+  get socket() {
+    return this.socketInstance
   };
 
   userDisconnected() {
