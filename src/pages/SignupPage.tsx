@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"
 import { useForm, FormProvider } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSelector } from "react-redux";
@@ -14,6 +15,7 @@ import withoutAuthentication from "../components/HOC/withoutAuthentication";
 import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from "../utils/consts";
 import { useSignupUserMutation } from "../redux/api";
 import { MapRootState } from "../redux/store";
+import { setCurrentUser } from "../redux/features/userSlice";
 
 const FormSchema = z.object({
   firstName: z
@@ -50,6 +52,7 @@ const FormSchema = z.object({
 export type SignupFormSchemaType = z.infer<typeof FormSchema>;
 
 const SignupPage = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const {myLocation} = useSelector((state: MapRootState) => state.map);
 
@@ -71,7 +74,10 @@ const SignupPage = () => {
     }
     
     try {
-      await signupUser(values).unwrap();
+      const data = await signupUser(values).unwrap();
+
+      dispatch(setCurrentUser(data));
+
       navigate("/map", {replace: true});
 
     } catch (error: any) {

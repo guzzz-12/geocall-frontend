@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSelector } from "react-redux";
@@ -14,6 +15,7 @@ import withoutAuthentication from "../components/HOC/withoutAuthentication";
 import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
 import { useLoginUserMutation } from "../redux/api";
 import { MapRootState } from "../redux/store";
+import { setCurrentUser } from "../redux/features/userSlice";
 
 const FormSchema = z.object({
   email: z
@@ -30,6 +32,7 @@ const FormSchema = z.object({
 export type LoginFormSchemaType = z.infer<typeof FormSchema>;
 
 const LoginPage = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const {myLocation} = useSelector((state: MapRootState) => state.map);
 
@@ -49,8 +52,12 @@ const LoginPage = () => {
     };
 
     try {
-      await loginUser(values).unwrap();
+      const data = await loginUser(values).unwrap();
+
+      dispatch(setCurrentUser(data));
+
       navigate("/map", {replace: true});
+      
     } catch(error: any) {
       setLoginError(error.message);
     }
