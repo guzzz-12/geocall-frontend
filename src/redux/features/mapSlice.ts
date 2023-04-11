@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { User } from "../api";
 
 export interface UserLocation {
   lat: number;
@@ -8,10 +9,7 @@ export interface UserLocation {
 export interface OnlineUser {
   socketId: string;
   userId: string;
-  location: {
-    lat: number;
-    lon: number;
-  }
+  location: UserLocation
 };
 
 interface LocationAction {
@@ -24,16 +22,22 @@ interface OnlineUsersAction {
   payload: OnlineUser[];
 };
 
+export interface SelectedUser {
+  user: User;
+  location: UserLocation,
+  distance: string;
+};
+
 export interface MapState {
   myLocation: UserLocation | null;
   onlineUsers: OnlineUser[];
-  cardChosenOption: any;
+  selectedUser: SelectedUser | null;
 };
 
 const initialState: MapState = {
   myLocation: null,
   onlineUsers: [],
-  cardChosenOption: null
+  selectedUser: null
 };
 
 const mapSlice = createSlice({
@@ -45,9 +49,12 @@ const mapSlice = createSlice({
     },
     setOnlineUsers: (state, action: OnlineUsersAction) => {
       state.onlineUsers = action.payload;
+    },
+    setSelectedUser: (state, action: {type: string, payload: SelectedUser}) => {
+      state.selectedUser = action.payload;
     }
   }
 });
 
-export const { setMyLocation, setOnlineUsers } = mapSlice.actions;
+export const { setMyLocation, setOnlineUsers, setSelectedUser } = mapSlice.actions;
 export const mapReducer = mapSlice.reducer;

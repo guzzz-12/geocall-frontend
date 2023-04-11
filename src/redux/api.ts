@@ -15,11 +15,11 @@ export interface User {
 export const api = createApi({
   baseQuery: fetchBaseQuery({baseUrl: "http://localhost:5000/api", credentials: "include"}),
   reducerPath: "userApi",
-  tagTypes: ["User"],
+  tagTypes: ["User", "SelectedUser"],
   endpoints: (build) => {
     return {
-      getUser: build.query<User, void>({
-        query: () => "/auth/me",
+      getCurrentUser: build.query<User, void>({
+        query: () => "/users/me",
         providesTags: ["User"],
         transformErrorResponse: (response) => {
           const message = (response.data as {message: string}).message;
@@ -28,7 +28,7 @@ export const api = createApi({
       }),
       loginUser: build.mutation<User, LoginFormSchemaType>({
         query: ({email, password}) => ({
-          url: "/auth/login",
+          url: "/users/login",
           method: "POST",
           body: {email, password},
           headers: {
@@ -43,7 +43,7 @@ export const api = createApi({
       }),
       signupUser: build.mutation<User, SignupFormSchemaType>({
         query: ({firstName, lastName, username, email, password}) => ({
-          url: "/auth/signup",
+          url: "/users/signup",
           method: "POST",
           body: {firstName, lastName, username, email, password},
           headers: {
@@ -56,8 +56,16 @@ export const api = createApi({
         },
         invalidatesTags: ["User"]
       }),
+      getUser: build.query<User, string>({
+        query: (userId) => `/users/user/${userId}`,
+        providesTags: ["SelectedUser"],
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
+      })
     };
   }
 });
 
-export const {useGetUserQuery, useLoginUserMutation, useSignupUserMutation} = api;
+export const {useGetCurrentUserQuery, useLoginUserMutation, useSignupUserMutation, useGetUserQuery} = api;
