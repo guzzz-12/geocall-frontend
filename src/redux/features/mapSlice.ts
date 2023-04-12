@@ -52,9 +52,13 @@ const mapSlice = createSlice({
     },
     setSelectedUser: (state, action: {type: string, payload: SelectedUser}) => {
       state.selectedUser = action.payload;
+    },
+    clearMapState: (state) => {
+      state.onlineUsers = [];
+      state.selectedUser = null;
     }
   }
 });
 
-export const { setMyLocation, setOnlineUsers, setSelectedUser } = mapSlice.actions;
+export const { setMyLocation, setOnlineUsers, setSelectedUser, clearMapState } = mapSlice.actions;
 export const mapReducer = mapSlice.reducer;
