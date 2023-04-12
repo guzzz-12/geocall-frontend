@@ -2,9 +2,10 @@ import { CgSpinner } from "react-icons/cg";
 
 interface Props {
   size: "small" | "medium" | "large";
+  spinnerInfo?: string;
 };
 
-const Spinner = ({size}: Props) => {
+const Spinner = ({size, spinnerInfo}: Props) => {
   let dimensions: {w: number, h: number} = {
     w: 0,
     h: 0
@@ -28,7 +29,12 @@ const Spinner = ({size}: Props) => {
   };
 
   return (
-    <div className="absolute top-0 left-0 flex flex-col justify-center items-center w-full h-full bg-white">
+    <div className="absolute top-0 left-0 flex flex-col justify-center items-center gap-1 w-full h-full bg-white">
+      {spinnerInfo && (
+        <p className="text-sm text-center font-normal text-gray-700">
+          {spinnerInfo}
+        </p>
+      )}
       <CgSpinner
         style={{width: dimensions.w, height: dimensions.h}}
         className="text-blue-500 animate-spin"
