@@ -4,7 +4,7 @@ import { SignupFormSchemaType } from "../pages/SignupPage";
 
 export interface User {
   _id: string;
-  name: string;
+  firstName: string;
   lastName: string;
   username: string;
   email: string;
@@ -56,6 +56,18 @@ export const api = createApi({
         },
         invalidatesTags: ["User"]
       }),
+      logoutUser: build.mutation<void, void>({
+        query: () => ({
+          url: "/users/logout",
+          method: "POST",
+          body: {}
+        }),
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        },
+        invalidatesTags: ["User"]
+      }),
       getUser: build.query<User, string>({
         query: (userId) => `/users/user/${userId}`,
         providesTags: ["SelectedUser"],
@@ -68,4 +80,10 @@ export const api = createApi({
   }
 });
 
-export const {useGetCurrentUserQuery, useLoginUserMutation, useSignupUserMutation, useGetUserQuery} = api;
+export const {
+  useGetCurrentUserQuery,
+  useLoginUserMutation,
+  useSignupUserMutation,
+  useLogoutUserMutation,
+  useGetUserQuery
+} = api;
