@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Map, { Marker, Popup, FullscreenControl, NavigationControl, GeolocateControl } from "react-map-gl";
 import { useSelector, useDispatch } from "react-redux";
 import { distance } from "@turf/turf";
+import Navbar from "../components/Navbar";
 import withAuthentication from "../components/HOC/withAuthentication";
 import { MapRootState, UserRootState } from "../redux/store";
 import { useGetUserQuery } from "../redux/api";
@@ -13,7 +14,7 @@ const MapPage = () => {
   const {onlineUsers, myLocation} = useSelector((state: MapRootState) => state.map);
   const {currentuser} = useSelector((state: UserRootState) => state.user);
 
-  const [showPopup, setShotPopup] = useState(true);
+  const [showPopup, setShotPopup] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState("");
 
   // Consultar la data del usuario seleccionado
@@ -47,7 +48,8 @@ const MapPage = () => {
   const mapboxToken = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
 
   return (
-    <div className="w-full h-screen">
+    <div className="relative w-full h-screen">
+      <Navbar />
       <Map
         style={{width: "100%", height: "100%"}}
         mapStyle="mapbox://styles/mapbox/dark-v11"
@@ -57,6 +59,7 @@ const MapPage = () => {
           longitude: myLocation.lon,
           zoom: 3
         }}
+        onLoad={() => setShotPopup(true)}
       >
         <FullscreenControl />
         <GeolocateControl positionOptions={{enableHighAccuracy: true}}/>
