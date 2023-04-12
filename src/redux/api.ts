@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { LoginFormSchemaType } from "../pages/LoginPage";
 import { SignupFormSchemaType } from "../pages/SignupPage";
+import { UserLocation } from "./features/mapSlice";
 
 export interface User {
   _id: string;
@@ -13,9 +14,12 @@ export interface User {
 };
 
 export const api = createApi({
-  baseQuery: fetchBaseQuery({baseUrl: "http://localhost:5000/api", credentials: "include"}),
+  baseQuery: fetchBaseQuery({
+    baseUrl: "http://localhost:5000/api",
+    credentials: "include"
+  }),
   reducerPath: "userApi",
-  tagTypes: ["User", "SelectedUser"],
+  tagTypes: ["User", "SelectedUser", "SelectedUserAddress"],
   endpoints: (build) => {
     return {
       getCurrentUser: build.query<User, void>({
@@ -68,8 +72,8 @@ export const api = createApi({
         },
         invalidatesTags: ["User"]
       }),
-      getUser: build.query<User, string>({
-        query: (userId) => `/users/user/${userId}`,
+      getUser: build.query<{user: User, address: string}, {userId: string, location: UserLocation}>({
+        query: ({userId, location: {lat, lon}}) => `/users/user/${userId}/${lat}/${lon}`,
         providesTags: ["SelectedUser"],
         transformErrorResponse: (response) => {
           const message = (response.data as {message: string}).message;

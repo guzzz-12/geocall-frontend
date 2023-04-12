@@ -24,7 +24,8 @@ interface OnlineUsersAction {
 
 export interface SelectedUser {
   user: User;
-  location: UserLocation,
+  address: string;
+  location: UserLocation;
   distance: string;
 };
 
