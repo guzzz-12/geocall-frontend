@@ -2,12 +2,12 @@ import { useState } from "react";
 import Map, { Marker, Popup, FullscreenControl, NavigationControl, GeolocateControl } from "react-map-gl";
 import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 import Navbar from "../components/Navbar";
 import SelectedUserCard from "../components/SelectedUserCard";
 import withAuthentication from "../components/HOC/withAuthentication";
 import { MapRootState, UserRootState } from "../redux/store";
-import "mapbox-gl/dist/mapbox-gl.css";
 import { setMyLocation } from "../redux/features/mapSlice";
 
 const MapPage = () => {
@@ -17,6 +17,7 @@ const MapPage = () => {
 
   const [showPopup, setShotPopup] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUserSocketId, setSelectedUserSocketId] = useState<string | null>(null);
 
   if (!myLocation || !currentuser) {
     return null;
@@ -29,7 +30,7 @@ const MapPage = () => {
       <Navbar />
 
       <AnimatePresence>
-        {selectedUserId && (
+        {selectedUserId && selectedUserSocketId && (
           <motion.aside
             key="selectedUserCard"
             className="absolute top-[50%] left-2 z-10"
@@ -39,6 +40,7 @@ const MapPage = () => {
           >
             <SelectedUserCard
               selectedUserId={selectedUserId}
+              selectedUserSocketId={selectedUserSocketId}
               myLocation={myLocation}
               setSelectedUserId={setSelectedUserId}
             />
@@ -96,7 +98,8 @@ const MapPage = () => {
                   return false;
                 };
 
-                setSelectedUserId(user.userId)
+                setSelectedUserId(user.userId);
+                setSelectedUserSocketId(user.socketId);
               }}
             />
           )

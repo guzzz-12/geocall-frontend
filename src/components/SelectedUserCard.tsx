@@ -18,11 +18,12 @@ import { IconType } from "react-icons/lib";
 
 interface Props {
   selectedUserId: string;
+  selectedUserSocketId: string;
   myLocation: UserLocation;
   setSelectedUserId: Dispatch<SetStateAction<string | null>>
 };
 
-const SelectedUserCard = ({selectedUserId, myLocation, setSelectedUserId}: Props) => {
+const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, setSelectedUserId}: Props) => {
   const dispatch = useDispatch();
   const {onlineUsers, selectedUser} = useSelector((state: MapRootState) => state.map);
   const [selectedUserLocation, setSelectedUserLocation] = useState<UserLocation | null>(null);
@@ -30,7 +31,7 @@ const SelectedUserCard = ({selectedUserId, myLocation, setSelectedUserId}: Props
   // Consultar la data del usuario seleccionado
   const {data, isLoading, isFetching} = useGetUserQuery(
     {userId: selectedUserId, location: selectedUserLocation!},
-    {skip: !selectedUserId || !selectedUserLocation}
+    {skip: !selectedUserId || !selectedUserSocketId || !selectedUserLocation}
   );
 
   // Buscar al usuario seleccionado en el state global
@@ -44,13 +45,14 @@ const SelectedUserCard = ({selectedUserId, myLocation, setSelectedUserId}: Props
   // Calcular la distancia del usuario seleccionado
   // y actualizar el state global del usuario seleccionado
   useEffect(() => {
-    if (selectedUserLocation && data) {
+    if (selectedUserLocation && data && selectedUserSocketId) {
       const from = [myLocation.lat, myLocation.lon];
       const to = [selectedUserLocation.lat, selectedUserLocation.lon];
       const userDistance = distance(from, to, {units: "kilometers"});
       
       const selectedUser: SelectedUser = {
         user: data.user,
+        socketId: selectedUserSocketId,
         location: selectedUserLocation,
         address: data.address,
         distance: `${(userDistance).toFixed(2)}km`,
@@ -58,7 +60,7 @@ const SelectedUserCard = ({selectedUserId, myLocation, setSelectedUserId}: Props
 
       dispatch(setSelectedUser(selectedUser));
     }
-  }, [selectedUserLocation, data, myLocation]);
+  }, [selectedUserLocation, data, selectedUserSocketId, myLocation]);
 
 
   const UserMetadata = ({Icon, text}: {Icon: IconType, text: string}) => {

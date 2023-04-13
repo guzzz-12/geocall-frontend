@@ -24,6 +24,7 @@ interface OnlineUsersAction {
 
 export interface SelectedUser {
   user: User;
+  socketId: string;
   address: string;
   location: UserLocation;
   distance: string;
