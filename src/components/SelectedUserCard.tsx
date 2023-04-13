@@ -77,7 +77,10 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
     <div className="w-[300px] min-h-[400px] max-h-[500px] translate-y-[-50%] rounded-md border border-gray-500 bg-slate-50 scrollbar-thumb-gray-600 scrollbar-thin overflow-y-auto overflow-x-hidden">
       <div
         className="absolute top-1 right-1 p-1 cursor-pointer"
-        onClick={() => setSelectedUserId(null)}
+        onClick={() => {
+          setSelectedUserId(null);
+          dispatch(setSelectedUser(null));
+        }}
       >
         <GrClose className="w-5 h-5 opacity-60" />
       </div>

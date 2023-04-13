@@ -52,7 +52,7 @@ const mapSlice = createSlice({
     setOnlineUsers: (state, action: OnlineUsersAction) => {
       state.onlineUsers = action.payload;
     },
-    setSelectedUser: (state, action: {type: string, payload: SelectedUser}) => {
+    setSelectedUser: (state, action: {type: string, payload: SelectedUser | null}) => {
       state.selectedUser = action.payload;
     },
     clearMapState: (state) => {
