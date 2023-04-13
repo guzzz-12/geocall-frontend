@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Map, { Marker, Popup, FullscreenControl, NavigationControl, GeolocateControl } from "react-map-gl";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 
 import Navbar from "../components/Navbar";
@@ -8,8 +8,10 @@ import SelectedUserCard from "../components/SelectedUserCard";
 import withAuthentication from "../components/HOC/withAuthentication";
 import { MapRootState, UserRootState } from "../redux/store";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { setMyLocation } from "../redux/features/mapSlice";
 
 const MapPage = () => {
+  const dispatch = useDispatch();
   const {onlineUsers, myLocation} = useSelector((state: MapRootState) => state.map);
   const {currentuser} = useSelector((state: UserRootState) => state.user);
 
@@ -56,7 +58,13 @@ const MapPage = () => {
         onLoad={() => setShotPopup(true)}
       >
         <FullscreenControl />
-        <GeolocateControl positionOptions={{enableHighAccuracy: true}}/>
+        <GeolocateControl
+          positionOptions={{enableHighAccuracy: true}}
+          onGeolocate={(geolocate) => {
+            const {latitude, longitude} = geolocate.coords;
+            dispatch(setMyLocation({lat: latitude, lon: longitude}));
+          }}
+        />
         <NavigationControl showCompass={true} />
 
         {showPopup && (

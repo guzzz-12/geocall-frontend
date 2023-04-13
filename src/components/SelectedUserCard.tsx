@@ -58,7 +58,7 @@ const SelectedUserCard = ({selectedUserId, myLocation, setSelectedUserId}: Props
 
       dispatch(setSelectedUser(selectedUser));
     }
-  }, [selectedUserLocation, data]);
+  }, [selectedUserLocation, data, myLocation]);
 
 
   const UserMetadata = ({Icon, text}: {Icon: IconType, text: string}) => {
