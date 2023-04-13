@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { distance } from "@turf/turf";
 import dayjs from "dayjs";
 import { GrClose } from "react-icons/gr";
-// import { MdOutlineVideoCall } from "react-icons/md";
+import { BsFillChatLeftTextFill } from "react-icons/bs";
 import { FiMail } from "react-icons/fi";
 import { HiAtSymbol } from "react-icons/hi";
 import { BsCalendar3 } from "react-icons/bs";
@@ -64,7 +64,7 @@ const SelectedUserCard = ({selectedUserId, myLocation, setSelectedUserId}: Props
   const UserMetadata = ({Icon, text}: {Icon: IconType, text: string}) => {
     return (
       <p className="flex justify-start items-center gap-3">
-        <Icon className="w-5 h-5 text-gray-500" />
+        <Icon className="w-5 h-5 shrink-0 text-gray-500" />
         {text}
       </p>
     )
@@ -72,12 +72,12 @@ const SelectedUserCard = ({selectedUserId, myLocation, setSelectedUserId}: Props
   
 
   return (
-    <div className="w-[350px] h-[500px] p-4 translate-y-[-50%] rounded-md border border-gray-500 bg-slate-50 scrollbar-thumb-gray-600 scrollbar-thin overflow-y-auto overflow-x-hidden">
+    <div className="w-[300px] min-h-[400px] max-h-[500px] translate-y-[-50%] rounded-md border border-gray-500 bg-slate-50 scrollbar-thumb-gray-600 scrollbar-thin overflow-y-auto overflow-x-hidden">
       <div
-        className="absolute top-1 right-2 p-1 cursor-pointer"
+        className="absolute top-1 right-1 p-1 cursor-pointer"
         onClick={() => setSelectedUserId(null)}
       >
-        <GrClose className="w-5 h-5 text-gray-700" />
+        <GrClose className="w-5 h-5 opacity-60" />
       </div>
 
       {(isLoading || isFetching) && (
@@ -88,25 +88,35 @@ const SelectedUserCard = ({selectedUserId, myLocation, setSelectedUserId}: Props
       )}
 
       {!isLoading && selectedUser && (
-        <div className="flex flex-col justify-start items-center gap-1 w-full max-w-full h-full p-1">
-          <div className="w-32 h-32 rounded-full border-4 border-blue-600 overflow-hidden">
-            <img
-              className="block w-full h-full object-contain object-center"
-              src={selectedUser.user.avatar}
-              alt={selectedUser.user.firstName}
-            />
+        <div className="flex flex-col justify-start items-center w-full max-w-full h-full">
+          <div className="flex justify-center items-center gap-4 w-full max-w-[100%] mb-4 p-4 bg-gradient-to-b from-transparent to-gray-300 shadow-sm">
+            {/* Avatar del usuario */}
+            <div className="w-32 h-32 shrink-0 rounded-full border-4 border-blue-600 overflow-hidden">
+              <img
+                className="block w-full h-full object-cover object-center"
+                src={selectedUser.user.avatar}
+                alt={selectedUser.user.firstName}
+              />
+            </div>
+
+            {/* Nombre y botón del chat */}
+            <div className="flex flex-col justify-center items-center grow-0 gap-2 w-[50%] max-w-[50%] overflow-hidden">
+              <p
+                className="max-w-[100%] font-semibold text-center text-2xl overflow-ellipsis whitespace-nowrap overflow-hidden text-gray-700"
+                title={`${selectedUser.user.firstName} ${selectedUser.user.lastName}`}
+              >
+                {selectedUser.user.firstName} {selectedUser.user.lastName}
+              </p>
+              <button className="flex justify-between items-center gap-2 px-3 py-1 rounded bg-blue-700 text-white hover:bg-blue-900 transition-colors">
+                <BsFillChatLeftTextFill />
+                <span className="text-base font-normal">
+                  Message
+                </span>
+              </button>
+            </div>
           </div>
 
-          <p
-            className="max-w-[100%] font-semibold text-center text-3xl overflow-ellipsis whitespace-nowrap overflow-hidden text-gray-700"
-            title={`${selectedUser.user.firstName} ${selectedUser.user.lastName}`}
-          >
-            {selectedUser.user.firstName} {selectedUser.user.lastName}
-          </p>
-
-          <div className="w-full h-[1px] my-2 bg-slate-200" />
-
-          <div className="flex flex-col justify-start items-start gap-4 text-base font-semibold">
+          <div className="flex flex-col justify-start items-start gap-3 px-4 pb-5 text-base font-semibold">
             <UserMetadata Icon={FiMail} text={selectedUser.user.email} />
             <UserMetadata Icon={HiAtSymbol} text={selectedUser.user.username} />
             <UserMetadata

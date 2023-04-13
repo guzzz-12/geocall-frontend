@@ -18,10 +18,10 @@ axios.defaults.withCredentials = true;
 
 const App = () => {
   return (
-    <Suspense fallback={<Spinner size="large" />}>
-      <Provider store={store}>
+    <Provider store={store}>
+      <ReconnectUser />
+      <Suspense fallback={<Spinner size="large" />}>
         <main className="min-h-screen bg-slate-100">
-          <ReconnectUser />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<HomePage />}  />
@@ -32,8 +32,8 @@ const App = () => {
             </Routes>
           </BrowserRouter>
         </main>
-      </Provider>
-    </Suspense>
+      </Suspense>
+    </Provider>
   )
 };
 
