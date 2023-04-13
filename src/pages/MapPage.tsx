@@ -1,45 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Map, { Marker, Popup, FullscreenControl, NavigationControl, GeolocateControl } from "react-map-gl";
-import { useSelector, useDispatch } from "react-redux";
-import { distance } from "@turf/turf";
+import { useSelector } from "react-redux";
+import { AnimatePresence, motion } from "framer-motion";
+
 import Navbar from "../components/Navbar";
+import SelectedUserCard from "../components/SelectedUserCard";
 import withAuthentication from "../components/HOC/withAuthentication";
 import { MapRootState, UserRootState } from "../redux/store";
-import { useGetUserQuery } from "../redux/api";
-import { SelectedUser, setSelectedUser } from "../redux/features/mapSlice";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const MapPage = () => {
-  const dispatch = useDispatch();
   const {onlineUsers, myLocation} = useSelector((state: MapRootState) => state.map);
   const {currentuser} = useSelector((state: UserRootState) => state.user);
 
   const [showPopup, setShotPopup] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState("");
-
-  // Consultar la data del usuario seleccionado
-  const {data: selectedUserData} = useGetUserQuery(selectedUserId, {skip: !Boolean(selectedUserId)});
-
-  // Calcular la distancia a la que se encuentra el usuarios seleccionado
-  // y actualizar el state global del usuario seleccionado
-  useEffect(() => {
-    if (selectedUserData && myLocation) {
-      const {location} = onlineUsers.find(user => user.userId === selectedUserId)!;
-
-      const from = [myLocation.lat, myLocation.lon];
-      const to = [location.lat, location.lon];
-      const userDistance = distance(from, to, {units: "kilometers"});
-
-      const selectedUser: SelectedUser = {
-        distance: `${(userDistance).toFixed(2)}km`,
-        location,
-        user: selectedUserData
-      };
-
-      dispatch(setSelectedUser(selectedUser));
-
-    }
-  }, [selectedUserId, selectedUserData, myLocation]);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   if (!myLocation || !currentuser) {
     return null;
@@ -48,8 +23,27 @@ const MapPage = () => {
   const mapboxToken = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
 
   return (
-    <div className="relative w-full h-screen">
+    <div className="relative w-full h-screen overflow-hidden">
       <Navbar />
+
+      <AnimatePresence>
+        {selectedUserId && (
+          <motion.aside
+            key="selectedUserCard"
+            className="absolute top-[50%] left-2 z-10"
+            initial={{translateY: -10, opacity: 0}}
+            animate={{translateY: 0, opacity: 1}}
+            exit={{translateY: 10, opacity: 0}}
+          >
+            <SelectedUserCard
+              selectedUserId={selectedUserId}
+              myLocation={myLocation}
+              setSelectedUserId={setSelectedUserId}
+            />
+          </motion.aside>
+        )}
+      </AnimatePresence>
+
       <Map
         style={{width: "100%", height: "100%"}}
         mapStyle="mapbox://styles/mapbox/dark-v11"
@@ -72,9 +66,9 @@ const MapPage = () => {
             longitude={myLocation.lon}
             anchor="bottom"
             offset={16}
-            closeButton={true}
             closeOnClick={false}
-            onClose={() => setShotPopup(false)}
+            // closeButton={true}
+            // onClose={() => setShotPopup(false)}
           >
             <p>You are here</p>
           </Popup>
@@ -84,12 +78,18 @@ const MapPage = () => {
           return (
             <Marker
               key={user.userId}
-              style={{cursor: "pointer"}}
+              style={{cursor: currentuser._id !== user.userId ? "pointer" : "default"}}
               latitude={user.location.lat}
               longitude={user.location.lon}
               anchor="top"
               color={user.userId === currentuser._id ? "#0ea5e9" : "#bae6fd"}
-              onClick={() => setSelectedUserId(user.userId)}
+              onClick={() => {
+                if (currentuser._id === user.userId) {
+                  return false;
+                };
+
+                setSelectedUserId(user.userId)
+              }}
             />
           )
         })}
