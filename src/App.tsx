@@ -5,6 +5,7 @@ import axios from "axios";
 
 import ReconnectUser from "./components/ReconnectUser";
 import Spinner from "./components/Spinner";
+import ChatWindow from "./components/ChatWindow";
 import store from "./redux/store";
 import "./index.css";
 
@@ -21,7 +22,7 @@ const App = () => {
     <Provider store={store}>
       <ReconnectUser />
       <Suspense fallback={<Spinner size="large" />}>
-        <main className="min-h-screen bg-slate-100">
+        <main className="relative min-h-screen bg-slate-100">
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<HomePage />}  />
@@ -31,6 +32,7 @@ const App = () => {
               <Route path="*" element={<h1>Page not found...</h1>} />
             </Routes>
           </BrowserRouter>
+          <ChatWindow />
         </main>
       </Suspense>
     </Provider>
