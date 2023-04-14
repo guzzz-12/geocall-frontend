@@ -6,10 +6,11 @@ import { useGetCurrentUserQuery } from "../redux/api";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
 import { MapRootState } from "../redux/store";
 import { setCurrentUser } from "../redux/features/userSlice";
+import { Message, incomingMessage } from "../redux/features/chatsSlice";
 
 /**
  * Reconectar el usuario al servidor de websocket,
- * escuchar los eventos de websocket
+ * escuchar los eventos de socket io
  * y volver a consultar la data y la ubicación
  * del usuario al actualizar la app.
  */
@@ -35,6 +36,10 @@ const ReconnectUser = () => {
       // para actualizar el state en tiempo real
       socketClient.socket.on(SocketEvents.GET_ONLINE_USERS, (users: OnlineUser[]) => {
         dispatch(setOnlineUsers(users));
+      });
+
+      socketClient.socket.on(SocketEvents.NEW_MESSAGE, (newMessage: Message) => {
+        dispatch(incomingMessage({message: newMessage}));
       });
     };
   }, [userData, myLocation]);
