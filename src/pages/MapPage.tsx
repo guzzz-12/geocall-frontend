@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Map, { Marker, Popup, FullscreenControl, NavigationControl, GeolocateControl } from "react-map-gl";
 import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
@@ -9,6 +9,8 @@ import SelectedUserCard from "../components/SelectedUserCard";
 import withAuthentication from "../components/HOC/withAuthentication";
 import { MapRootState, UserRootState } from "../redux/store";
 import { setMyLocation } from "../redux/features/mapSlice";
+import { Message } from "../redux/features/chatsSlice";
+import { SocketEvents, socketClient } from "../socket/socketClient";
 
 const MapPage = () => {
   const dispatch = useDispatch();
@@ -18,6 +20,20 @@ const MapPage = () => {
   const [showPopup, setShotPopup] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedUserSocketId, setSelectedUserSocketId] = useState<string | null>(null);
+
+  // Actualizar el state local para abrir la ventata del chat al recibir un mensaje
+  // si no hay una ventana de chat abierta.
+  useEffect(() => {
+    socketClient.socket.on(SocketEvents.NEW_MESSAGE, (msg: Message) => {
+      const {senderId, senderSocketId} = msg;
+
+      if (!selectedUserId && !selectedUserSocketId) {
+        setSelectedUserId(senderId);
+        setSelectedUserSocketId(senderSocketId);
+      }
+
+    })
+  }, []);
 
   if (!myLocation || !currentuser) {
     return null;

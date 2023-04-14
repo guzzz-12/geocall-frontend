@@ -38,6 +38,8 @@ const ReconnectUser = () => {
         dispatch(setOnlineUsers(users));
       });
 
+      // Escuchar el evento de nuevo mensaje entrante
+      // y actualizar el state de los mensajes del chat correspondiente
       socketClient.socket.on(SocketEvents.NEW_MESSAGE, (newMessage: Message) => {
         dispatch(incomingMessage({message: newMessage}));
       });

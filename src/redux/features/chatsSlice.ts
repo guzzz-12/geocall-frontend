@@ -6,6 +6,7 @@ export interface Message {
   senderId: string;
   recipientId: string;
   content: string;
+  senderSocketId: string;
   createdAt: string;
 };
 
