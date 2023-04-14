@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { distance } from "@turf/turf";
 import dayjs from "dayjs";
+import { v4 } from "uuid";
 import { GrClose } from "react-icons/gr";
 import { BsFillChatLeftTextFill } from "react-icons/bs";
 import { FiMail } from "react-icons/fi";
@@ -10,11 +11,12 @@ import { BsCalendar3 } from "react-icons/bs";
 import { GoLocation } from "react-icons/go";
 import { FaAddressCard } from "react-icons/fa";
 import { GiPathDistance } from "react-icons/gi";
+import { IconType } from "react-icons/lib";
 import Spinner from "./Spinner";
 import { SelectedUser, UserLocation, setSelectedUser } from "../redux/features/mapSlice";
 import { useGetUserQuery } from "../redux/api";
-import { MapRootState } from "../redux/store";
-import { IconType } from "react-icons/lib";
+import { MapRootState, UserRootState } from "../redux/store";
+import { createOrSelectChat, Chat } from "../redux/features/chatsSlice";
 
 interface Props {
   selectedUserId: string;
@@ -25,6 +27,7 @@ interface Props {
 
 const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, setSelectedUserId}: Props) => {
   const dispatch = useDispatch();
+  const {currentuser} = useSelector((state: UserRootState) => state.user);
   const {onlineUsers, selectedUser} = useSelector((state: MapRootState) => state.map);
   const [selectedUserLocation, setSelectedUserLocation] = useState<UserLocation | null>(null);
 
@@ -61,6 +64,22 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
       dispatch(setSelectedUser(selectedUser));
     }
   }, [selectedUserLocation, data, selectedUserSocketId, myLocation]);
+
+
+  /**
+   * Crear el chat si no existe o abrirlo si ya existe
+   */
+  const onClickHandler = () => {
+    const chat: Chat = {
+      chatId: v4(),
+      senderId: currentuser!._id,
+      recipientId: selectedUserId,
+      messages: [],
+      createdAt: new Date().toISOString()
+    };
+
+    dispatch(createOrSelectChat(chat));
+  };
 
 
   const UserMetadata = ({Icon, text}: {Icon: IconType, text: string}) => {
@@ -112,7 +131,10 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
               >
                 {selectedUser.user.firstName} {selectedUser.user.lastName}
               </p>
-              <button className="flex justify-between items-center gap-2 px-3 py-1 rounded bg-blue-700 text-white hover:bg-blue-900 transition-colors">
+              <button
+                className="flex justify-between items-center gap-2 px-3 py-1 rounded bg-blue-700 text-white hover:bg-blue-900 transition-colors"
+                onClick={onClickHandler}
+              >
                 <BsFillChatLeftTextFill />
                 <span className="text-base font-normal">
                   Message
