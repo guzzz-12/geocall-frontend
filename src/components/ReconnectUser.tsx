@@ -7,6 +7,7 @@ import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
 import { MapRootState } from "../redux/store";
 import { setCurrentUser } from "../redux/features/userSlice";
 import { Message, incomingMessage } from "../redux/features/chatsSlice";
+import { Notification, setNotifications } from "../redux/features/notificationsSlice";
 
 /**
  * Reconectar el usuario al servidor de websocket,
@@ -16,7 +17,7 @@ import { Message, incomingMessage } from "../redux/features/chatsSlice";
  */
 const ReconnectUser = () => {  
   const dispatch = useDispatch();
-  const {myLocation} = useSelector((state: MapRootState) => state.map);
+  const {myLocation, selectedUser} = useSelector((state: MapRootState) => state.map);
 
   const {data: userData} = useGetCurrentUserQuery();
 
@@ -42,6 +43,18 @@ const ReconnectUser = () => {
       // y actualizar el state de los mensajes del chat correspondiente
       socketClient.socket.on(SocketEvents.NEW_MESSAGE, (newMessage: Message) => {
         dispatch(incomingMessage({message: newMessage}));
+      });
+
+      // Escuchar el evento de nueva notificación
+      // y actualizar el state sólo si el remitente
+      // no es el mismo usuario atenticado
+      socketClient.socket.on(SocketEvents.NEW_NOTIFICATION, (notification: Notification) => {
+        if (
+          notification.notificationType === "incomingMessage" &&
+          notification.senderId !== userData._id
+        ) {
+          dispatch(setNotifications(notification))
+        }
       });
     };
   }, [userData, myLocation]);

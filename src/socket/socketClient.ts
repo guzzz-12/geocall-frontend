@@ -1,6 +1,7 @@
 import { Socket, io } from "socket.io-client";
 import { UserLocation } from "../redux/features/mapSlice";
 import { Message } from "../redux/features/chatsSlice";
+import { Notification } from "../redux/features/notificationsSlice";
 
 export enum SocketEvents {
   USER_RECONNECTED = "USER_RECONNECTED",
@@ -9,6 +10,7 @@ export enum SocketEvents {
   GET_ONLINE_USERS = "GET_ONLINE_USERS",
   NEW_MESSAGE = "NEW_MESSAGE",
   DELETED_MESSAGE = "DELETED_MESSAGE",
+  NEW_NOTIFICATION = "NEW_NOTIFICATION",
   DISCONNECT = "DISCONNECT"
 };
 
@@ -33,6 +35,10 @@ class SocketClient {
 
   newMessage(message: Message) {
     this.socketInstance.emit(SocketEvents.NEW_MESSAGE, message)
+  };
+
+  newNotification(notification: Notification) {
+    this.socketInstance.emit(SocketEvents.NEW_NOTIFICATION, notification)
   };
 
   get socket() {
