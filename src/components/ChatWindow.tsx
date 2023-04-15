@@ -7,6 +7,7 @@ import MessageItem from "./MessageItem";
 import { ChatsRootState, MapRootState, UserRootState } from "../redux/store";
 import { Message, closeChat, createMessage } from "../redux/features/chatsSlice";
 import { socketClient } from "../socket/socketClient";
+import { Notification } from "../redux/features/notificationsSlice";
 
 const ChatWindow = () => {
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
@@ -42,7 +43,24 @@ const ChatWindow = () => {
       createdAt: new Date().toISOString()
     };
 
+    const notification: Notification = {
+      notificationId: v4(),
+      notificationType: "incomingMessage",
+      receiverId: selectedUser!.user._id,
+      receiverSockerId: selectedUser!.socketId,
+      senderId: currentUser!._id,
+      senderData: {
+        firstName: selectedUser!.user.firstName,
+        lastName: selectedUser!.user.lastName,
+        avatar: selectedUser!.user.avatar,
+      },
+      senderSocketId: selectedUser!.socketId,
+      unread: true
+    };
+
     socketClient.newMessage(msg);
+    socketClient.newNotification(notification);
+
     dispatch(createMessage({chatId: selectedChat!.chatId, message: msg}));
     setMessageText("");
   };
@@ -54,7 +72,7 @@ const ChatWindow = () => {
 
   return (
     <div className="absolute right-2 bottom-0 flex flex-col w-[330px] h-[450px] rounded-t-lg bg-slate-100 overflow-hidden z-10">
-      <div className="flex justify-between items-stretch w-full px-3 py-2 flex-shrink-0 border-b border-gray-400">
+      <div className="flex justify-between items-stretch w-full px-3 py-2 flex-shrink-0 border-b border-gray-400 bg-gray-300">
         <div className="flex justify-start items-center gap-2">
           <div className="w-8 h-8 rounded-full border-2 border-gray-500 overflow-hidden">
             <img
