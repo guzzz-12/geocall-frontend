@@ -108,7 +108,7 @@ const MapPage = () => {
               latitude={user.location.lat}
               longitude={user.location.lon}
               anchor="top"
-              color={user.userId === currentuser._id ? "#0ea5e9" : "#bae6fd"}
+              color={user.userId === currentuser._id ? "#ef4444" : "#bae6fd"}
               onClick={() => {
                 if (currentuser._id === user.userId) {
                   return false;

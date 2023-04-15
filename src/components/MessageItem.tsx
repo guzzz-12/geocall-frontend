@@ -18,7 +18,7 @@ const MessageItem = ({message, sender, currentUser}: Props) => {
       className="w-[max-content] max-w-[85%]"
     >
       <p
-        style={{backgroundColor: isSender ? "#bae6fd" : "#e2e8f0"}}
+        style={{backgroundColor: isSender ? "#bae6fd" : "#d1d5db"}}
         className="w-full px-4 py-2 text-left text-base leading-normal rounded-lg shadow-md"
       >
         {message.content}
