@@ -6,7 +6,9 @@ import axios from "axios";
 import ReconnectUser from "./components/ReconnectUser";
 import Spinner from "./components/Spinner";
 import ChatWindow from "./components/ChatWindow";
+import VideoCallModal from "./components/VideoCallModal";
 import store from "./redux/store";
+import "react-tooltip/dist/react-tooltip.css";
 import "./index.css";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -23,6 +25,7 @@ const App = () => {
       <ReconnectUser />
       <Suspense fallback={<Spinner size="large" />}>
         <main className="relative min-h-screen bg-slate-100">
+          <VideoCallModal />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<HomePage />}  />
