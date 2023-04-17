@@ -4,7 +4,8 @@ import { distance } from "@turf/turf";
 import dayjs from "dayjs";
 import { v4 } from "uuid";
 import { GrClose } from "react-icons/gr";
-import { BsFillChatLeftTextFill } from "react-icons/bs";
+import { AiOutlineWechat } from "react-icons/ai";
+import { MdVideocam } from "react-icons/md";
 import { FiMail } from "react-icons/fi";
 import { HiAtSymbol } from "react-icons/hi";
 import { BsCalendar3 } from "react-icons/bs";
@@ -12,11 +13,15 @@ import { GoLocation } from "react-icons/go";
 import { FaAddressCard } from "react-icons/fa";
 import { GiPathDistance } from "react-icons/gi";
 import { IconType } from "react-icons/lib";
+
+import IconButton from "./IconButton";
 import Spinner from "./Spinner";
 import { SelectedUser, UserLocation, setSelectedUser } from "../redux/features/mapSlice";
 import { useGetUserQuery } from "../redux/api";
-import { MapRootState, UserRootState } from "../redux/store";
+import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
 import { createOrSelectChat, Chat } from "../redux/features/chatsSlice";
+import { setRemoteStream, setVideoCall } from "../redux/features/videoCallSlice";
+import peerClient from "../utils/peerClient";
 
 interface Props {
   selectedUserId: string;
@@ -29,7 +34,10 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
   const dispatch = useDispatch();
   const {currentuser} = useSelector((state: UserRootState) => state.user);
   const {onlineUsers, selectedUser} = useSelector((state: MapRootState) => state.map);
+  const {localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
+
   const [selectedUserLocation, setSelectedUserLocation] = useState<UserLocation | null>(null);
+  const [selectedUserPeerId, setSelectedUserPeerId] = useState("");
 
   // Consultar la data del usuario seleccionado
   const {data, isLoading, isFetching} = useGetUserQuery(
@@ -38,10 +46,12 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
   );
 
   // Buscar al usuario seleccionado en el state global
+  // y extraer su ubicación y su peer id
   useEffect(() => {
     if (selectedUserId) {
-      const {location} = onlineUsers.find(user => user.userId === selectedUserId)!;
-      setSelectedUserLocation(location);     
+      const {location, peerId} = onlineUsers.find(user => user.userId === selectedUserId)!;
+      setSelectedUserLocation(location);
+      setSelectedUserPeerId(peerId);
     }
   }, [selectedUserId]);
 
@@ -56,6 +66,7 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
       const selectedUser: SelectedUser = {
         user: data.user,
         socketId: selectedUserSocketId,
+        peerId: selectedUserPeerId,
         location: selectedUserLocation,
         address: data.address,
         distance: `${(userDistance).toFixed(2)}km`,
@@ -69,7 +80,7 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
   /**
    * Crear el chat si no existe o abrirlo si ya existe
    */
-  const onClickHandler = () => {
+  const onChatClickHandler = () => {
     const chat: Chat = {
       chatId: v4(),
       senderId: currentuser!._id,
@@ -79,6 +90,37 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
     };
 
     dispatch(createOrSelectChat(chat));
+  };
+
+
+  /**
+   * Iniciar una videollamada con el usuario seleccionado
+   */
+  const onVideoCallClickHandler = () => {
+    if (!localStream || !selectedUser) {
+      return false;
+    };
+
+    dispatch(setVideoCall(true));
+
+    const recipientPeerId = selectedUser.peerId;
+
+    try {
+      const call = peerClient.getInstance.call(recipientPeerId, localStream);
+  
+      call.on("error", (err) => {
+        console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`)
+      });
+  
+      call.on("stream", (remoteStream) => {
+        console.log(`Videocall with ${selectedUser.user.firstName} initialized`);
+        dispatch(setRemoteStream(remoteStream));
+      });
+      
+    } catch (err: any) {
+      console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`);
+      dispatch(setVideoCall(false));
+    }
   };
 
 
@@ -123,7 +165,7 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
               />
             </div>
 
-            {/* Nombre y botón del chat */}
+            {/* Nombre y botones de mensaje y llamada */}
             <div className="flex flex-col justify-center items-center grow-0 gap-2 w-[50%] max-w-[50%] overflow-hidden">
               <p
                 className="max-w-[100%] font-semibold text-center text-2xl overflow-ellipsis whitespace-nowrap overflow-hidden text-gray-700"
@@ -131,15 +173,24 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
               >
                 {selectedUser.user.firstName} {selectedUser.user.lastName}
               </p>
-              <button
-                className="flex justify-between items-center gap-2 px-3 py-1 rounded bg-blue-700 text-white hover:bg-blue-900 transition-colors"
-                onClick={onClickHandler}
-              >
-                <BsFillChatLeftTextFill />
-                <span className="text-base font-normal">
-                  Message
-                </span>
-              </button>
+              <div className="flex justify-between items-center gap-1">
+                <IconButton
+                  Icon={AiOutlineWechat}
+                  tooltipText={`Chat with ${selectedUser.user.firstName}`}
+                  disabled={false}
+                  onClickHandler={onChatClickHandler}
+                />
+                <IconButton
+                  Icon={MdVideocam}
+                  tooltipText={
+                    !localStream ? `Connect your camera to start a videocall with ${selectedUser.user.firstName}`
+                    :
+                    "Start videocall"
+                  }
+                  disabled={!localStream}
+                  onClickHandler={onVideoCallClickHandler}
+                />
+              </div>
             </div>
           </div>
 
