@@ -26,6 +26,7 @@ const ReconnectUser = () => {
   // Obtener la ubicación del usuario
   useGetUserLocation();
 
+  // Reinicializar la conexión con el servidor de Peer
   const {peerId} = usePeerConnection();
 
   useEffect(() => {
