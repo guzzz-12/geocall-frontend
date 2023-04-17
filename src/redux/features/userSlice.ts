@@ -4,11 +4,15 @@ import { User } from "../api";
 export interface UserState {
   currentuser: User | null;
   isAuth: boolean;
+  peerId: string | null;
+  hasMediaDevice: boolean;
 };
 
 const initialState: UserState = {
   currentuser: null,
-  isAuth: false
+  isAuth: false,
+  peerId: null,
+  hasMediaDevice: false
 };
 
 const userSlice = createSlice({
@@ -22,9 +26,21 @@ const userSlice = createSlice({
     removeCurrentUser: (state) => {
       state.isAuth = false;
       state.currentuser = null;
+    },
+    setPeerId: (state, action: {type: string, payload: string | null}) => {
+      state.peerId = action.payload;
+    },
+    setHasMediaDevice: (state, action: {type: string, payload: boolean}) => {
+      state.hasMediaDevice = action.payload;
     }
   }
 });
 
 export const userReducer = userSlice.reducer;
-export const {setCurrentUser, removeCurrentUser} = userSlice.actions;
+
+export const {
+  setCurrentUser,
+  removeCurrentUser,
+  setPeerId,
+  setHasMediaDevice
+} = userSlice.actions;

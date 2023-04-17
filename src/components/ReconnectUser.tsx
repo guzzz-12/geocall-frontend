@@ -1,37 +1,54 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useGetUserLocation from "../hooks/useGetUserLocation";
+import usePeerConnection from "../hooks/usePeerConnection";
 import { socketClient, SocketEvents } from "../socket/socketClient";
 import { useGetCurrentUserQuery } from "../redux/api";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
 import { MapRootState } from "../redux/store";
-import { setCurrentUser } from "../redux/features/userSlice";
+import { setCurrentUser, setHasMediaDevice, setPeerId } from "../redux/features/userSlice";
 import { Message, incomingMessage } from "../redux/features/chatsSlice";
 import { Notification, setNotifications } from "../redux/features/notificationsSlice";
 
 /**
- * Reconectar el usuario al servidor de websocket,
- * escuchar los eventos de socket io
- * y volver a consultar la data y la ubicación
- * del usuario al actualizar la app.
+ * Reconectar el usuario al servidor de socket io,
+ * escuchar los eventos de socket io,
+ * volver a consultar la data y la ubicación del usuario,
+ * verificar si el dispositivo tiene cámara,
+ * almacenar el id del peer en el state global.
  */
 const ReconnectUser = () => {  
   const dispatch = useDispatch();
-  const {myLocation, selectedUser} = useSelector((state: MapRootState) => state.map);
+  const {myLocation} = useSelector((state: MapRootState) => state.map);
 
   const {data: userData} = useGetCurrentUserQuery();
 
   // Obtener la ubicación del usuario
   useGetUserLocation();
 
+  const {peerId} = usePeerConnection();
+
   useEffect(() => {
-    if (userData && myLocation) {
+    if (userData && myLocation && peerId) {
       dispatch(setCurrentUser(userData));
+      dispatch(setPeerId(peerId));
+
+      navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      })
+      .then(() => {
+        dispatch(setHasMediaDevice(true));
+      })
+      .catch((err: any) => {
+        console.log(err);
+        dispatch(setHasMediaDevice(false));
+      });
 
       // Agregar/actualizar el usuario en la lista de
       // los usuarios online del servidor de socket
       // al autenticarse o actualizar la página
-      socketClient.userReconnected(userData._id, myLocation); 
+      socketClient.userReconnected(userData._id, myLocation, peerId); 
 
       // Escuchar evento de usuarios online
       // para actualizar el state en tiempo real
@@ -57,7 +74,7 @@ const ReconnectUser = () => {
         }
       });
     };
-  }, [userData, myLocation]);
+  }, [userData, myLocation, peerId]);
 
   return null;
 };

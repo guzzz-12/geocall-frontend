@@ -9,6 +9,7 @@ export interface UserLocation {
 export interface OnlineUser {
   socketId: string;
   userId: string;
+  peerId: string;
   location: UserLocation
 };
 
@@ -25,6 +26,7 @@ interface OnlineUsersAction {
 export interface SelectedUser {
   user: User;
   socketId: string;
+  peerId: string;
   address: string;
   location: UserLocation;
   distance: string;
