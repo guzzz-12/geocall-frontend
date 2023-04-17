@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { TfiWorld } from "react-icons/tfi";
 import { MdNotificationsNone, MdNotificationsActive } from "react-icons/md";
+import { Tooltip } from "react-tooltip";
+
 import NotificationsList from "./NotificationsList";
 import { NotificationsRootState, UserRootState } from "../redux/store";
 import { api, useLogoutUserMutation } from "../redux/api";
@@ -49,6 +51,7 @@ const Navbar = () => {
 
   return (
     <nav className="absolute top-2 left-[50%] mx-2 -translate-x-[50%] flex justify-between items-center w-[95%] max-w-[600px] px-3 py-2 rounded border border-gray-500 bg-slate-50 z-[2]">
+      <Tooltip id="notifications-tooltip" />
       <div className="flex justify-between items-center gap-2">
         <TfiWorld className="w-9 h-9 text-gray-400" />
         <h1 className="text-lg font-bold uppercase text-gray-600">
@@ -75,6 +78,8 @@ const Navbar = () => {
 
         <div
           className="relative flex justify-center items-center w-10 p-1 rounded-full border border-gray-500 cursor-pointer"
+          data-tooltip-id="notifications-tooltip"
+          data-tooltip-content="Notifications"
           onClick={onClickNotificationsHandler}
         >
           {unread.length === 0 && (
