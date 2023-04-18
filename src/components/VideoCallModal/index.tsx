@@ -1,8 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Tooltip } from "react-tooltip";
 import { GrClose } from "react-icons/gr";
-import { BsCameraVideoOff, BsFillMicMuteFill } from "react-icons/bs";
+import { BsCameraVideoOff } from "react-icons/bs";
+import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import { HiPhoneMissedCall } from "react-icons/hi";
 import IconButton from "../IconButton";
 import { MapRootState, VideoCallRootState } from "../../redux/store";
@@ -16,6 +17,8 @@ const VideoCallModal = () => {
   const {videoCall, activeCallWith} = useSelector((state: VideoCallRootState) => state.videoCall);
   const {selectedUser} = useSelector((state: MapRootState) => state.map);
   const {localStream, remoteStream} = useSelector((state: VideoCallRootState) => state.videoCall);
+
+  const [isLocalStreamMuted, setIsLocalStreamMuted] = useState(false);
   
   // Inicializar los videos de los participantes de la videollamada
   useEffect(() => {
@@ -36,6 +39,21 @@ const VideoCallModal = () => {
 
   if (!videoCall) {
     return null;
+  };
+
+
+  // Mutear/desmutear el audio de la transmisión de salida
+  const toggleMuteStreamHandler = () => {
+    if (!localStream) {
+      return false;
+    };
+
+    const audioTrack = localStream.getAudioTracks()[0];
+
+    setIsLocalStreamMuted((prev) => {
+      audioTrack.enabled = !prev;
+      return !prev;
+    });
   };
 
 
@@ -71,10 +89,10 @@ const VideoCallModal = () => {
               </p>
               <div className="flex justify-stretch items-center gap-1 min-w-[200px]">
                 <IconButton
-                  Icon={BsFillMicMuteFill}
+                  Icon={!isLocalStreamMuted ? FaMicrophone : FaMicrophoneSlash}
                   disabled={false}
-                  tooltipText="Mute"
-                  onClickHandler={() => {}}
+                  tooltipText={isLocalStreamMuted ? "Enable audio" : "Disable audio"}
+                  onClickHandler={toggleMuteStreamHandler}
                 />
                 <IconButton
                   Icon={HiPhoneMissedCall}
