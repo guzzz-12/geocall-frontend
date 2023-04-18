@@ -37,7 +37,8 @@ const store = configureStore({
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
     serializableCheck: {
-      ignoreActions: true
+      ignoredActions: ["videoCall/setVideoCall", "videoCall/setLocalStream", "videoCall/setRemoteStream"],
+      ignoredPaths: ["videoCall.videoCall", "videoCall.localStream", "videoCall.remoteStream"]
     }
   }).concat(api.middleware)
 });
