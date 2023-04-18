@@ -6,14 +6,14 @@ import { BsCameraVideoOff, BsFillMicMuteFill } from "react-icons/bs";
 import { HiPhoneMissedCall } from "react-icons/hi";
 import IconButton from "../IconButton";
 import { MapRootState, VideoCallRootState } from "../../redux/store";
-import { setVideoCall } from "../../redux/features/videoCallSlice";
+import { setActiveVideoCallData, setVideoCall } from "../../redux/features/videoCallSlice";
 
 const VideoCallModal = () => {
   const myVideoRef = useRef<HTMLVideoElement | null>(null);
   const myPeerVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const dispatch = useDispatch();
-  const {videoCall} = useSelector((state: VideoCallRootState) => state.videoCall);
+  const {videoCall, activeCallWith} = useSelector((state: VideoCallRootState) => state.videoCall);
   const {selectedUser} = useSelector((state: MapRootState) => state.map);
   const {localStream, remoteStream} = useSelector((state: VideoCallRootState) => state.videoCall);
   
@@ -43,6 +43,7 @@ const VideoCallModal = () => {
   const endVideoCallHandler = () => {
     videoCall.close();
     dispatch(setVideoCall(null));
+    dispatch(setActiveVideoCallData(null));
   };
 
 
@@ -50,7 +51,7 @@ const VideoCallModal = () => {
     <div
       className="fixed top-0 left-0 flex flex-col justify-center items-center w-screen h-screen bg-[rgba(0,0,0,0.8)] z-[10000]">
       <div
-        className="relative flex justify-center items-center w-[90%] aspect-[16/9] p-5 rounded-xl bg-white"
+        className="relative flex justify-center items-center w-[90%] aspect-[16/9] p-6 rounded-xl bg-white"
         onClick={(e) => e.stopPropagation()}
       >
         <Tooltip id="close-button-tooltip" />
@@ -62,11 +63,11 @@ const VideoCallModal = () => {
         >
           <GrClose className="w-full h-full opacity-75" />
         </div>
-        <div className="flex flex-col justify-start items-center gap-3">
+        <div className="flex flex-col justify-start items-center gap-6 h-full">
           {localStream && (
             <div className="flex flex-col justify-start items-center gap-3 mb-3">
-              <p className="font-light text-2xl text-center">
-                Active video call with {selectedUser?.user.firstName} (@{selectedUser?.user.username})
+              <p className="font-bold text-2xl text-center text-gray-600">
+                Active video call with {activeCallWith?.firstName} (@{activeCallWith?.username})
               </p>
               <div className="flex justify-stretch items-center gap-1 min-w-[200px]">
                 <IconButton
@@ -108,7 +109,7 @@ const VideoCallModal = () => {
             </div>
 
             {/* Stream remoto */}
-            <div className="w-[50%] p-1 border border-gray-300 rounded">
+            <div className="flex justify-center items-center w-[50%] aspect-[4/3] p-1 border border-gray-300 rounded">
               {remoteStream && (
                 <video
                   ref={myPeerVideoRef}
