@@ -101,12 +101,12 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
       return false;
     };
 
-    dispatch(setVideoCall(true));
-
     const recipientPeerId = selectedUser.peerId;
-
+    
     try {
       const call = peerClient.getInstance.call(recipientPeerId, localStream);
+
+      dispatch(setVideoCall(call));
   
       call.on("error", (err) => {
         console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`)
@@ -119,7 +119,6 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
       
     } catch (err: any) {
       console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`);
-      dispatch(setVideoCall(false));
     }
   };
 

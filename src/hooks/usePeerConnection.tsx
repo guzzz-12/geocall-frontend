@@ -28,7 +28,7 @@ const usePeerConnection = () => {
       };
 
       // Abrir el modal de videollamada
-      dispatch(setVideoCall(true));
+      dispatch(setVideoCall(call));
       
       // Responder la llamada transmitiendo el stream local del usuario
       // al usuario remoto que realizó la llamada
@@ -37,7 +37,12 @@ const usePeerConnection = () => {
       // Al responder la llamada mostrar el stream del usuario que llama
       call.on("stream", (remoteStream) => {
         dispatch(setRemoteStream(remoteStream));
-      })
+      });
+
+      // Notificar al usuario cuando el otro usuario corta la videollamada
+      call.on("close", () => {
+        console.log("Call ended by the other user")
+      });
     });
   }, [localStream]);
 

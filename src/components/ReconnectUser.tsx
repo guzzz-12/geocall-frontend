@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useGetUserLocation from "../hooks/useGetUserLocation";
 import usePeerConnection from "../hooks/usePeerConnection";
+import useMediaDevices from "../hooks/useMediaDevices";
 import { socketClient, SocketEvents } from "../socket/socketClient";
 import { useGetCurrentUserQuery } from "../redux/api";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
@@ -25,6 +26,9 @@ const ReconnectUser = () => {
 
   // Obtener la ubicación del usuario
   useGetUserLocation();
+
+  // Solicitar permisos de acceso a la cámara
+  useMediaDevices();
 
   // Reinicializar la conexión con el servidor de Peer
   const {peerId} = usePeerConnection();

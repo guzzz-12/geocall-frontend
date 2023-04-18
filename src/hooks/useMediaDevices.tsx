@@ -8,9 +8,9 @@ import { setLocalStream } from "../redux/features/videoCallSlice";
  */
 const useMediaDevices = () => {
   const dispatch = useDispatch();
-
-  const [myStream, _setMyStream] = useState<MediaStream | null>(null);
+  
   const [streamError, setStreamError] = useState<string | null>(null);
+  console.log({streamError});
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia({
@@ -26,7 +26,7 @@ const useMediaDevices = () => {
     });
   }, []);
 
-  return {myStream, streamError};
+  return {streamError};
 };
 
 export default useMediaDevices;
