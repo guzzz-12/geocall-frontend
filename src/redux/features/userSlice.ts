@@ -22,10 +22,12 @@ const userSlice = createSlice({
     setCurrentUser: (state, action: {type: string, payload: User}) => {
       state.isAuth = true;
       state.currentuser = action.payload;
+      localStorage.setItem("token", action.payload.token);
     },
     removeCurrentUser: (state) => {
       state.isAuth = false;
       state.currentuser = null;
+      localStorage.clear();
     },
     setPeerId: (state, action: {type: string, payload: string | null}) => {
       state.peerId = action.payload;

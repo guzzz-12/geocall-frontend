@@ -10,13 +10,19 @@ export interface User {
   username: string;
   email: string;
   avatar: string;
+  token: string;
   createdAt: Date
 };
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api",
-    credentials: "include"
+    // baseUrl: "http://localhost:5000/api",
+    baseUrl: "http://192.168.0.114:5000/api",
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem("token");
+      headers.set("authorization", token || "");
+      return headers;
+    }
   }),
   reducerPath: "userApi",
   tagTypes: ["User", "SelectedUser", "SelectedUserAddress"],
