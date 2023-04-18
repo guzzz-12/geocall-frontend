@@ -20,8 +20,9 @@ import { SelectedUser, UserLocation, setSelectedUser } from "../redux/features/m
 import { useGetUserQuery } from "../redux/api";
 import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
 import { createOrSelectChat, Chat } from "../redux/features/chatsSlice";
-import { setRemoteStream, setVideoCall } from "../redux/features/videoCallSlice";
+import { VideoCallData, setActiveVideoCallData, setRemoteStream, setVideoCall } from "../redux/features/videoCallSlice";
 import peerClient from "../utils/peerClient";
+import { socketClient } from "../socket/socketClient";
 
 interface Props {
   selectedUserId: string;
@@ -102,11 +103,32 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
     };
 
     const recipientPeerId = selectedUser.peerId;
+
+    const videoCallData: VideoCallData = {
+      remitent: {
+        id: currentuser!._id,
+        socketId: socketClient.socket.id,
+        firstName: currentuser!.firstName,
+        username: currentuser!.username,
+        avatar: currentuser!.avatar
+      },
+      recipient: {
+        id: selectedUser.user._id,
+        socketId: selectedUser.socketId,
+        firstName: selectedUser.user.firstName,
+        username: selectedUser.user.username,
+        avatar: selectedUser.user.avatar
+      }
+    };
     
     try {
       const call = peerClient.getInstance.call(recipientPeerId, localStream);
 
       dispatch(setVideoCall(call));
+      dispatch(setActiveVideoCallData(videoCallData.recipient));
+
+      socketClient.videoCall(videoCallData);
+
   
       call.on("error", (err) => {
         console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`)

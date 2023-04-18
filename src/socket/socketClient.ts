@@ -2,6 +2,7 @@ import { Socket, io } from "socket.io-client";
 import { UserLocation } from "../redux/features/mapSlice";
 import { Message } from "../redux/features/chatsSlice";
 import { Notification } from "../redux/features/notificationsSlice";
+import { VideoCallData } from "../redux/features/videoCallSlice";
 
 export enum SocketEvents {
   USER_RECONNECTED = "USER_RECONNECTED",
@@ -11,6 +12,9 @@ export enum SocketEvents {
   NEW_MESSAGE = "NEW_MESSAGE",
   DELETED_MESSAGE = "DELETED_MESSAGE",
   NEW_NOTIFICATION = "NEW_NOTIFICATION",
+  INCOMING_CALL = "INCOMING_CALL",
+  CALL_ENDED = "CALL_ENDED",
+  CALL_REJECTED = "CALL_REJECTED",
   DISCONNECT = "DISCONNECT"
 };
 
@@ -40,6 +44,10 @@ class SocketClient {
 
   newNotification(notification: Notification) {
     this.socketInstance.emit(SocketEvents.NEW_NOTIFICATION, notification)
+  };
+
+  videoCall(videoCall: VideoCallData) {
+    this.socketInstance.emit(SocketEvents.INCOMING_CALL, videoCall);
   };
 
   get socket() {

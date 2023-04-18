@@ -10,6 +10,7 @@ import { MapRootState } from "../redux/store";
 import { setCurrentUser, setHasMediaDevice, setPeerId } from "../redux/features/userSlice";
 import { Message, incomingMessage } from "../redux/features/chatsSlice";
 import { Notification, setNotifications } from "../redux/features/notificationsSlice";
+import { VideoCallData, setActiveVideoCallData } from "../redux/features/videoCallSlice";
 
 /**
  * Reconectar el usuario al servidor de socket io,
@@ -78,6 +79,13 @@ const ReconnectUser = () => {
         ) {
           dispatch(setNotifications(notification))
         }
+      });
+
+      // Escuchar el evento de nueva llamada entrante y actualizar el state global
+      // con la data del usuario que está llamando
+      socketClient.socket.on(SocketEvents.INCOMING_CALL, (data: VideoCallData) => {
+        const {remitent} = data;
+        dispatch(setActiveVideoCallData(remitent))
       });
     };
   }, [userData, myLocation, peerId]);
