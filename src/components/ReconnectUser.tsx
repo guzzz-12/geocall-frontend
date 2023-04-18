@@ -30,8 +30,9 @@ const ReconnectUser = () => {
   const {peerId} = usePeerConnection();
 
   useEffect(() => {
-    if (userData && myLocation && peerId) {
-      dispatch(setCurrentUser(userData));
+    if ("navigator" in window && userData && myLocation && peerId) {
+      const currentToken = localStorage.getItem("token");
+      dispatch(setCurrentUser({...userData, token: currentToken!}));
       dispatch(setPeerId(peerId));
 
       navigator.mediaDevices.getUserMedia({

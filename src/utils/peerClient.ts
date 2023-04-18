@@ -5,7 +5,7 @@ class PeerClient {
 
   constructor() {
     this.peerInstance = new Peer({
-      host: "localhost",
+      host: "192.168.0.114",
       port: 443,
       path: "/peer"
     });

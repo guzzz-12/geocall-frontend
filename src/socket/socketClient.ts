@@ -18,7 +18,8 @@ class SocketClient {
   private socketInstance: Socket;
 
   constructor() {
-    this.socketInstance = io("http://localhost:5000");
+    // this.socketInstance = io("http://localhost:5000");
+    this.socketInstance = io("http://192.168.0.114:5000");
   };
 
   userReconnected(userId: string, location: UserLocation, peerId: string) {

@@ -15,22 +15,23 @@ const usePeerConnection = () => {
   const [peerId, setPeerId] = useState<string | null>(null);
 
   useEffect(() => {
-    const peerInstance = peerClient.getInstance;
-
-    peerInstance.on("open", (id) => {
+    peerClient.getInstance.on("open", (id) => {
       setPeerId(id)
     });
 
     // Escuchar el evento de llamada entrante
-    peerInstance.on("call", (call) => {
+    peerClient.getInstance.on("call", (call) => {
       if (!localStream) {
+        console.log({incomingCall: call});
+        console.log("You must connect your camera to receive videocalls");
         return false;
       };
 
       // Abrir el modal de videollamada
       dispatch(setVideoCall(true));
       
-      // Responder la llamada transmitiendo el localstream
+      // Responder la llamada transmitiendo el stream local del usuario
+      // al usuario remoto que realizó la llamada
       call.answer(localStream);
 
       // Al responder la llamada mostrar el stream del usuario que llama
