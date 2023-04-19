@@ -54,6 +54,10 @@ class SocketClient {
     return this.socketInstance
   };
 
+  get socketId() {
+    return this.socketInstance.id
+  };
+
   userDisconnected() {
     this.socketInstance.emit(SocketEvents.DISCONNECT)
   };
