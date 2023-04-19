@@ -36,12 +36,20 @@ export interface MapState {
   myLocation: UserLocation | null;
   onlineUsers: OnlineUser[];
   selectedUser: SelectedUser | null;
+  selectedUserPrefetch: {
+    selectedUserId: string | null;
+    selectedUserSocketId: string | null;
+  }
 };
 
 const initialState: MapState = {
   myLocation: null,
   onlineUsers: [],
-  selectedUser: null
+  selectedUser: null,
+  selectedUserPrefetch: {
+    selectedUserId: null,
+    selectedUserSocketId: null
+  }
 };
 
 const mapSlice = createSlice({
@@ -54,6 +62,9 @@ const mapSlice = createSlice({
     setOnlineUsers: (state, action: OnlineUsersAction) => {
       state.onlineUsers = action.payload;
     },
+    setSelectedUserPrefetch: (state, action: {type: string, payload: {selectedUserId: string | null, selectedUserSocketId: string | null}}) => {
+      state.selectedUserPrefetch = action.payload;
+    },
     setSelectedUser: (state, action: {type: string, payload: SelectedUser | null}) => {
       state.selectedUser = action.payload;
     },
@@ -64,5 +75,11 @@ const mapSlice = createSlice({
   }
 });
 
-export const { setMyLocation, setOnlineUsers, setSelectedUser, clearMapState } = mapSlice.actions;
 export const mapReducer = mapSlice.reducer;
+export const {
+  setMyLocation,
+  setOnlineUsers,
+  setSelectedUserPrefetch,
+  setSelectedUser,
+  clearMapState
+} = mapSlice.actions;
