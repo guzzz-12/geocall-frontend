@@ -1,6 +1,5 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { distance } from "@turf/turf";
 import dayjs from "dayjs";
 import { v4 } from "uuid";
 import { GrClose } from "react-icons/gr";
@@ -16,13 +15,13 @@ import { IconType } from "react-icons/lib";
 
 import IconButton from "./IconButton";
 import Spinner from "./Spinner";
-import { SelectedUser, UserLocation, setSelectedUser } from "../redux/features/mapSlice";
-import { useGetUserQuery } from "../redux/api";
+import { UserLocation, setSelectedUser } from "../redux/features/mapSlice";
 import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
 import { createOrSelectChat, Chat } from "../redux/features/chatsSlice";
 import { VideoCallData, setActiveVideoCallData, setRemoteStream, setVideoCall } from "../redux/features/videoCallSlice";
 import peerClient from "../utils/peerClient";
 import { socketClient } from "../socket/socketClient";
+import useSelectedUser from "../hooks/useSelectedUser";
 
 interface Props {
   selectedUserId: string;
@@ -31,51 +30,14 @@ interface Props {
   setSelectedUserId: Dispatch<SetStateAction<string | null>>
 };
 
-const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, setSelectedUserId}: Props) => {
+const SelectedUserCard = ({selectedUserId, selectedUserSocketId, setSelectedUserId}: Props) => {
   const dispatch = useDispatch();
-  const {currentuser} = useSelector((state: UserRootState) => state.user);
-  const {onlineUsers, selectedUser} = useSelector((state: MapRootState) => state.map);
+  const {currentUser} = useSelector((state: UserRootState) => state.user);
+  const {selectedUser} = useSelector((state: MapRootState) => state.map);
   const {localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
 
-  const [selectedUserLocation, setSelectedUserLocation] = useState<UserLocation | null>(null);
-  const [selectedUserPeerId, setSelectedUserPeerId] = useState("");
-
-  // Consultar la data del usuario seleccionado
-  const {data, isLoading, isFetching} = useGetUserQuery(
-    {userId: selectedUserId, location: selectedUserLocation!},
-    {skip: !selectedUserId || !selectedUserSocketId || !selectedUserLocation}
-  );
-
-  // Buscar al usuario seleccionado en el state global
-  // y extraer su ubicación y su peer id
-  useEffect(() => {
-    if (selectedUserId) {
-      const {location, peerId} = onlineUsers.find(user => user.userId === selectedUserId)!;
-      setSelectedUserLocation(location);
-      setSelectedUserPeerId(peerId);
-    }
-  }, [selectedUserId]);
-
-  // Calcular la distancia del usuario seleccionado
-  // y actualizar el state global del usuario seleccionado
-  useEffect(() => {
-    if (selectedUserLocation && data && selectedUserSocketId) {
-      const from = [myLocation.lat, myLocation.lon];
-      const to = [selectedUserLocation.lat, selectedUserLocation.lon];
-      const userDistance = distance(from, to, {units: "kilometers"});
-      
-      const selectedUser: SelectedUser = {
-        user: data.user,
-        socketId: selectedUserSocketId,
-        peerId: selectedUserPeerId,
-        location: selectedUserLocation,
-        address: data.address,
-        distance: `${(userDistance).toFixed(2)}km`,
-      };
-
-      dispatch(setSelectedUser(selectedUser));
-    }
-  }, [selectedUserLocation, data, selectedUserSocketId, myLocation]);
+  // Consultar la data del usuario seleccionado y actualizar el state global
+  const {isLoading, isFetching} = useSelectedUser({selectedUserId, selectedUserSocketId});
 
 
   /**
@@ -84,7 +46,7 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
   const onChatClickHandler = () => {
     const chat: Chat = {
       chatId: v4(),
-      senderId: currentuser!._id,
+      senderId: currentUser!._id,
       recipientId: selectedUserId,
       messages: [],
       createdAt: new Date().toISOString()
@@ -106,11 +68,11 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
 
     const videoCallData: VideoCallData = {
       remitent: {
-        id: currentuser!._id,
+        id: currentUser!._id,
         socketId: socketClient.socket.id,
-        firstName: currentuser!.firstName,
-        username: currentuser!.username,
-        avatar: currentuser!.avatar
+        firstName: currentUser!.firstName,
+        username: currentUser!.username,
+        avatar: currentUser!.avatar
       },
       recipient: {
         id: selectedUser.user._id,
