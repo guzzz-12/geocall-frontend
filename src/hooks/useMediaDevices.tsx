@@ -10,7 +10,6 @@ const useMediaDevices = () => {
   const dispatch = useDispatch();
   
   const [streamError, setStreamError] = useState<string | null>(null);
-  console.log({streamError});
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia({

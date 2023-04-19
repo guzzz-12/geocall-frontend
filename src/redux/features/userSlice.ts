@@ -1,16 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { User } from "../api";
+import { socketClient } from "../../socket/socketClient";
 
 export interface UserState {
-  currentuser: User | null;
+  currentUser: User | null;
   isAuth: boolean;
+  socketId: string;
   peerId: string | null;
   hasMediaDevice: boolean;
 };
 
 const initialState: UserState = {
-  currentuser: null,
+  currentUser: null,
   isAuth: false,
+  socketId: "",
   peerId: null,
   hasMediaDevice: false
 };
@@ -21,12 +24,13 @@ const userSlice = createSlice({
   reducers: {
     setCurrentUser: (state, action: {type: string, payload: User}) => {
       state.isAuth = true;
-      state.currentuser = action.payload;
+      state.currentUser = action.payload;
+      state.socketId = socketClient.socketId;
       localStorage.setItem("token", action.payload.token);
     },
     removeCurrentUser: (state) => {
       state.isAuth = false;
-      state.currentuser = null;
+      state.currentUser = null;
       localStorage.clear();
     },
     setPeerId: (state, action: {type: string, payload: string | null}) => {

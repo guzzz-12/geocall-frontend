@@ -73,7 +73,10 @@ const ReconnectUser = () => {
       // y actualizar el state sólo si el remitente
       // no es el mismo usuario atenticado
       socketClient.socket.on(SocketEvents.NEW_NOTIFICATION, (notification: Notification) => {
-        if (notification.notificationType === "incomingMessage") {
+        if (
+          notification.notificationType === "incomingMessage" &&
+          notification.senderId !== userData._id
+        ) {
           dispatch(setNotifications(notification))
         }
       });

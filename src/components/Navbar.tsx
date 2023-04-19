@@ -16,7 +16,7 @@ import { socketClient } from "../socket/socketClient";
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {currentuser} = useSelector((state: UserRootState) => state.user);
+  const {currentUser} = useSelector((state: UserRootState) => state.user);
   const {all, unread} = useSelector((state: NotificationsRootState) => state.notifications);
 
   const [logoutUser, {isLoading}] = useLogoutUserMutation();
@@ -36,7 +36,7 @@ const Navbar = () => {
     dispatch(api.util.resetApiState());
     dispatch(removeCurrentUser());
     dispatch(clearMapState());
-    socketClient.userLogout(currentuser!._id);
+    socketClient.userLogout(currentUser!._id);
     navigate("/login", {replace: true});
   };
   
@@ -67,12 +67,12 @@ const Navbar = () => {
         <div className="flex justify-center items-center gap-2 px-2 py-1 border border-slate-400 rounded-md cursor-pointer">
           <div className="w-8 h-8 overflow-hidden">
             <img
-              src={currentuser!.avatar}
+              src={currentUser!.avatar}
               className="block w-full h-full object-cover object-center rounded-full outline-2 outline-blue-500"
             />
           </div>
           <p className="text-base font-bold text-gray-600">
-            {currentuser!.firstName}
+            {currentUser!.firstName}
           </p>
         </div>
 
