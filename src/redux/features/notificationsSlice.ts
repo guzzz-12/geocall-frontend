@@ -11,7 +11,7 @@ export interface Notification {
   };
   senderSocketId: string;
   receiverId: string;
-  receiverSockerId: string;
+  receiverSocketId: string;
   unread: boolean;
 };
 

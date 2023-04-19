@@ -124,16 +124,22 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, myLocation, set
     try {
       const call = peerClient.getInstance.call(recipientPeerId, localStream);
 
+      // Almacenar el objeto call en el state global
+      // para acceder a éste desde el resto de la app
       dispatch(setVideoCall(call));
+
+      // Almacenar la data del usuario recipiente en el state global
       dispatch(setActiveVideoCallData(videoCallData.recipient));
 
+      // Emitir el evento de videollamada al usuario recipiente
       socketClient.videoCall(videoCallData);
-
   
       call.on("error", (err) => {
         console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`)
       });
   
+      // Almacenar el stream remoto en el state global
+      // cuando el usuario recipiente acepta la llamada
       call.on("stream", (remoteStream) => {
         console.log(`Videocall with ${selectedUser.user.firstName} initialized`);
         dispatch(setRemoteStream(remoteStream));

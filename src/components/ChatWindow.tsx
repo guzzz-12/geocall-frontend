@@ -14,8 +14,8 @@ const ChatWindow = () => {
 
   const dispatch = useDispatch();
   const currentUser = useSelector((state: UserRootState) => state.user.currentuser);
-  const selectedChat = useSelector((state: ChatsRootState) => state.chats.selectedChat);
-  const selectedUser = useSelector((state: MapRootState) => state.map.selectedUser);
+  const {selectedUser} = useSelector((state: MapRootState) => state.map);
+  const {selectedChat} = useSelector((state: ChatsRootState) => state.chats);
 
   const [messageText, setMessageText] = useState("");
 
@@ -24,8 +24,10 @@ const ChatWindow = () => {
   // Scrollear al bottom de la ventana al recibir un nuevo mensaje
   /*----------------------------------------------------------------*/
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({behavior: "smooth"});
-  }, [selectedChat?.messages]);
+    if (selectedChat) {
+      chatBottomRef.current?.scrollIntoView({behavior: "smooth"});
+    }
+  }, [selectedChat]);
 
   const onCloseHandler = () => {
     dispatch(closeChat())
@@ -47,14 +49,14 @@ const ChatWindow = () => {
       notificationId: v4(),
       notificationType: "incomingMessage",
       receiverId: selectedUser!.user._id,
-      receiverSockerId: selectedUser!.socketId,
+      receiverSocketId: selectedUser!.socketId,
       senderId: currentUser!._id,
       senderData: {
-        firstName: selectedUser!.user.firstName,
-        lastName: selectedUser!.user.lastName,
-        avatar: selectedUser!.user.avatar,
+        firstName: currentUser!.firstName,
+        lastName: currentUser!.lastName,
+        avatar: currentUser!.avatar,
       },
-      senderSocketId: selectedUser!.socketId,
+      senderSocketId: socketClient.socketId,
       unread: true
     };
 
