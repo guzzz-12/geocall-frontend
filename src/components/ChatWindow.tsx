@@ -40,9 +40,9 @@ const ChatWindow = () => {
       messageId: v4(),
       senderId: currentUser!._id,
       senderData: {
-        firstName: selectedUser!.user.firstName,
-        lastName: selectedUser!.user.lastName,
-        avatar: selectedUser!.user.avatar
+        firstName: currentUser!.firstName,
+        lastName: currentUser!.lastName,
+        avatar: currentUser!.avatar
       },
       recipientId: selectedUser!.user._id,
       content: messageText,
