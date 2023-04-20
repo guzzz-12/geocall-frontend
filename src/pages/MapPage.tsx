@@ -9,6 +9,7 @@ import SelectedUserCard from "../components/SelectedUserCard";
 import withAuthentication from "../components/HOC/withAuthentication";
 import { MapRootState, UserRootState } from "../redux/store";
 import { OnlineUser, setMyLocation, setSelectedUserPrefetch } from "../redux/features/mapSlice";
+import { closeChat } from "../redux/features/chatsSlice";
 
 const MapPage = () => {
   const dispatch = useDispatch();
@@ -29,6 +30,8 @@ const MapPage = () => {
     if (currentUser._id === user.userId) {
       return false;
     };
+    
+    dispatch(closeChat());
 
     dispatch(setSelectedUserPrefetch({
       selectedUserId: user.userId,

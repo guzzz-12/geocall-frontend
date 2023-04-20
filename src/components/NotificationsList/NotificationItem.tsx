@@ -16,7 +16,8 @@ const NotificationItem = ({notification}: Props) => {
   const {currentUser} = useSelector((state: UserRootState) => state.user);
 
   /**
-   * Seleccionar el chat al clickear la notificación correspondiente
+   * Si la notificación es de tipo mensaje, seleccionar
+   * el chatal clickear la notificación correspondiente
    */
   const onClickNotificationHandler = () => {
     const chat: Chat = {
@@ -26,13 +27,14 @@ const NotificationItem = ({notification}: Props) => {
       messages: [],
       createdAt: new Date().toISOString()
     };
+
+    dispatch(createOrSelectChat(chat));
     
     dispatch(setSelectedUserPrefetch({
       selectedUserId: notification.senderId,
       selectedUserSocketId: notification.senderSocketId
     }));
 
-    dispatch(createOrSelectChat(chat));
   };
 
   return (

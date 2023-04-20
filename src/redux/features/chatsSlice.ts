@@ -81,26 +81,25 @@ const chatsSlice = createSlice({
     },
     incomingMessage: (state, action: {type: string, payload: { message: Message}}) => {
       const {message: {chatId, senderId, recipientId, createdAt}} = action.payload;
-      console.log("INCOMING MESSAGE", action.payload);
 
-      const chatIndex = state.chats.findIndex(chat => {
-        return (
-          (chat.senderId === senderId && chat.recipientId === recipientId)
-          ||
-          (chat.senderId === recipientId && chat.recipientId === senderId)
-        )
-      });
-
+      // Verificar si el chat existe
+      const chatIndex = state.chats.findIndex(chat => chat.chatId === chatId);
       const chatExists = state.chats[chatIndex];
 
-      // Si ya existe un chat con los usuarios del mensaje, actualizarloy seleccionarlo
-      // Si el chat no existe, crearlo y seleccionarlo
+      // Si ya existe un chat con los usuarios del mensaje, actualizarlo
+      // Si el chat no existe, crearlo
       if (chatExists) {
         const updatedMessages = [...chatExists.messages, action.payload.message];
         chatExists.messages = updatedMessages;
+
         const updatedChats = [...state.chats];
         updatedChats.splice(chatIndex, 1, chatExists);
-        state.selectedChat = chatExists;
+        state.chats = updatedChats;
+
+        if (state.selectedChat?.chatId === chatExists.chatId) {
+          state.selectedChat = chatExists;
+        };
+
       } else {
         const chat: Chat = {
           chatId,
@@ -111,7 +110,6 @@ const chatsSlice = createSlice({
         };
 
         state.chats = [chat, ...state.chats];
-        state.selectedChat = chat;
       };
     },
     deleteMessage: (state, action: {type: string, payload: {chatId: string, messageId: string}}) => {

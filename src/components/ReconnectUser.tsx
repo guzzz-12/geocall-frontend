@@ -68,11 +68,6 @@ const ReconnectUser = () => {
       // y actualizar el state de los mensajes del chat correspondiente
       socketClient.socket.on(SocketEvents.NEW_MESSAGE, (newMessage: Message) => {
         const {senderData: {avatar, firstName}} = newMessage;
-
-        dispatch(setSelectedUserPrefetch({
-          selectedUserId: newMessage.senderId,
-          selectedUserSocketId: newMessage.senderSocketId
-        }));
         
         dispatch(incomingMessage({message: newMessage}));
 

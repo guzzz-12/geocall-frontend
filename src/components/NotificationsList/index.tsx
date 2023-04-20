@@ -13,7 +13,9 @@ interface Props {
 const NotificationsList = ({isOpen, notifications, setIsOpen}: Props) => {
   const {onlineUsers} = useSelector((state: MapRootState) => state.map);
 
-  // Verificar si el usuario remitente está online
+  /**
+   * Filtrar los usuarios offline de la lista de notificaciones
+   */
   const filteredOffline = notifications.filter((n) => {
     return onlineUsers.find((u) => u.userId === n.senderId)
   });
@@ -35,7 +37,7 @@ const NotificationsList = ({isOpen, notifications, setIsOpen}: Props) => {
         {filteredOffline.length === 0 && (
           <div className="flex justify-center items-center self-center w-full p-3">
             <p className="flex-grow text-center">
-              There are no notifications
+              There are no new messages
             </p>
           </div>
         )}
