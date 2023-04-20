@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Map, { Marker, Popup, FullscreenControl, NavigationControl, GeolocateControl } from "react-map-gl";
 import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
@@ -8,36 +8,34 @@ import Navbar from "../components/Navbar";
 import SelectedUserCard from "../components/SelectedUserCard";
 import withAuthentication from "../components/HOC/withAuthentication";
 import { MapRootState, UserRootState } from "../redux/store";
-import { setMyLocation } from "../redux/features/mapSlice";
-import { Message } from "../redux/features/chatsSlice";
-import { SocketEvents, socketClient } from "../socket/socketClient";
+import { OnlineUser, setMyLocation, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 
 const MapPage = () => {
   const dispatch = useDispatch();
-  const {onlineUsers, myLocation} = useSelector((state: MapRootState) => state.map);
-  const {currentuser} = useSelector((state: UserRootState) => state.user);
+  const {onlineUsers, myLocation, selectedUserPrefetch: {selectedUserId, selectedUserSocketId}} = useSelector((state: MapRootState) => state.map);
+  const {currentUser} = useSelector((state: UserRootState) => state.user);
 
   const [showPopup, setShotPopup] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [selectedUserSocketId, setSelectedUserSocketId] = useState<string | null>(null);
 
-  // Actualizar el state local para abrir la ventata del chat al recibir un mensaje
-  // si no hay una ventana de chat abierta.
-  useEffect(() => {
-    socketClient.socket.on(SocketEvents.NEW_MESSAGE, (msg: Message) => {
-      const {senderId, senderSocketId} = msg;
-
-      if (!selectedUserId && !selectedUserSocketId) {
-        setSelectedUserId(senderId);
-        setSelectedUserSocketId(senderSocketId);
-      }
-
-    })
-  }, []);
-
-  if (!myLocation || !currentuser) {
+  if (!myLocation || !currentUser) {
     return null;
   };
+
+  
+  /**
+   * Seleccionar la ID del usuario
+   */
+  const onMarkerClickHandler = (user: OnlineUser) => {
+    if (currentUser._id === user.userId) {
+      return false;
+    };
+
+    dispatch(setSelectedUserPrefetch({
+      selectedUserId: user.userId,
+      selectedUserSocketId: user.socketId
+    }));
+  };
+
 
   const mapboxToken = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
 
@@ -57,8 +55,6 @@ const MapPage = () => {
             <SelectedUserCard
               selectedUserId={selectedUserId}
               selectedUserSocketId={selectedUserSocketId}
-              myLocation={myLocation}
-              setSelectedUserId={setSelectedUserId}
             />
           </motion.aside>
         )}
@@ -93,8 +89,6 @@ const MapPage = () => {
             anchor="bottom"
             offset={16}
             closeOnClick={false}
-            // closeButton={true}
-            // onClose={() => setShotPopup(false)}
           >
             <p>You are here</p>
           </Popup>
@@ -104,19 +98,12 @@ const MapPage = () => {
           return (
             <Marker
               key={user.userId}
-              style={{cursor: currentuser._id !== user.userId ? "pointer" : "default"}}
+              style={{cursor: currentUser._id !== user.userId ? "pointer" : "default"}}
               latitude={user.location.lat}
               longitude={user.location.lon}
               anchor="top"
-              color={user.userId === currentuser._id ? "#ef4444" : "#bae6fd"}
-              onClick={() => {
-                if (currentuser._id === user.userId) {
-                  return false;
-                };
-
-                setSelectedUserId(user.userId);
-                setSelectedUserSocketId(user.socketId);
-              }}
+              color={user.userId === currentUser._id ? "#ef4444" : "#bae6fd"}
+              onClick={onMarkerClickHandler.bind(null, user)}
             />
           )
         })}

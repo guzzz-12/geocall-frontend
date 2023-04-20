@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from "dayjs";
 import { v4 } from "uuid";
@@ -15,7 +14,8 @@ import { IconType } from "react-icons/lib";
 
 import IconButton from "./IconButton";
 import Spinner from "./Spinner";
-import { UserLocation, setSelectedUser } from "../redux/features/mapSlice";
+import { setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
+import { closeChat } from "../redux/features/chatsSlice";
 import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
 import { createOrSelectChat, Chat } from "../redux/features/chatsSlice";
 import { VideoCallData, setActiveVideoCallData, setRemoteStream, setVideoCall } from "../redux/features/videoCallSlice";
@@ -26,11 +26,9 @@ import useSelectedUser from "../hooks/useSelectedUser";
 interface Props {
   selectedUserId: string;
   selectedUserSocketId: string;
-  myLocation: UserLocation;
-  setSelectedUserId: Dispatch<SetStateAction<string | null>>
 };
 
-const SelectedUserCard = ({selectedUserId, selectedUserSocketId, setSelectedUserId}: Props) => {
+const SelectedUserCard = ({selectedUserId, selectedUserSocketId}: Props) => {
   const dispatch = useDispatch();
   const {currentUser} = useSelector((state: UserRootState) => state.user);
   const {selectedUser} = useSelector((state: MapRootState) => state.map);
@@ -128,8 +126,9 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId, setSelectedUser
       <div
         className="absolute top-1 right-1 p-1 cursor-pointer"
         onClick={() => {
-          setSelectedUserId(null);
+          dispatch(setSelectedUserPrefetch({selectedUserId: null, selectedUserSocketId: null}))
           dispatch(setSelectedUser(null));
+          dispatch(closeChat())
         }}
       >
         <GrClose className="w-5 h-5 opacity-60" />

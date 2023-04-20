@@ -32,9 +32,12 @@ const useSelectedUser = ({selectedUserId, selectedUserSocketId}: Props) => {
   // y extraer su ubicación y su peer id
   useEffect(() => {
     if (selectedUserId) {
-      const {location, peerId} = onlineUsers.find(user => user.userId === selectedUserId)!;
-      setSelectedUserLocation(location);
-      setSelectedUserPeerId(peerId);
+      const user = onlineUsers.find(user => user.userId === selectedUserId);
+
+      if (user) {
+        setSelectedUserLocation(user.location);
+        setSelectedUserPeerId(user.peerId);
+      };
     }
   }, [selectedUserId]);
 
