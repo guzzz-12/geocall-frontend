@@ -4,6 +4,11 @@ export interface Message {
   messageId: string;
   chatId: string;
   senderId: string;
+  senderData: {
+    firstName: string;
+    lastName: string;
+    avatar: string;
+  };
   recipientId: string;
   content: string;
   senderSocketId: string;
