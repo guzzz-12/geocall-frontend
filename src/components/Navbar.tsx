@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { TfiWorld } from "react-icons/tfi";
-import { MdNotificationsNone, MdNotificationsActive } from "react-icons/md";
+import { MdMailOutline, MdEmail } from "react-icons/md";
 import { Tooltip } from "react-tooltip";
 
 import NotificationsList from "./NotificationsList";
@@ -51,14 +51,13 @@ const Navbar = () => {
 
   return (
     <nav className="absolute top-2 left-[50%] mx-2 -translate-x-[50%] flex justify-between items-center w-[95%] max-w-[600px] px-3 py-2 rounded border border-gray-500 bg-slate-50 z-[2]">
-      <Tooltip id="notifications-tooltip" />
       <div className="flex justify-between items-center gap-2">
         <TfiWorld className="w-9 h-9 text-gray-400" />
         <h1 className="text-lg font-bold uppercase text-gray-600">
           GeoCall
         </h1>
       </div>
-      <div className="relative flex justify-center items-stretch gap-4">
+      <div className="relative flex justify-center items-stretch gap-3">
         <NotificationsList
           isOpen={isNotificationsOpen}
           notifications={all}
@@ -77,19 +76,17 @@ const Navbar = () => {
         </div>
 
         <div
-          className="relative flex justify-center items-center w-10 p-1 rounded-full border border-gray-500 cursor-pointer"
-          data-tooltip-id="notifications-tooltip"
-          data-tooltip-content="Notifications"
+          className="relative flex justify-center items-center w-9 p-1 cursor-pointer"
           onClick={onClickNotificationsHandler}
         >
           {unread.length === 0 && (
-            <MdNotificationsNone className="w-full h-full text-gray-600" />
+            <MdMailOutline className="w-full h-full text-gray-600" />
           )}
 
           {unread.length > 0 && (
             <>
-              <MdNotificationsActive className="w-full h-full text-gray-600" />
-              <div className="absolute -top-2 -right-2 flex justify-center items-center w-6 h-6 rounded-full bg-red-700">
+              <MdEmail className="w-full h-full text-gray-600" />
+              <div className="absolute -top-[2px] -right-[2px] flex justify-center items-center w-5 h-5 rounded-full bg-red-700">
                 <span className="font-bold text-white text-sm">
                   {unread.length}
                 </span>
@@ -100,7 +97,7 @@ const Navbar = () => {
         </div>
 
         <button
-          className="px-2 py-1 text-center text-base font-normal text-blue-600 uppercase rounded bg-blue-50 hover:bg-blue-100 disabled:bg-slate-300 disabled:cursor-default transition-colors"
+          className="px-0 py-1 text-center text-base font-normal text-gray-600 uppercase rounded disabled:bg-slate-300 disabled:cursor-default transition-colors"
           disabled={isLoading}
           onClick={logoutHandler}
         >
