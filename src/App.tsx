@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import axios from "axios";
 
 import ReconnectUser from "./components/ReconnectUser";
@@ -9,6 +10,7 @@ import ChatWindow from "./components/ChatWindow";
 import VideoCallModal from "./components/VideoCallModal";
 import store from "./redux/store";
 import "react-tooltip/dist/react-tooltip.css";
+import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -35,6 +37,12 @@ const App = () => {
             </Routes>
           </BrowserRouter>
           <ChatWindow />
+          <ToastContainer
+            position="bottom-left"
+            autoClose={5000}
+            hideProgressBar={true}
+            theme="dark"
+          />
         </main>
       </Suspense>
     </Provider>

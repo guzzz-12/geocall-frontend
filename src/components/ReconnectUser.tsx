@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import useGetUserLocation from "../hooks/useGetUserLocation";
 import usePeerConnection from "../hooks/usePeerConnection";
 import useMediaDevices from "../hooks/useMediaDevices";
 import { socketClient, SocketEvents } from "../socket/socketClient";
 import { useGetCurrentUserQuery } from "../redux/api";
-import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
+import { OnlineUser, setOnlineUsers, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { MapRootState } from "../redux/store";
 import { setCurrentUser, setHasMediaDevice, setPeerId } from "../redux/features/userSlice";
 import { Message, incomingMessage } from "../redux/features/chatsSlice";
@@ -66,7 +67,29 @@ const ReconnectUser = () => {
       // Escuchar el evento de nuevo mensaje entrante
       // y actualizar el state de los mensajes del chat correspondiente
       socketClient.socket.on(SocketEvents.NEW_MESSAGE, (newMessage: Message) => {
+        const {senderData: {avatar, firstName}} = newMessage;
+
+        dispatch(setSelectedUserPrefetch({
+          selectedUserId: newMessage.senderId,
+          selectedUserSocketId: newMessage.senderSocketId
+        }));
+        
         dispatch(incomingMessage({message: newMessage}));
+
+        toast.dismiss();
+
+        toast(
+          <div className="flex justify-start items-center gap-4">
+            <img
+              className="block w-12 h-12 rounded-full"
+              src={avatar}
+              alt={firstName}
+            />
+            <p className="text-white text-left opacity-75">
+              New message from {firstName}
+            </p>
+          </div>
+        );
       });
 
       // Escuchar el evento de nueva notificación
