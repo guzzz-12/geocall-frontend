@@ -7,8 +7,8 @@ import useMediaDevices from "../hooks/useMediaDevices";
 import { socketClient, SocketEvents } from "../socket/socketClient";
 import { useGetCurrentUserQuery } from "../redux/api";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
-import { MapRootState, VideoCallRootState } from "../redux/store";
-import { setCurrentUser, setHasMediaDevice, setPeerId } from "../redux/features/userSlice";
+import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
+import { setCurrentUser, setHasMediaDevice, setPeerId, setUserStatus } from "../redux/features/userSlice";
 import { Message, incomingMessage } from "../redux/features/chatsSlice";
 import { Notification, setNotifications } from "../redux/features/notificationsSlice";
 import { VideoCallData, setActiveVideoCallData, setVideoCall } from "../redux/features/videoCallSlice";
@@ -22,6 +22,7 @@ import { VideoCallData, setActiveVideoCallData, setVideoCall } from "../redux/fe
  */
 const ReconnectUser = () => {  
   const dispatch = useDispatch();
+  const {status} = useSelector((state: UserRootState) => state.user);
   const {myLocation} = useSelector((state: MapRootState) => state.map);
   const {videoCall} = useSelector((state: VideoCallRootState) => state.videoCall);
 
@@ -41,23 +42,52 @@ const ReconnectUser = () => {
   // Escuchar los eventos relacionados con las videollamadas
   /*--------------------------------------------------------*/
   useEffect(() => {
+    // Escuchar el evento de nueva llamada entrante
+    socketClient.socket.on(SocketEvents.INCOMING_CALL, (data: VideoCallData) => {
+      if (status === "active") {
+        console.log("INCOMING_CALL", "status = active")
+        const {remitent} = data;
+        dispatch(setActiveVideoCallData(remitent));
+        dispatch(setUserStatus("busy"));
+      };
+
+      if (status === "busy") {
+        console.log("INCOMING_CALL", "status = busy");
+        socketClient.socket.emit(SocketEvents.CALL_USER_UNAVAILABLE, data.remitent.socketId);
+        return false;
+      };
+    });
+
+    // Restablecer el listener del evento de llamada entrante
+    //al cambiar el status del usuario
+    return () => {
+      socketClient.socket.removeListener(SocketEvents.INCOMING_CALL)
+    };
+  }, [status]);
+
+  useEffect(() => {
     // Escuchar evento de videollamada aceptada para cambiar el status a accepted
     socketClient.socket.on(SocketEvents.CALL_ACCEPTED, () => {
-      console.log("CALL_ACCEPTED")
+      console.log("CALL_ACCEPTED");
       dispatch(setVideoCall({...videoCall!, status: "accepted"}));
     });
 
     // Escuchar evento de videollamada finalizada para cambiar el status a ended
     socketClient.socket.on(SocketEvents.CALL_ENDED, () => {
-      console.log("CALL_ENDED")
+      console.log("CALL_ENDED");
       dispatch(setVideoCall({...videoCall!, status: "ended"}));
     });
     
     // Escuchar evento de videollamada rechazada para cambiar el status a rejected
     socketClient.socket.on(SocketEvents.CALL_REJECTED, () => {
-      console.log("CALL_REJECTED")
+      console.log("CALL_REJECTED");
       dispatch(setVideoCall({...videoCall!, status: "rejected"}));
-    })
+    });
+
+    socketClient.socket.on(SocketEvents.CALL_USER_UNAVAILABLE, () => {
+      console.log("CALL_USER_UNAVAILABLE");
+      dispatch(setVideoCall({...videoCall!, status: "unavailable"}));
+    });
   }, [videoCall]);
 
 
@@ -126,13 +156,6 @@ const ReconnectUser = () => {
         ) {
           dispatch(setNotifications(notification))
         }
-      });
-
-      // Escuchar el evento de nueva llamada entrante y actualizar el state global
-      // con la data del usuario que está llamando
-      socketClient.socket.on(SocketEvents.INCOMING_CALL, (data: VideoCallData) => {
-        const {remitent} = data;
-        dispatch(setActiveVideoCallData(remitent))
       });
     };
   }, [userData, myLocation, peerId]);
