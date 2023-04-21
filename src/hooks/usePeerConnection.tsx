@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setVideoCall, setRemoteStream, VideoCall } from "../redux/features/videoCallSlice";
-import { VideoCallRootState } from "../redux/store";
+import { UserRootState, VideoCallRootState } from "../redux/store";
 import peerClient from "../utils/peerClient";
+import { setUserStatus } from "../redux/features/userSlice";
 
 /**
  * Inicializar conexión con el servidor de WebRTC vía Peer
@@ -10,6 +11,7 @@ import peerClient from "../utils/peerClient";
  */
 const usePeerConnection = () => {
   const dispatch = useDispatch();
+  const {status} = useSelector((state: UserRootState) => state.user);
   const {localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
   
   const [peerId, setPeerId] = useState<string | null>(null);
@@ -22,8 +24,11 @@ const usePeerConnection = () => {
     // Escuchar el evento de llamada entrante
     peerClient.getInstance.on("call", (call) => {
       if (!localStream) {
-        console.log({incomingCall: call});
         console.log("You must connect your camera to receive videocalls");
+        return false;
+      };
+
+      if (status === "busy") {
         return false;
       };
 
@@ -45,7 +50,7 @@ const usePeerConnection = () => {
         console.log("Call ended by the other user")
       });
     });
-  }, [localStream]);
+  }, [localStream, status]);
 
   return {peerId};
 };

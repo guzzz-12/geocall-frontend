@@ -9,6 +9,7 @@ import IconButton from "../IconButton";
 import { MapRootState, VideoCallRootState } from "../../redux/store";
 import { setActiveVideoCallData, setVideoCall } from "../../redux/features/videoCallSlice";
 import { SocketEvents, socketClient } from "../../socket/socketClient";
+import { setUserStatus } from "../../redux/features/userSlice";
 
 const VideoCallModal = () => {
   const myVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -81,6 +82,7 @@ const VideoCallModal = () => {
     videoCall.callObj!.close();
     dispatch(setVideoCall(null));
     dispatch(setActiveVideoCallData(null));
+    dispatch(setUserStatus("active"));
   };
 
 
@@ -138,6 +140,24 @@ const VideoCallModal = () => {
           </div>
         )}
 
+        {videoCall.status === "unavailable" && (
+          <div className="flex flex-col justify-center items-center gap-6">
+            <p className="font-bold text-3xl text-center text-gray-600">
+              {activeCallWith?.firstName} is not available in this moment.
+            </p>
+            <button
+              className="block min-w-[150px] px-3 py-2 uppercase rounded-sm bg-blue-50 hover:bg-blue-100 transition-colors"
+              onClick={() => {
+                dispatch(setVideoCall(null));
+                dispatch(setActiveVideoCallData(null));
+                dispatch(setUserStatus("active"));
+              }}
+            >
+              Accept
+            </button>
+          </div>
+        )}
+
         {(videoCall.status === "ended" || videoCall.status === "rejected") && (
           <div className="flex flex-col justify-center items-center gap-6">
             <p className="font-bold text-3xl text-center text-gray-600">
@@ -148,6 +168,7 @@ const VideoCallModal = () => {
               onClick={() => {
                 dispatch(setVideoCall(null));
                 dispatch(setActiveVideoCallData(null));
+                dispatch(setUserStatus("active"));
               }}
             >
               Accept

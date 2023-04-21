@@ -22,6 +22,7 @@ import { VideoCallData, setActiveVideoCallData, setRemoteStream, setVideoCall } 
 import peerClient from "../utils/peerClient";
 import { socketClient } from "../socket/socketClient";
 import useSelectedUser from "../hooks/useSelectedUser";
+import { setUserStatus } from "../redux/features/userSlice";
 
 interface Props {
   selectedUserId: string;
@@ -91,6 +92,9 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId}: Props) => {
       // Almacenar la data del usuario recipiente en el state global
       dispatch(setActiveVideoCallData(videoCallData.recipient));
 
+      // Pasar el status del usuario a busy
+      dispatch(setUserStatus("busy"));
+
       // Emitir el evento de videollamada al usuario recipiente
       socketClient.videoCall(videoCallData);
   
@@ -107,6 +111,7 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId}: Props) => {
       
     } catch (err: any) {
       console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`);
+      dispatch(setUserStatus("active"));
     }
   };
 
