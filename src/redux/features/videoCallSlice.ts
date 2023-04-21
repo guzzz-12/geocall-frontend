@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { MediaConnection } from "peerjs";
 
 export interface VideoCall {
-  status: null | "calling" | "pending" | "accepted" | "ended" | "rejected";
+  status: null | "calling" | "pending" | "accepted" | "ended" | "rejected" | "unavailable";
   callObj: MediaConnection | null;
 };
 

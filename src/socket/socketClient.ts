@@ -16,6 +16,7 @@ export enum SocketEvents {
   CALL_ACCEPTED = "CALL_ACCEPTED",
   CALL_ENDED = "CALL_ENDED",
   CALL_REJECTED = "CALL_REJECTED",
+  CALL_USER_UNAVAILABLE = "CALL_USER_UNAVAILABLE",
   DISCONNECT = "DISCONNECT"
 };
 
@@ -49,6 +50,10 @@ class SocketClient {
 
   videoCall(videoCall: VideoCallData) {
     this.socketInstance.emit(SocketEvents.INCOMING_CALL, videoCall);
+  };
+
+  userUnavailable(remitentSocketId: string) {
+    this.socketInstance.emit(SocketEvents.CALL_USER_UNAVAILABLE, remitentSocketId)
   };
 
   get socket() {
