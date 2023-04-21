@@ -1,8 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { MediaConnection } from "peerjs";
 
+export interface VideoCall {
+  status: null | "calling" | "pending" | "accepted" | "ended" | "rejected";
+  callObj: MediaConnection | null;
+};
+
 export interface VideoCallState {
-  videoCall: MediaConnection | null;
+  videoCall: VideoCall | null;
   localStream: MediaStream | null;
   remoteStream: MediaStream | null;
   activeCallWith: ActiveCallWith | null;
@@ -44,7 +49,7 @@ const videoCallSlice = createSlice({
   name: "videoCall",
   initialState,
   reducers: {
-    setVideoCall: (state, action: {type: string, payload: MediaConnection | null}) => {
+    setVideoCall: (state, action: {type: string, payload: VideoCall | null}) => {
       state.videoCall = action.payload;
     },
     setLocalStream: (state, action: {type: string, payload: MediaStream | null}) => {
