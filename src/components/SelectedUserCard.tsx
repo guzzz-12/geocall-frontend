@@ -86,7 +86,7 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId}: Props) => {
 
       // Almacenar el objeto call en el state global
       // para acceder a éste desde el resto de la app
-      dispatch(setVideoCall(call));
+      dispatch(setVideoCall({callObj: call, status: "calling"}));
 
       // Almacenar la data del usuario recipiente en el state global
       dispatch(setActiveVideoCallData(videoCallData.recipient));

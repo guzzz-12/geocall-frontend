@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Tooltip } from "react-tooltip";
-import { GrClose } from "react-icons/gr";
 import { BsCameraVideoOff } from "react-icons/bs";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
-import { HiPhoneMissedCall } from "react-icons/hi";
+import { HiPhoneMissedCall, HiOutlinePhoneMissedCall } from "react-icons/hi";
+import { FiPhoneCall } from "react-icons/fi";
 import IconButton from "../IconButton";
 import { MapRootState, VideoCallRootState } from "../../redux/store";
 import { setActiveVideoCallData, setVideoCall } from "../../redux/features/videoCallSlice";
+import { SocketEvents, socketClient } from "../../socket/socketClient";
 
 const VideoCallModal = () => {
   const myVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -57,9 +58,27 @@ const VideoCallModal = () => {
   };
 
 
-  // Finalizar la video llamada
-  const endVideoCallHandler = () => {
-    videoCall.close();
+  // Aceptar la videollamada
+  const acceptVideoCallHandler = () => {
+    if (!localStream) {
+      return false;
+    };
+
+    socketClient.socket.emit(SocketEvents.CALL_ACCEPTED, activeCallWith!.socketId);    
+    dispatch(setVideoCall({...videoCall, status: "accepted"}));
+    videoCall.callObj!.answer(localStream);
+  };
+
+
+  // Finalizar/rechazar la video llamada
+  const endVideoCallHandler = (mode: "end" | "reject") => {
+    if (mode === "reject") {
+      socketClient.socket.emit(SocketEvents.CALL_REJECTED, activeCallWith!.socketId)
+    } else {
+      socketClient.socket.emit(SocketEvents.CALL_ENDED, activeCallWith!.socketId)
+    };
+    
+    videoCall.callObj!.close();
     dispatch(setVideoCall(null));
     dispatch(setActiveVideoCallData(null));
   };
@@ -69,85 +88,143 @@ const VideoCallModal = () => {
     <div
       className="fixed top-0 left-0 flex flex-col justify-center items-center w-screen h-screen bg-[rgba(0,0,0,0.8)] z-[10000]">
       <div
-        className="relative flex justify-center items-center w-[90%] aspect-[16/9] p-6 rounded-xl bg-white"
+        className="relative flex justify-center items-center w-[80%] aspect-[16/9] p-6 rounded-xl bg-white"
         onClick={(e) => e.stopPropagation()}
       >
-        <Tooltip id="close-button-tooltip" />
-        <div
-          className="absolute top-3 right-3 w-6 h-6 cursor-pointer z-10"
-          data-tooltip-id="close-button-tooltip"
-          data-tooltip-content={`End videocall with ${selectedUser?.user.firstName}`}
-          onClick={endVideoCallHandler}
-        >
-          <GrClose className="w-full h-full opacity-75" />
-        </div>
-        <div className="flex flex-col justify-start items-center gap-6 h-full">
-          {localStream && (
-            <div className="flex flex-col justify-start items-center gap-3 mb-3">
-              <p className="font-bold text-2xl text-center text-gray-600">
-                Active video call with {activeCallWith?.firstName} (@{activeCallWith?.username})
-              </p>
-              <div className="flex justify-stretch items-center gap-1 min-w-[200px]">
-                <IconButton
-                  Icon={!isLocalStreamMuted ? FaMicrophone : FaMicrophoneSlash}
-                  disabled={false}
-                  tooltipText={isLocalStreamMuted ? "Enable audio" : "Disable audio"}
-                  onClickHandler={toggleMuteStreamHandler}
-                />
-                <IconButton
-                  Icon={HiPhoneMissedCall}
-                  disabled={false}
-                  tooltipText={`End videocall with ${selectedUser?.user.firstName}`}
-                  onClickHandler={endVideoCallHandler}
-                />
+        {(videoCall.status === "calling"  || videoCall.status === "pending") && (
+          <div className="flex flex-col justify-center items-center gap-16">
+            <p className="font-bold text-3xl text-center text-gray-600">
+              {videoCall.status === "calling" && "Calling "}
+              {activeCallWith?.firstName} (@{activeCallWith?.username})
+              {videoCall.status === "pending" && " is calling..."}
+            </p>
+
+            <div className="flex justify-center items-center gap-16 w-full">
+              <Tooltip id="accept-button-tooltip" />
+              <Tooltip id="reject-button-tooltip" />
+
+              <div className="relative w-min">
+                <button
+                  style={{cursor: videoCall.status === "pending" ? "pointer" : "default"}}
+                  className="relative flex justify-center items-center p-6 bg-green-100 rounded-full border-4 border-green-800 z-30"
+                  data-tooltip-id="accept-button-tooltip"
+                  data-tooltip-content="Accept Videocall"
+                  disabled={videoCall.status === "calling"}
+                  onClick={() => {
+                    if (videoCall.status === "calling") {
+                      return false;
+                    };
+
+                    acceptVideoCallHandler();
+                  }}
+                >
+                  <FiPhoneCall className="w-[60px] h-[60px] stroke-green-800" />
+                </button>
+                <div className="absolute top-0 left-0 h-full w-full animate-ping rounded-full bg-green-400 opacity-75 z-20" />
               </div>
-            </div>
-          )}
-
-          <div className="flex justify-between gap-3 w-full">
-            {/* Stream local */}
-            <div className="flex justify-center items-center w-[50%] aspect-[4/3] p-1 border border-gray-300 rounded">
-              {localStream && (
-                <video
-                  ref={myVideoRef}
-                  className="w-100"
-                  playsInline
-                  autoPlay
-                  controls
-                />
-              )}
-              {!localStream && (
-                <div className="flex flex-col justify-center items-center gap-3 w-full h-full">
-                  <p className="text-base text-center">
-                    Sorry. You don't have any video device connected!
-                  </p>
-                  <BsCameraVideoOff className="w-[120px] h-[120px] opacity-60" />
-                </div>
-              )}
-            </div>
-
-            {/* Stream remoto */}
-            <div className="flex justify-center items-center w-[50%] aspect-[4/3] p-1 border border-gray-300 rounded">
-              {remoteStream && (
-                <video
-                  ref={myPeerVideoRef}
-                  className="w-100"
-                  playsInline
-                  autoPlay
-                  controls
-                />
-              )}
-              {!remoteStream && (
-                <div className="flex flex-col justify-center items-center gap-3 w-full h-full">
-                  <p className="text-base text-center">
-                    There was a problem stablishing connection with your partner
-                  </p>
-                  <BsCameraVideoOff className="w-[120px] h-[120px] opacity-60" />
-                </div>
-              )}
+              
+              <button
+                className="flex justify-center items-center p-6 bg-red-100 rounded-full border-4 border-red-800 cursor-pointer"
+                data-tooltip-id="reject-button-tooltip"
+                data-tooltip-content="Reject Videocall"
+                onClick={() => {
+                  const mode = videoCall.status === "calling" ? "end" : "reject";
+                  endVideoCallHandler(mode);
+                }}
+              >
+                <HiOutlinePhoneMissedCall className="w-[60px] h-[60px] stroke-red-800" />
+              </button>
             </div>
           </div>
-        </div>
+        )}
+
+        {(videoCall.status === "ended" || videoCall.status === "rejected") && (
+          <div className="flex flex-col justify-center items-center gap-6">
+            <p className="font-bold text-3xl text-center text-gray-600">
+              {activeCallWith?.firstName} {videoCall.status === "ended" ? "ended" : "rejected"} the videocall
+            </p>
+            <button
+              className="block min-w-[150px] px-3 py-2 uppercase rounded-sm bg-blue-50 hover:bg-blue-100 transition-colors"
+              onClick={() => {
+                dispatch(setVideoCall(null));
+                dispatch(setActiveVideoCallData(null));
+              }}
+            >
+              Accept
+            </button>
+          </div>
+        )}
+
+        {/* Mostrar los streams si la video llamada es aceptada */}
+        {videoCall.status === "accepted" && (
+          <div className="flex flex-col justify-start items-center gap-6 h-full">
+            {localStream && (
+              <div className="flex flex-col justify-start items-center gap-3 mb-3">
+                <p className="font-bold text-2xl text-center text-gray-600">
+                  Active video call with {activeCallWith?.firstName} (@{activeCallWith?.username})
+                </p>
+                <div className="flex justify-stretch items-center gap-1 min-w-[200px]">
+                  <IconButton
+                    Icon={!isLocalStreamMuted ? FaMicrophone : FaMicrophoneSlash}
+                    disabled={false}
+                    tooltipText={isLocalStreamMuted ? "Enable audio" : "Disable audio"}
+                    onClickHandler={toggleMuteStreamHandler}
+                  />
+                  <IconButton
+                    Icon={HiPhoneMissedCall}
+                    disabled={false}
+                    tooltipText={`End videocall with ${selectedUser?.user.firstName}`}
+                    onClickHandler={endVideoCallHandler.bind(null, "end")}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-between gap-3 w-full">
+              {/* Stream local */}
+              <div className="flex justify-center items-center w-[50%] aspect-[4/3] p-1 border border-gray-300 rounded">
+                {localStream && (
+                  <video
+                    ref={myVideoRef}
+                    className="w-100"
+                    playsInline
+                    autoPlay
+                    controls
+                  />
+                )}
+                {!localStream && (
+                  <div className="flex flex-col justify-center items-center gap-3 w-full h-full">
+                    <p className="text-base text-center">
+                      Sorry. You don't have any video device connected!
+                    </p>
+                    <BsCameraVideoOff className="w-[120px] h-[120px] opacity-60" />
+                  </div>
+                )}
+              </div>
+
+              {/* Stream remoto */}
+              <div className="flex justify-center items-center w-[50%] aspect-[4/3] p-1 border border-gray-300 rounded">
+                {remoteStream && (
+                  <video
+                    ref={myPeerVideoRef}
+                    className="w-100"
+                    playsInline
+                    autoPlay
+                    controls
+                  />
+                )}
+                {!remoteStream && (
+                  <div className="flex flex-col justify-center items-center gap-3 w-full h-full">
+                    <p className="text-base text-center">
+                      There was a problem stablishing connection with your partner
+                    </p>
+                    <BsCameraVideoOff className="w-[120px] h-[120px] opacity-60" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

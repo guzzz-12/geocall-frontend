@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setVideoCall, setRemoteStream } from "../redux/features/videoCallSlice";
+import { setVideoCall, setRemoteStream, VideoCall } from "../redux/features/videoCallSlice";
 import { VideoCallRootState } from "../redux/store";
 import peerClient from "../utils/peerClient";
 
@@ -27,12 +27,13 @@ const usePeerConnection = () => {
         return false;
       };
 
-      // Abrir el modal de videollamada
-      dispatch(setVideoCall(call));
-      
-      // Responder la llamada transmitiendo el stream local del usuario
-      // al usuario remoto que realizó la llamada
-      call.answer(localStream);
+      const videoCall: VideoCall = {
+        status: "pending",
+        callObj: call
+      };
+
+      // Abrir el modal de videollamada con el status en pending
+      dispatch(setVideoCall(videoCall));
 
       // Al responder la llamada mostrar el stream del usuario que llama
       call.on("stream", (remoteStream) => {
