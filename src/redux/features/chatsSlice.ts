@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import db from "../../db/GeoCallDB";
 
 export interface Message {
   messageId: string;
@@ -37,6 +38,9 @@ const chatsSlice = createSlice({
   name: "chats",
   initialState,
   reducers: {
+    initStoredChats: (state, action: {type: string, payload: Chat[]}) => {
+      state.chats = action.payload;
+    },
     createOrSelectChat: (state, action: {type: string, payload: Chat}) => {
       const {senderId, recipientId} = action.payload;
 
@@ -52,9 +56,16 @@ const chatsSlice = createSlice({
       // Si el chat no existe, crearlo y seleccionarlo
       if (chatExists) {
         state.selectedChat = chatExists;
+
+        // Agregar el chat a la base de datos local
+        db.chats.add(chatExists);
+
       } else {
         state.chats = [action.payload, ...state.chats];
         state.selectedChat = action.payload;
+
+        // Agregar el chat a la base de datos local
+        db.chats.add(action.payload);
       };
     },
     closeChat: (state) => {
@@ -62,6 +73,7 @@ const chatsSlice = createSlice({
     },
     deleteChat: (state, action: {type: string, payload: string}) => {
       state.chats = state.chats.filter(chat => chat.chatId !== action.payload);
+      db.chats.where("chatId").equals(action.payload).delete();
     },
     createMessage: (state, action: {type: string, payload: {chatId: string, message: Message}}) => {
       const chatIndex = state.chats.findIndex(chat => chat.chatId === action.payload.chatId);
@@ -78,6 +90,9 @@ const chatsSlice = createSlice({
       updatedChats.splice(chatIndex, 1, chat);
       state.chats = updatedChats;
       state.selectedChat = chat;
+
+      // Actualizar los mensajes del chat en la DB local
+      db.chats.where("chatId").equals(action.payload.chatId).modify({...chat})
     },
     incomingMessage: (state, action: {type: string, payload: { message: Message}}) => {
       const {message: {chatId, senderId, recipientId, createdAt}} = action.payload;
@@ -100,6 +115,9 @@ const chatsSlice = createSlice({
           state.selectedChat = chatExists;
         };
 
+        // Actualizar los mensajes del chat en la DB local
+        db.chats.where("chatId").equals(chatId).modify({...chatExists})
+
       } else {
         const chat: Chat = {
           chatId,
@@ -110,6 +128,9 @@ const chatsSlice = createSlice({
         };
 
         state.chats = [chat, ...state.chats];
+
+        // Agregar el chat a la base de datos local
+        db.chats.add(chat);
       };
     },
     deleteMessage: (state, action: {type: string, payload: {chatId: string, messageId: string}}) => {
@@ -127,12 +148,16 @@ const chatsSlice = createSlice({
       const updatedChats = [...state.chats];
       updatedChats.splice(chatIndex, 1, chat);
       state.chats = updatedChats;
+
+      // Actualizar los mensajes del chat en la DB local
+      db.chats.where("chatId").equals(action.payload.chatId).modify({...chat})
     }
   }
 });
 
 export const chatsReducer = chatsSlice.reducer;
 export const {
+  initStoredChats,
   createOrSelectChat,
   createMessage,
   incomingMessage,
