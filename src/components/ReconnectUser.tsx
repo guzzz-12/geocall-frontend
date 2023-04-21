@@ -6,12 +6,12 @@ import usePeerConnection from "../hooks/usePeerConnection";
 import useMediaDevices from "../hooks/useMediaDevices";
 import { socketClient, SocketEvents } from "../socket/socketClient";
 import { useGetCurrentUserQuery } from "../redux/api";
-import { OnlineUser, setOnlineUsers, setSelectedUserPrefetch } from "../redux/features/mapSlice";
-import { MapRootState } from "../redux/store";
+import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
+import { MapRootState, VideoCallRootState } from "../redux/store";
 import { setCurrentUser, setHasMediaDevice, setPeerId } from "../redux/features/userSlice";
 import { Message, incomingMessage } from "../redux/features/chatsSlice";
 import { Notification, setNotifications } from "../redux/features/notificationsSlice";
-import { VideoCallData, setActiveVideoCallData } from "../redux/features/videoCallSlice";
+import { VideoCallData, setActiveVideoCallData, setVideoCall } from "../redux/features/videoCallSlice";
 
 /**
  * Reconectar el usuario al servidor de socket io,
@@ -23,6 +23,7 @@ import { VideoCallData, setActiveVideoCallData } from "../redux/features/videoCa
 const ReconnectUser = () => {  
   const dispatch = useDispatch();
   const {myLocation} = useSelector((state: MapRootState) => state.map);
+  const {videoCall} = useSelector((state: VideoCallRootState) => state.videoCall);
 
   const {data: userData} = useGetCurrentUserQuery();
 
@@ -35,6 +36,34 @@ const ReconnectUser = () => {
   // Reinicializar la conexión con el servidor de Peer
   const {peerId} = usePeerConnection();
 
+
+  /*--------------------------------------------------------*/
+  // Escuchar los eventos relacionados con las videollamadas
+  /*--------------------------------------------------------*/
+  useEffect(() => {
+    // Escuchar evento de videollamada aceptada para cambiar el status a accepted
+    socketClient.socket.on(SocketEvents.CALL_ACCEPTED, () => {
+      console.log("CALL_ACCEPTED")
+      dispatch(setVideoCall({...videoCall!, status: "accepted"}));
+    });
+
+    // Escuchar evento de videollamada finalizada para cambiar el status a ended
+    socketClient.socket.on(SocketEvents.CALL_ENDED, () => {
+      console.log("CALL_ENDED")
+      dispatch(setVideoCall({...videoCall!, status: "ended"}));
+    });
+    
+    // Escuchar evento de videollamada rechazada para cambiar el status a rejected
+    socketClient.socket.on(SocketEvents.CALL_REJECTED, () => {
+      console.log("CALL_REJECTED")
+      dispatch(setVideoCall({...videoCall!, status: "rejected"}));
+    })
+  }, [videoCall]);
+
+
+  /*--------------------------------------------*/
+  // Escuchar el resto de los eventos de la app
+  /*--------------------------------------------*/
   useEffect(() => {
     if ("navigator" in window && userData && myLocation && peerId) {
       const currentToken = localStorage.getItem("token");
