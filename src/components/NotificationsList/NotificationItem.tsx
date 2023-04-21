@@ -40,7 +40,7 @@ const NotificationItem = ({notification}: Props) => {
   return (
     <div
       style={{backgroundColor: unread ? "#e0f2fe" : "transparent"}}
-      className="flex justify-start items-center gap-2 w-full px-2 py-2 border-b border-gray-200 cursor-pointer transition-all"
+      className="flex justify-start items-center gap-2 w-full px-2 py-2 border-b border-gray-200 cursor-pointer transition-all overflow-hidden"
       onClick={onClickNotificationHandler}
     >
       <div className="w-10 h-10 flex-shrink-0 rounded-full border border-gray-300 overflow-hidden">
@@ -51,7 +51,7 @@ const NotificationItem = ({notification}: Props) => {
         />
       </div>
       {notificationType === "incomingMessage" && (
-        <p className="flex-grow text-sm text-left text-gray-700">
+        <p className="flex-grow max-w-[full] text-sm text-left text-gray-700 text-ellipsis overflow-hidden">
           New message from {firstName}
         </p>
       )}
