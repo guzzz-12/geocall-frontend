@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+
 import useGetUserLocation from "../hooks/useGetUserLocation";
 import usePeerConnection from "../hooks/usePeerConnection";
 import useMediaDevices from "../hooks/useMediaDevices";
+import useLocalDbInit from "../hooks/useLocalDbInit";
 import { socketClient, SocketEvents } from "../socket/socketClient";
 import { useGetCurrentUserQuery } from "../redux/api";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
@@ -36,6 +38,10 @@ const ReconnectUser = () => {
 
   // Reinicializar la conexión con el servidor de Peer
   const {peerId} = usePeerConnection();
+
+  // Consultar los chats almacenados en la DB local
+  // y restablecer el state global de los chats
+  useLocalDbInit();
 
 
   /*--------------------------------------------------------*/
