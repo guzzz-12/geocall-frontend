@@ -8,6 +8,7 @@ export interface UserState {
   socketId: string;
   peerId: string | null;
   hasMediaDevice: boolean;
+  status: "active" | "busy";
 };
 
 const initialState: UserState = {
@@ -15,7 +16,8 @@ const initialState: UserState = {
   isAuth: false,
   socketId: "",
   peerId: null,
-  hasMediaDevice: false
+  hasMediaDevice: false,
+  status: "active"
 };
 
 const userSlice = createSlice({
@@ -38,6 +40,9 @@ const userSlice = createSlice({
     },
     setHasMediaDevice: (state, action: {type: string, payload: boolean}) => {
       state.hasMediaDevice = action.payload;
+    },
+    setUserStatus: (state, action: {type: string, payload: "active" | "busy"}) => {
+      state.status = action.payload;
     }
   }
 });
@@ -48,5 +53,6 @@ export const {
   setCurrentUser,
   removeCurrentUser,
   setPeerId,
-  setHasMediaDevice
+  setHasMediaDevice,
+  setUserStatus
 } = userSlice.actions;
