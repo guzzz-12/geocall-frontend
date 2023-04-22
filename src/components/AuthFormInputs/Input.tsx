@@ -3,11 +3,11 @@ import { useFormContext } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import { AiOutlineEye, AiOutlineEyeInvisible, AiFillCheckCircle } from "react-icons/ai";
 import { RiErrorWarningFill } from "react-icons/ri";
-import { FormSchemaType } from "../../pages/SignupPage";
+import { SignupFormSchemaType } from "../../pages/SignupPage";
 
 interface Props {
   id: string;
-  name: keyof FormSchemaType;
+  name: keyof SignupFormSchemaType;
   type: "text" | "email" | "password" | "number";
   placeholder: string;
   disabled: boolean;
