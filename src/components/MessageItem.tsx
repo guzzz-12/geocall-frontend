@@ -4,12 +4,11 @@ import { User } from "../redux/api";
 
 interface Props {
   message: Message;
-  sender: User;
   currentUser: User;
 };
 
 
-const MessageItem = ({message, sender, currentUser}: Props) => {
+const MessageItem = ({message, currentUser}: Props) => {
   const isSender = message.senderId === currentUser._id;
 
   return (

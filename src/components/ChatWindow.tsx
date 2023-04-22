@@ -109,7 +109,6 @@ const ChatWindow = () => {
               <MessageItem
                 key={msg.messageId}
                 message={msg}
-                sender={selectedUser.user}
                 currentUser={currentUser}
               />
             )

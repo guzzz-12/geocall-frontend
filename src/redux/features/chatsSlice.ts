@@ -56,10 +56,6 @@ const chatsSlice = createSlice({
       // Si el chat no existe, crearlo y seleccionarlo
       if (chatExists) {
         state.selectedChat = chatExists;
-
-        // Agregar el chat a la base de datos local
-        db.chats.add(chatExists);
-
       } else {
         state.chats = [action.payload, ...state.chats];
         state.selectedChat = action.payload;
@@ -98,11 +94,18 @@ const chatsSlice = createSlice({
       const {message: {chatId, senderId, recipientId, createdAt}} = action.payload;
 
       // Verificar si el chat existe
-      const chatIndex = state.chats.findIndex(chat => chat.chatId === chatId);
+      const chatIndex = state.chats.findIndex((chat) => {
+        return (
+          (chat.senderId === senderId && chat.recipientId === recipientId)
+          ||
+          (chat.senderId === recipientId && chat.recipientId === senderId)
+        )
+      });
+
       const chatExists = state.chats[chatIndex];
 
       // Si ya existe un chat con los usuarios del mensaje, actualizarlo
-      // Si el chat no existe, crearlo
+      // Si no existe un chat con los usuarios del mensaje, crearlo
       if (chatExists) {
         const updatedMessages = [...chatExists.messages, action.payload.message];
         chatExists.messages = updatedMessages;
