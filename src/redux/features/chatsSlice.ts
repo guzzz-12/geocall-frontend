@@ -17,6 +17,7 @@ export interface Message {
     avatar: string;
   },
   content: string;
+  unread: boolean;
   createdAt: string;
 };
 
@@ -204,8 +205,32 @@ const chatsSlice = createSlice({
       db.chats
       .where("chatId")
       .equals(action.payload.chatId)
-      .modify((item: Chat) => chat.messages = updatedMessages)
+      .modify((item: Chat) => item.messages = updatedMessages)
       .catch((err) => console.log({error_deleting_message: err.message}))
+    },
+    setReadMessages: (state, action: {type: string, payload: {chatId: string}}) => {
+      const chat = state.chats.find(chat => chat.chatId === action.payload.chatId);
+      const chatIndex = state.chats.findIndex(chat => chat.chatId === action.payload.chatId);
+
+      if (!chat) {
+        return state;
+      };
+
+      // Pasar el status de los mensajes del chat a unread = false
+      const updatedMessages = [...chat.messages];
+      updatedMessages.forEach(msg => msg.unread = false);
+      chat.messages = updatedMessages;
+      
+      // Actualizar el chat con los mensajes actualizados en el state de los chats
+      const updatedChats = [...state.chats];
+      updatedChats.splice(chatIndex, 1, chat);
+
+      // Actualizar el chat con los mensajes actualizados en la DB local
+      db.chats
+      .where("chatId")
+      .equals(action.payload.chatId)
+      .modify((item: Chat) => item.messages = updatedMessages)
+      .catch((err) => console.log({error_updating_unread_messages: err.message}))
     }
   }
 });
@@ -219,5 +244,6 @@ export const {
   incomingMessage,
   closeChat,
   deleteChat,
-  deleteMessage
+  deleteMessage,
+  setReadMessages
 } = chatsSlice.actions;

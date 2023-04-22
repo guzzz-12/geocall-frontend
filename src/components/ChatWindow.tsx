@@ -56,6 +56,7 @@ const ChatWindow = () => {
       },
       recipientData: otherUserData,
       content: messageText,
+      unread: true,
       createdAt: new Date().toISOString()
     };
 
