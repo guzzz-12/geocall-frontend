@@ -5,12 +5,17 @@ export interface Message {
   messageId: string;
   chatId: string;
   senderId: string;
+  recipientId: string;
   senderData: {
     firstName: string;
     lastName: string;
     avatar: string;
   };
-  recipientId: string;
+  recipientData: {
+    firstName: string;
+    lastName: string;
+    avatar: string;
+  },
   content: string;
   createdAt: string;
 };
@@ -19,6 +24,16 @@ export interface Chat {
   chatId: string;
   senderId: string;
   recipientId: string;
+  senderData: {
+    firstName: string;
+    lastName: string;
+    avatar: string;
+  },
+  recipientData: {
+    firstName: string;
+    lastName: string;
+    avatar: string;
+  },
   messages: Message[];
   createdAt: string;
 };
@@ -33,6 +48,21 @@ const initialState: ChatsState = {
   selectedChat: null
 };
 
+
+/**
+ * Verificar si existe un chat entre los usuarios especificados
+ */
+const checkIfChatExists = (state: ChatsState, senderId: string, recipientId: string) => {
+  return state.chats.find((chat) => {
+    return (
+      (chat.senderId === senderId && chat.recipientId === recipientId)
+      ||
+      (chat.senderId === recipientId && chat.recipientId === senderId)
+    )
+  });
+};
+
+
 const chatsSlice = createSlice({
   name: "chats",
   initialState,
@@ -43,13 +73,8 @@ const chatsSlice = createSlice({
     createOrSelectChat: (state, action: {type: string, payload: Chat}) => {
       const {senderId, recipientId} = action.payload;
 
-      const chatExists = state.chats.find((chat) => {
-        return (
-          (chat.senderId === senderId && chat.recipientId === recipientId)
-          ||
-          (chat.senderId === recipientId && chat.recipientId === senderId)
-        )
-      });
+      // Verificar si existe un chat entre ambos usuarios
+      const chatExists = checkIfChatExists(state, senderId, recipientId);
 
       // Si ya existe un chat con el usuario que seleccioné, seleccionarlo
       // Si el chat no existe, crearlo y seleccionarlo
@@ -71,26 +96,44 @@ const chatsSlice = createSlice({
       db.chats.where("chatId").equals(action.payload).delete();
     },
     createMessage: (state, action: {type: string, payload: {chatId: string, message: Message}}) => {
+      // Buscar el chat en el state global
       const chatIndex = state.chats.findIndex(chat => chat.chatId === action.payload.chatId);
       const chat = state.chats[chatIndex];
 
+      // Si no existe, retornar sin hacer nada
       if (!chat) {
         return state;
       };
 
+      // Agregar el mensaje a los mensajes del chat
       const updatedMessages = [...chat.messages, action.payload.message];
       chat.messages = updatedMessages;
       
+      // Actualizar el chat en la lista de chats
       const updatedChats = [...state.chats];
       updatedChats.splice(chatIndex, 1, chat);
+      
       state.chats = updatedChats;
       state.selectedChat = chat;
 
       // Actualizar los mensajes del chat en la DB local
-      db.chats.where("chatId").equals(action.payload.chatId).modify({...chat})
+      db.chats
+      .where("chatId")
+      .equals(chat.chatId)
+      .modify((item: Chat) => item.messages.push(action.payload.message))
+      .catch((err) => console.log({error_updating_chat: err.message}))
     },
-    incomingMessage: (state, action: {type: string, payload: { message: Message}}) => {
-      const {message: {chatId, senderId, recipientId, createdAt}} = action.payload;
+    incomingMessage: (state, action: {type: string, payload: {message: Message}}) => {
+      const {
+        message: {
+          chatId,
+          senderId,
+          recipientId,
+          senderData,
+          recipientData,
+          createdAt
+        }
+      } = action.payload;
 
       // Verificar si el chat existe
       const chatIndex = state.chats.findIndex((chat) => {
@@ -118,13 +161,19 @@ const chatsSlice = createSlice({
         };
 
         // Actualizar los mensajes del chat en la DB local
-        db.chats.where("chatId").equals(chatId).modify({...chatExists})
+        db.chats
+        .where("chatId")
+        .equals(chatExists.chatId)
+        .modify((item: Chat) => item.messages.push(action.payload.message))
+        .catch((err) => console.log({error_updating_chat: err.message}))
 
       } else {
         const chat: Chat = {
           chatId,
           senderId,
           recipientId,
+          senderData,
+          recipientData,
           messages: [action.payload.message],
           createdAt
         };
@@ -152,12 +201,17 @@ const chatsSlice = createSlice({
       state.chats = updatedChats;
 
       // Actualizar los mensajes del chat en la DB local
-      db.chats.where("chatId").equals(action.payload.chatId).modify({...chat})
+      db.chats
+      .where("chatId")
+      .equals(action.payload.chatId)
+      .modify((item: Chat) => chat.messages = updatedMessages)
+      .catch((err) => console.log({error_deleting_message: err.message}))
     }
   }
 });
 
 export const chatsReducer = chatsSlice.reducer;
+
 export const {
   initStoredChats,
   createOrSelectChat,
