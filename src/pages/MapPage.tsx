@@ -13,7 +13,7 @@ import { closeChat } from "../redux/features/chatsSlice";
 
 const MapPage = () => {
   const dispatch = useDispatch();
-  const {onlineUsers, myLocation, selectedUserPrefetch: {selectedUserId, selectedUserSocketId}} = useSelector((state: MapRootState) => state.map);
+  const {onlineUsers, myLocation, selectedUserPrefetch: {selectedUserId}} = useSelector((state: MapRootState) => state.map);
   const {currentUser} = useSelector((state: UserRootState) => state.user);
 
   const [showPopup, setShotPopup] = useState(false);
@@ -34,8 +34,7 @@ const MapPage = () => {
     dispatch(closeChat());
 
     dispatch(setSelectedUserPrefetch({
-      selectedUserId: user.userId,
-      selectedUserSocketId: user.socketId
+      selectedUserId: user.userId
     }));
   };
 
@@ -47,7 +46,7 @@ const MapPage = () => {
       <Navbar />
 
       <AnimatePresence>
-        {selectedUserId && selectedUserSocketId && (
+        {selectedUserId && (
           <motion.aside
             key="selectedUserCard"
             className="absolute top-[50%] left-2 z-10"
@@ -57,7 +56,6 @@ const MapPage = () => {
           >
             <SelectedUserCard
               selectedUserId={selectedUserId}
-              selectedUserSocketId={selectedUserSocketId}
             />
           </motion.aside>
         )}

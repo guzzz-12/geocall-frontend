@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { setVideoCall, setRemoteStream, VideoCall } from "../redux/features/videoCallSlice";
 import { UserRootState, VideoCallRootState } from "../redux/store";
 import peerClient from "../utils/peerClient";
-import { setUserStatus } from "../redux/features/userSlice";
 
 /**
  * Inicializar conexión con el servidor de WebRTC vía Peer

@@ -31,8 +31,7 @@ const NotificationItem = ({notification}: Props) => {
     dispatch(createOrSelectChat(chat));
     
     dispatch(setSelectedUserPrefetch({
-      selectedUserId: notification.senderId,
-      selectedUserSocketId: notification.senderSocketId
+      selectedUserId: notification.senderId
     }));
 
   };

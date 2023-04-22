@@ -7,7 +7,6 @@ import { useGetUserQuery } from "../redux/api";
 
 interface Props {
   selectedUserId: string;
-  selectedUserSocketId: string;
 };
 
 /**
@@ -15,7 +14,7 @@ interface Props {
  * calcular su distancia al usuario actual
  * y actualizar el state global.
  */
-const useSelectedUser = ({selectedUserId, selectedUserSocketId}: Props) => {
+const useSelectedUser = ({selectedUserId}: Props) => {
   const dispatch = useDispatch();
   const {onlineUsers, myLocation} = useSelector((state: MapRootState) => state.map);
 
@@ -25,7 +24,7 @@ const useSelectedUser = ({selectedUserId, selectedUserSocketId}: Props) => {
   // Consultar la data del usuario seleccionado
   const {data, isLoading, isFetching} = useGetUserQuery(
     {userId: selectedUserId, location: selectedUserLocation!},
-    {skip: !selectedUserId || !selectedUserSocketId || !selectedUserLocation}
+    {skip: !selectedUserId || !selectedUserLocation}
   );
 
   // Buscar al usuario seleccionado en el state global
@@ -44,14 +43,13 @@ const useSelectedUser = ({selectedUserId, selectedUserSocketId}: Props) => {
   // Calcular la distancia del usuario seleccionado
   // y actualizar el state global del usuario seleccionado
   useEffect(() => {
-    if (selectedUserLocation && data && selectedUserSocketId && myLocation) {
+    if (selectedUserLocation && data && myLocation) {
       const from = [myLocation.lat, myLocation.lon];
       const to = [selectedUserLocation.lat, selectedUserLocation.lon];
       const userDistance = distance(from, to, {units: "kilometers"});
       
       const selectedUser: SelectedUser = {
         user: data.user,
-        socketId: selectedUserSocketId,
         peerId: selectedUserPeerId,
         location: selectedUserLocation,
         address: data.address,
@@ -60,7 +58,7 @@ const useSelectedUser = ({selectedUserId, selectedUserSocketId}: Props) => {
 
       dispatch(setSelectedUser(selectedUser));
     }
-  }, [selectedUserLocation, data, selectedUserSocketId, myLocation]);
+  }, [selectedUserLocation, data, myLocation]);
 
   return {
     data,

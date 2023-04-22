@@ -16,14 +16,12 @@ export interface VideoCallState {
 export interface VideoCallData {
   remitent: {
     id: string;
-    socketId: string;
     firstName: string;
     avatar: string;
     username: string;
   };
   recipient: {
     id: string;
-    socketId: string;
     firstName: string;
     avatar: string;
     username: string;
@@ -32,7 +30,6 @@ export interface VideoCallData {
 
 export interface ActiveCallWith {
   id: string;
-  socketId: string;
   firstName: string;
   avatar: string;
   username: string;

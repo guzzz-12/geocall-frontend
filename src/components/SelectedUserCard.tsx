@@ -26,17 +26,16 @@ import { setUserStatus } from "../redux/features/userSlice";
 
 interface Props {
   selectedUserId: string;
-  selectedUserSocketId: string;
 };
 
-const SelectedUserCard = ({selectedUserId, selectedUserSocketId}: Props) => {
+const SelectedUserCard = ({selectedUserId}: Props) => {
   const dispatch = useDispatch();
   const {currentUser} = useSelector((state: UserRootState) => state.user);
   const {selectedUser} = useSelector((state: MapRootState) => state.map);
   const {localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
 
   // Consultar la data del usuario seleccionado y actualizar el state global
-  const {isLoading, isFetching} = useSelectedUser({selectedUserId, selectedUserSocketId});
+  const {isLoading, isFetching} = useSelectedUser({selectedUserId});
 
 
   /**
@@ -68,14 +67,12 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId}: Props) => {
     const videoCallData: VideoCallData = {
       remitent: {
         id: currentUser!._id,
-        socketId: socketClient.socket.id,
         firstName: currentUser!.firstName,
         username: currentUser!.username,
         avatar: currentUser!.avatar
       },
       recipient: {
         id: selectedUser.user._id,
-        socketId: selectedUser.socketId,
         firstName: selectedUser.user.firstName,
         username: selectedUser.user.username,
         avatar: selectedUser.user.avatar
@@ -131,7 +128,7 @@ const SelectedUserCard = ({selectedUserId, selectedUserSocketId}: Props) => {
       <div
         className="absolute top-1 right-1 p-1 cursor-pointer"
         onClick={() => {
-          dispatch(setSelectedUserPrefetch({selectedUserId: null, selectedUserSocketId: null}))
+          dispatch(setSelectedUserPrefetch({selectedUserId: null}))
           dispatch(setSelectedUser(null));
           dispatch(closeChat())
         }}

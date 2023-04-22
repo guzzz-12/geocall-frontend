@@ -13,7 +13,7 @@ const ChatWindow = () => {
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
 
   const dispatch = useDispatch();
-  const {currentUser, socketId: currentUserSocketId} = useSelector((state: UserRootState) => state.user);
+  const {currentUser} = useSelector((state: UserRootState) => state.user);
   const {selectedUser} = useSelector((state: MapRootState) => state.map);
   const {selectedChat} = useSelector((state: ChatsRootState) => state.chats);
 
@@ -39,14 +39,13 @@ const ChatWindow = () => {
       chatId: selectedChat!.chatId,
       messageId: v4(),
       senderId: currentUser!._id,
+      recipientId: selectedUser!.user._id,
       senderData: {
         firstName: currentUser!.firstName,
         lastName: currentUser!.lastName,
         avatar: currentUser!.avatar
       },
-      recipientId: selectedUser!.user._id,
       content: messageText,
-      senderSocketId: currentUserSocketId,
       createdAt: new Date().toISOString()
     };
 
@@ -54,14 +53,12 @@ const ChatWindow = () => {
       notificationId: v4(),
       notificationType: "incomingMessage",
       receiverId: selectedUser!.user._id,
-      receiverSocketId: selectedUser!.socketId,
       senderId: currentUser!._id,
       senderData: {
         firstName: currentUser!.firstName,
         lastName: currentUser!.lastName,
         avatar: currentUser!.avatar,
       },
-      senderSocketId: currentUserSocketId,
       unread: true
     };
 

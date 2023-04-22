@@ -7,7 +7,7 @@ export interface UserLocation {
 };
 
 export interface OnlineUser {
-  socketId: string;
+  // socketId: string;
   userId: string;
   peerId: string;
   location: UserLocation
@@ -25,7 +25,7 @@ interface OnlineUsersAction {
 
 export interface SelectedUser {
   user: User;
-  socketId: string;
+  // socketId: string;
   peerId: string;
   address: string;
   location: UserLocation;
@@ -38,7 +38,7 @@ export interface MapState {
   selectedUser: SelectedUser | null;
   selectedUserPrefetch: {
     selectedUserId: string | null;
-    selectedUserSocketId: string | null;
+    // selectedUserSocketId: string | null;
   }
 };
 
@@ -48,7 +48,7 @@ const initialState: MapState = {
   selectedUser: null,
   selectedUserPrefetch: {
     selectedUserId: null,
-    selectedUserSocketId: null
+    // selectedUserSocketId: null
   }
 };
 
@@ -62,7 +62,7 @@ const mapSlice = createSlice({
     setOnlineUsers: (state, action: OnlineUsersAction) => {
       state.onlineUsers = action.payload;
     },
-    setSelectedUserPrefetch: (state, action: {type: string, payload: {selectedUserId: string | null, selectedUserSocketId: string | null}}) => {
+    setSelectedUserPrefetch: (state, action: {type: string, payload: {selectedUserId: string | null}}) => {
       state.selectedUserPrefetch = action.payload;
     },
     setSelectedUser: (state, action: {type: string, payload: SelectedUser | null}) => {

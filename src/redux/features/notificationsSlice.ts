@@ -4,14 +4,12 @@ export interface Notification {
   notificationId: string;
   notificationType: "incomingMessage" | "incomingVideocall";
   senderId: string;
+  receiverId: string;
   senderData: {
     firstName: string;
     lastName: string;
     avatar: string;
   };
-  senderSocketId: string;
-  receiverId: string;
-  receiverSocketId: string;
   unread: boolean;
 };
 

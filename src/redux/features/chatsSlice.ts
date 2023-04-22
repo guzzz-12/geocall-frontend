@@ -12,7 +12,6 @@ export interface Message {
   };
   recipientId: string;
   content: string;
-  senderSocketId: string;
   createdAt: string;
 };
 
