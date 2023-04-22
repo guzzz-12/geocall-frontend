@@ -65,7 +65,7 @@ const VideoCallModal = () => {
       return false;
     };
 
-    socketClient.socket.emit(SocketEvents.CALL_ACCEPTED, activeCallWith!.socketId);    
+    socketClient.socket.emit(SocketEvents.CALL_ACCEPTED, activeCallWith!.id);    
     dispatch(setVideoCall({...videoCall, status: "accepted"}));
     videoCall.callObj!.answer(localStream);
   };
@@ -74,9 +74,9 @@ const VideoCallModal = () => {
   // Finalizar/rechazar la video llamada
   const endVideoCallHandler = (mode: "end" | "reject") => {
     if (mode === "reject") {
-      socketClient.socket.emit(SocketEvents.CALL_REJECTED, activeCallWith!.socketId)
+      socketClient.socket.emit(SocketEvents.CALL_REJECTED, activeCallWith!.id)
     } else {
-      socketClient.socket.emit(SocketEvents.CALL_ENDED, activeCallWith!.socketId)
+      socketClient.socket.emit(SocketEvents.CALL_ENDED, activeCallWith!.id)
     };
     
     videoCall.callObj!.close();

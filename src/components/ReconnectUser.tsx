@@ -59,7 +59,7 @@ const ReconnectUser = () => {
 
       if (status === "busy") {
         console.log("INCOMING_CALL", "status = busy");
-        socketClient.socket.emit(SocketEvents.CALL_USER_UNAVAILABLE, data.remitent.socketId);
+        socketClient.userUnavailable(data.remitent.id);
         return false;
       };
     });

@@ -52,8 +52,8 @@ class SocketClient {
     this.socketInstance.emit(SocketEvents.INCOMING_CALL, videoCall);
   };
 
-  userUnavailable(remitentSocketId: string) {
-    this.socketInstance.emit(SocketEvents.CALL_USER_UNAVAILABLE, remitentSocketId)
+  userUnavailable(remitentId: string) {
+    this.socketInstance.emit(SocketEvents.CALL_USER_UNAVAILABLE, remitentId)
   };
 
   get socket() {
