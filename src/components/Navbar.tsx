@@ -18,7 +18,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {currentUser} = useSelector((state: UserRootState) => state.user);
-  const {all, unread} = useSelector((state: NotificationsRootState) => state.notifications);
+  const {unread} = useSelector((state: NotificationsRootState) => state.notifications);
 
   const [logoutUser, {isLoading}] = useLogoutUserMutation();
 

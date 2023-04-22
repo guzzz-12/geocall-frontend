@@ -4,6 +4,7 @@ import { UserState, userReducer } from "./features/userSlice";
 import { ChatsState, chatsReducer } from "./features/chatsSlice";
 import { NotificationsState, notificationsReducer } from "./features/notificationsSlice";
 import { VideoCallState, videoCallReducer } from "./features/videoCallSlice";
+import { ImageModalState, imageModalReducer } from "./features/imageModalSlice";
 import { api } from "./api";
 
 export interface MapRootState {
@@ -26,6 +27,10 @@ export interface VideoCallRootState {
   videoCall: VideoCallState
 };
 
+export interface ImageModalRootState {
+  imageModal: ImageModalState
+};
+
 const store = configureStore({
   reducer: {
     map: mapReducer,
@@ -33,6 +38,7 @@ const store = configureStore({
     chats: chatsReducer,
     notifications: notificationsReducer,
     videoCall: videoCallReducer,
+    imageModal: imageModalReducer,
     [api.reducerPath]: api.reducer
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({

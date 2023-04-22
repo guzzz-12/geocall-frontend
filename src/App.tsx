@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -8,6 +8,7 @@ import ReconnectUser from "./components/ReconnectUser";
 import Spinner from "./components/Spinner";
 import ChatWindow from "./components/ChatWindow";
 import VideoCallModal from "./components/VideoCallModal";
+import ImageModal from "./components/ImageModal";
 import store from "./redux/store";
 import "react-tooltip/dist/react-tooltip.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -21,11 +22,22 @@ const MapPage = lazy(() => import("./pages/MapPage"));
 axios.defaults.baseURL = "http://localhost:5000";
 
 const App = () => {
+  // Verificar la cantidad de espacio consumido y disponible
+  useEffect(() => {
+    navigator.storage
+    .estimate()
+    .then((result) => {
+      const {quota, usage} = result;
+      console.log({storage: {quota, usage}})
+    });
+  }, []);
+
   return (
     <Provider store={store}>
       <ReconnectUser />
       <Suspense fallback={<Spinner size="large" />}>
         <main className="relative min-h-screen bg-slate-100">
+          <ImageModal />
           <VideoCallModal />
           <BrowserRouter>
             <Routes>
