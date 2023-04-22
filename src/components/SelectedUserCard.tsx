@@ -46,6 +46,16 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
       chatId: v4(),
       senderId: currentUser!._id,
       recipientId: selectedUserId,
+      senderData: {
+        firstName: currentUser!.firstName,
+        lastName: currentUser!.lastName,
+        avatar: currentUser!.avatar,
+      },
+      recipientData: {
+        firstName: selectedUser!.user.firstName,
+        lastName: selectedUser!.user.lastName,
+        avatar: selectedUser!.user.avatar,
+      },
       messages: [],
       createdAt: new Date().toISOString()
     };

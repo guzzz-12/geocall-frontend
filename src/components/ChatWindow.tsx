@@ -4,7 +4,7 @@ import { v4 } from "uuid";
 import { GrClose } from "react-icons/gr";
 import { FiSend } from "react-icons/fi";
 import MessageItem from "./MessageItem";
-import { ChatsRootState, MapRootState, UserRootState } from "../redux/store";
+import { ChatsRootState, UserRootState } from "../redux/store";
 import { Message, closeChat, createMessage } from "../redux/features/chatsSlice";
 import { socketClient } from "../socket/socketClient";
 import { Notification } from "../redux/features/notificationsSlice";
@@ -14,10 +14,15 @@ const ChatWindow = () => {
 
   const dispatch = useDispatch();
   const {currentUser} = useSelector((state: UserRootState) => state.user);
-  const {selectedUser} = useSelector((state: MapRootState) => state.map);
   const {selectedChat} = useSelector((state: ChatsRootState) => state.chats);
 
   const [messageText, setMessageText] = useState("");
+
+  // Extraer la ID del otro usuario de la conversación
+  const otherUserId = selectedChat?.senderId === currentUser?._id ? selectedChat?.recipientId : selectedChat?.senderId;
+
+  // Extraer la data del otro usuario de la conversación
+  const otherUserData = selectedChat?.recipientId === currentUser?._id ? selectedChat?.senderData : selectedChat?.recipientData;
 
 
   /*----------------------------------------------------------------*/
@@ -35,16 +40,21 @@ const ChatWindow = () => {
 
 
   const onNewMessageHandler = () => {
+    if (!otherUserData || !otherUserId) {
+      return false;
+    };
+
     const msg: Message = {
       chatId: selectedChat!.chatId,
       messageId: v4(),
       senderId: currentUser!._id,
-      recipientId: selectedUser!.user._id,
+      recipientId: otherUserId,
       senderData: {
         firstName: currentUser!.firstName,
         lastName: currentUser!.lastName,
-        avatar: currentUser!.avatar
+        avatar: currentUser!.avatar,
       },
+      recipientData: otherUserData,
       content: messageText,
       createdAt: new Date().toISOString()
     };
@@ -52,7 +62,7 @@ const ChatWindow = () => {
     const notification: Notification = {
       notificationId: v4(),
       notificationType: "incomingMessage",
-      receiverId: selectedUser!.user._id,
+      receiverId: otherUserId,
       senderId: currentUser!._id,
       senderData: {
         firstName: currentUser!.firstName,
@@ -69,7 +79,7 @@ const ChatWindow = () => {
     setMessageText("");
   };
 
-  if (!selectedChat || !currentUser || !selectedUser) {
+  if (!selectedChat || !currentUser || !selectedChat || !otherUserData) {
     return null;
   };
 
@@ -81,12 +91,12 @@ const ChatWindow = () => {
           <div className="w-8 h-8 rounded-full border-2 border-gray-500 overflow-hidden">
             <img
               className="block w-full h-full object-cover object-center"
-              src={selectedUser.user.avatar}
-              alt={selectedUser.user.username}
+              src={otherUserData.avatar}
+              alt={otherUserData.firstName}
             />
           </div>
           <p className="font-semibold text-lg">
-            {selectedUser.user.firstName} {selectedUser.user.lastName}
+            {otherUserData.firstName} {otherUserData.lastName}
           </p>
         </div>
         <div className="flex justify-center items-center ml-auto cursor-pointer">
