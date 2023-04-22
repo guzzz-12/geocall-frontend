@@ -6,7 +6,7 @@ import { MdMailOutline, MdEmail } from "react-icons/md";
 import { AiOutlineLogout } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
-import NotificationsList from "./NotificationsList";
+import ChatsList from "./ChatsList";
 import { NotificationsRootState, UserRootState } from "../redux/store";
 import { api, useLogoutUserMutation } from "../redux/api";
 import { removeCurrentUser } from "../redux/features/userSlice";
@@ -65,9 +65,8 @@ const Navbar = () => {
       </div>
 
       <div className="relative flex justify-center items-stretch gap-3">
-        <NotificationsList
+        <ChatsList
           isOpen={isNotificationsOpen}
-          notifications={all}
           setIsOpen={setIsNotificationsOpen}
         />
 
