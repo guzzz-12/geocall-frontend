@@ -17,6 +17,7 @@ export interface Message {
     avatar: string;
   },
   content: string;
+  attachment: string | null,
   unread: boolean;
   createdAt: string;
 };
