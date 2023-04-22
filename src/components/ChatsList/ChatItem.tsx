@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import useSelectedUser from "../../hooks/useSelectedUser";
-import { Chat, createOrSelectChat } from "../../redux/features/chatsSlice";
+import { Chat, createOrSelectChat, setReadMessages } from "../../redux/features/chatsSlice";
 import { UserRootState } from "../../redux/store";
 
 interface Props {
@@ -14,6 +14,9 @@ const ChatItem = ({chat}: Props) => {
   // Extraer la ID del otro usuario de la conversación
   const otherUserId = chat.senderId === currentUser?._id ? chat.recipientId : chat.senderId;
 
+  // Buscar los mensajes sin leer del otro usuario
+  const unreadMessages = chat.messages.filter((msg) => msg.senderId === otherUserId && msg.unread);
+
   // Consultar la data del usuario seleccionado y actualizar el state global
   const {data, isLoading, isFetching} = useSelectedUser({selectedUserId: otherUserId});
 
@@ -25,9 +28,11 @@ const ChatItem = ({chat}: Props) => {
 
   /**
    * Abrir la ventana del chat
+   * Actualizar el unread de los mensajes a false
    */
   const onClickChatHandler = () => {
     dispatch(createOrSelectChat(chat));
+    dispatch(setReadMessages({chatId: chat.chatId}));
   };
 
 
@@ -52,9 +57,16 @@ const ChatItem = ({chat}: Props) => {
               alt={data?.user.firstName}
             />
           </div>
+
           <p className="flex-grow max-w-[full] text-sm text-left text-gray-700 text-ellipsis overflow-hidden">
             Chat with <span className="font-bold">{data?.user.firstName}</span>
-          </p>        
+          </p>
+
+          {unreadMessages.length > 0 && (
+            <p className="flex justify-center items-center w-5 h-5 ml-auto text-sm text-white font-semibold rounded-full bg-orange-700">
+              {unreadMessages.length}
+            </p>
+          )}
         </>
       )}
     </div>
