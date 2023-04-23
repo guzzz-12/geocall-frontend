@@ -68,7 +68,7 @@ const ChatItem = ({chat, setIsOpen}: Props) => {
       </p>
 
       {unreadMessages.length > 0 && (
-        <p className="flex justify-center items-center w-5 h-5 ml-auto text-sm text-white font-semibold rounded-full bg-orange-700">
+        <p className="flex justify-center items-center w-5 h-5 ml-auto flex-shrink-0 text-sm text-white font-semibold rounded-full bg-orange-600">
           {unreadMessages.length}
         </p>
       )}

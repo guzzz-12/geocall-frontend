@@ -98,7 +98,7 @@ const MapPage = () => {
     <div className="relative w-full h-screen overflow-hidden">
       <Navbar />
 
-      <div className="absolute bottom-2 left-2 flex gap-2 rounded z-[1000]">
+      <div className="absolute bottom-2 left-2 flex gap-2 rounded z-[100]">
         {MapThemeBtn()}
       </div>
 

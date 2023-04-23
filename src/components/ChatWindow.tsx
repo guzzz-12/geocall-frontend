@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { AnimatePresence, motion } from "framer-motion";
 import { v4 } from "uuid";
 import { GrClose } from "react-icons/gr";
 import { FiSend } from "react-icons/fi";
@@ -175,21 +176,6 @@ const ChatWindow = () => {
       
       {/* Input y botonera */}
       <div className="relative flex flex-col w-full flex-shrink-0 border-t border-gray-400 bg-white">
-        {/* Preview de la imagen seleccionada */}
-        {imageData && (
-          <div className="absolute -top-16 left-3 w-14 h-14 p-[2px] rounded-md border border-gray-400">
-            <FaTimesCircle
-              className="absolute -top-2 -left-2 w-4 h-4 rounded-full fill-red-500 bg-white cursor-pointer"
-              onClick={() => setImageData(null)}
-            />
-            <img
-              className="block w-full h-full object-cover object-center rounded-md"
-              src={imageData}
-              alt={"Picked image"}
-            />
-          </div>
-        )}
-
         <textarea
           className="block w-full min-h-[70px] mb-1 px-2 pt-1 flex-grow resize-none focus:outline-none scrollbar-thin scrollbar-thumb-slate-500"
           placeholder={isOnline ? "Type your message..." : "The user is offline..."}
@@ -200,6 +186,28 @@ const ChatWindow = () => {
         <div className="flex justify-end items-center gap-3 mt-1 pr-3 py-1 flex-shrink-0 border border-t border-gray-200">
           <Tooltip id="send-message-button" />
           <Tooltip id="select-image-button" />
+
+          {/* Preview de la imagen seleccionada */}
+          <AnimatePresence>
+            {imageData && (
+              <motion.div
+                className="relative ml-1 mr-auto p-[2px] rounded-md border border-gray-400"
+                initial={{width: 0, height: 0, opacity: 0}}
+                animate={{width: 60, height: 60, opacity: 1}}
+                exit={{width: 0, height: 0, opacity: 0}}
+              >
+                <FaTimesCircle
+                  className="absolute -top-2 -right-2 w-4 h-4 rounded-full fill-red-500 bg-white cursor-pointer"
+                  onClick={() => setImageData(null)}
+                />
+                <img
+                  className="block w-full h-full object-cover object-center rounded-md"
+                  src={imageData}
+                  alt={"Picked image"}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Input del selector de imágenes */}
           <input
@@ -215,7 +223,7 @@ const ChatWindow = () => {
           <BsImage
             className="w-[27px] h-[27px] opacity-80 cursor-pointer"
             data-tooltip-id="select-image-button"
-            data-tooltip-content="Add image"
+            data-tooltip-content={imageData ? "Change image" : "Add image"}
             onClick={() => fileInputRef.current?.click()}
           />
           <FiSend

@@ -25,7 +25,7 @@ const MessageItem = ({message, currentUser}: Props) => {
       {message.content.length > 0 &&
         <p
           style={{backgroundColor: isSender ? "#bae6fd" : "#d1d5db"}}
-          className="w-full px-4 py-2 text-left text-sm leading-normal rounded-lg shadow-md"
+          className="w-full px-4 py-2 text-left text-sm whitespace-pre-line leading-normal rounded-lg shadow-md"
         >
           {message.content}
         </p>

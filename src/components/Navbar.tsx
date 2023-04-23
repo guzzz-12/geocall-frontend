@@ -83,7 +83,7 @@ const Navbar = () => {
           {unread.length > 0 && (
             <>
               <MdEmail className="w-full h-full text-gray-600" />
-              <div className="absolute -top-1 -right-1 flex justify-center items-center w-5 h-5 rounded-full bg-red-700">
+              <div className="absolute -top-1 -right-1 flex justify-center items-center w-5 h-5 rounded-full bg-orange-600">
                 <span className="font-bold text-white text-sm">
                   {unread.length}
                 </span>
