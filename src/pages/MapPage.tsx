@@ -2,6 +2,7 @@ import { useState } from "react";
 import Map, { Marker, Popup, FullscreenControl, NavigationControl, GeolocateControl } from "react-map-gl";
 import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
+import { Tooltip } from "react-tooltip";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import Navbar from "../components/Navbar";
@@ -11,12 +12,31 @@ import { MapRootState, UserRootState } from "../redux/store";
 import { OnlineUser, setMyLocation, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { closeChat } from "../redux/features/chatsSlice";
 
+interface MapTheme {
+  name: string;
+  uri: string;
+  img: string;
+};
+
+const MAP_THEMES = [
+  {name: "Streets", uri: "mapbox://styles/mapbox/streets-v12", img: "streets.png"},
+  {name: "Light", uri: "mapbox://styles/mapbox/light-v11", img: "light.png"},
+  {name: "Dark", uri: "mapbox://styles/mapbox/dark-v11", img: "dark.png"},
+  {name: "Satellite", uri: "mapbox://styles/mapbox/satellite-streets-v12", img: "satellite.png"},
+  {name: "Navigation", uri: "mapbox://styles/mapbox/navigation-night-v1", img: "navigation.png"}
+];
+
+
 const MapPage = () => {
   const dispatch = useDispatch();
   const {onlineUsers, myLocation, selectedUserPrefetch: {selectedUserId}} = useSelector((state: MapRootState) => state.map);
   const {currentUser} = useSelector((state: UserRootState) => state.user);
 
+  // State del popup de la ubicación del usuario logueado
   const [showPopup, setShotPopup] = useState(false);
+
+  // State del theme del mapa
+  const [mapTheme, setMapTheme] = useState<MapTheme>(MAP_THEMES[2]);
 
   if (!myLocation || !currentUser) {
     return null;
@@ -39,11 +59,48 @@ const MapPage = () => {
   };
 
 
+  /**
+   * Botones del selector del theme del mapa
+   */
+  const MapThemeBtn = () => {
+    return MAP_THEMES.map((theme) => {
+      const isSelected = theme.name === mapTheme.name;
+
+      return (
+        <>
+          <Tooltip id={`${theme.name}-button`} style={{color: "black", background: "#f8fafc"}} />
+          <div
+            key={theme.name}
+            style={{
+              transform: `scale(${isSelected ? 1.05 : 1})`,
+              outline: isSelected ? "2px solid #ef4444" : "none"
+            }}
+            className="w-12 h-12 rounded border border-gray-400 hover:scale-105 transition-all overflow-hidden cursor-pointer"
+            data-tooltip-id={`${theme.name}-button`}
+            data-tooltip-content={theme.name}
+            onClick={() => setMapTheme(theme)}
+          >
+            <img
+              className="block w-full h-full object-cover object-center"
+              src={`/img/map-styles/${theme.img}`}
+              alt={theme.name}
+            />
+          </div>
+        </>
+      )
+    })
+  };
+
+
   const mapboxToken = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
       <Navbar />
+
+      <div className="absolute bottom-2 left-2 flex gap-2 rounded z-[1000]">
+        {MapThemeBtn()}
+      </div>
 
       <AnimatePresence>
         {selectedUserId && (
@@ -63,7 +120,7 @@ const MapPage = () => {
 
       <Map
         style={{width: "100%", height: "100%"}}
-        mapStyle="mapbox://styles/mapbox/dark-v11"
+        mapStyle={mapTheme.uri}
         mapboxAccessToken={mapboxToken}
         initialViewState={{
           latitude: myLocation.lat,
