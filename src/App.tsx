@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect } from "react";
 import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import axios from "axios";
 
 import ReconnectUser from "./components/ReconnectUser";
 import Spinner from "./components/Spinner";
@@ -18,8 +17,6 @@ const HomePage = lazy(() => import("./pages/HomePage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const SignupPage = lazy(() => import("./pages/SignupPage"));
 const MapPage = lazy(() => import("./pages/MapPage"));
-
-axios.defaults.baseURL = "http://localhost:5000";
 
 const App = () => {
   // Verificar la cantidad de espacio consumido y disponible
