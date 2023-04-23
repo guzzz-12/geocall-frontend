@@ -7,10 +7,9 @@ import usePeerConnection from "../hooks/usePeerConnection";
 import useMediaDevices from "../hooks/useMediaDevices";
 import useLocalDbInit from "../hooks/useLocalDbInit";
 import { socketClient, SocketEvents } from "../socket/socketClient";
-import { useGetCurrentUserQuery } from "../redux/api";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
 import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
-import { setCurrentUser, setHasMediaDevice, setPeerId, setUserVideoCallStatus } from "../redux/features/userSlice";
+import { setHasMediaDevice, setPeerId, setUserVideoCallStatus } from "../redux/features/userSlice";
 import { Message, incomingMessage } from "../redux/features/chatsSlice";
 import { Notification, setNotifications } from "../redux/features/notificationsSlice";
 import { VideoCallData, setActiveVideoCallData, setVideoCall } from "../redux/features/videoCallSlice";
@@ -24,11 +23,9 @@ import { VideoCallData, setActiveVideoCallData, setVideoCall } from "../redux/fe
  */
 const ReconnectUser = () => {  
   const dispatch = useDispatch();
-  const {videoCallStatus, chatStatus} = useSelector((state: UserRootState) => state.user);
+  const {currentUser, videoCallStatus, chatStatus} = useSelector((state: UserRootState) => state.user);
   const {myLocation} = useSelector((state: MapRootState) => state.map);
   const {videoCall} = useSelector((state: VideoCallRootState) => state.videoCall);
-
-  const {data: userData} = useGetCurrentUserQuery();
 
   // Obtener la ubicación del usuario
   useGetUserLocation();
@@ -102,9 +99,7 @@ const ReconnectUser = () => {
   // Escuchar el resto de los eventos de la app
   /*--------------------------------------------*/
   useEffect(() => {
-    if ("navigator" in window && userData && myLocation && peerId) {
-      const currentToken = localStorage.getItem("token");
-      dispatch(setCurrentUser({...userData, token: currentToken!}));
+    if ("navigator" in window && currentUser && myLocation && peerId) {
       dispatch(setPeerId(peerId));
 
       navigator.mediaDevices.getUserMedia({
@@ -122,7 +117,7 @@ const ReconnectUser = () => {
       // Agregar/actualizar el usuario en la lista de
       // los usuarios online del servidor de socket
       // al autenticarse o actualizar la página
-      socketClient.userReconnected(userData._id, myLocation, peerId); 
+      socketClient.userReconnected(currentUser._id, myLocation, peerId); 
 
       // Escuchar evento de usuarios online
       // para actualizar el state en tiempo real
@@ -159,13 +154,13 @@ const ReconnectUser = () => {
       socketClient.socket.on(SocketEvents.NEW_NOTIFICATION, (notification: Notification) => {
         if (
           notification.notificationType === "incomingMessage" &&
-          notification.senderId !== userData._id
+          notification.senderId !== currentUser._id
         ) {
           dispatch(setNotifications(notification))
         }
       });
     };
-  }, [userData, myLocation, peerId, chatStatus]);
+  }, [currentUser, myLocation, peerId, chatStatus]);
 
   return null;
 };
