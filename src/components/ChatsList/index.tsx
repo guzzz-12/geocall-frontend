@@ -34,7 +34,11 @@ const ChatsList = ({isOpen, setIsOpen}: Props) => {
         )}
         {chats.map(chat => {
           return (
-            <ChatItem key={chat.chatId} chat={chat} />
+            <ChatItem
+              key={chat.chatId}
+              chat={chat}
+              setIsOpen={setIsOpen}
+            />
           )
         })}
       </div>
