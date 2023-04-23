@@ -4,6 +4,7 @@ import { UserAvailability } from "./mapSlice";
 
 export interface UserState {
   currentUser: User | null;
+  isLoading: boolean;
   isAuth: boolean;
   peerId: string | null;
   hasMediaDevice: boolean;
@@ -13,6 +14,7 @@ export interface UserState {
 
 const initialState: UserState = {
   currentUser: null,
+  isLoading: true,
   isAuth: false,
   peerId: null,
   hasMediaDevice: false,
@@ -27,6 +29,7 @@ const userSlice = createSlice({
     setCurrentUser: (state, action: {type: string, payload: User}) => {
       state.isAuth = true;
       state.currentUser = action.payload;
+      state.isLoading = false;
       localStorage.setItem("token", action.payload.token);
     },
     removeCurrentUser: (state) => {
