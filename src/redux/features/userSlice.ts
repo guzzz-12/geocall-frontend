@@ -1,12 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { User } from "../api";
+import { UserAvailability } from "./mapSlice";
 
 export interface UserState {
   currentUser: User | null;
   isAuth: boolean;
   peerId: string | null;
   hasMediaDevice: boolean;
-  status: "active" | "busy";
+  videoCallStatus: "active" | "busy";
+  chatStatus: UserAvailability;
 };
 
 const initialState: UserState = {
@@ -14,7 +16,8 @@ const initialState: UserState = {
   isAuth: false,
   peerId: null,
   hasMediaDevice: false,
-  status: "active"
+  videoCallStatus: "active",
+  chatStatus: "available"
 };
 
 const userSlice = createSlice({
@@ -37,8 +40,11 @@ const userSlice = createSlice({
     setHasMediaDevice: (state, action: {type: string, payload: boolean}) => {
       state.hasMediaDevice = action.payload;
     },
-    setUserStatus: (state, action: {type: string, payload: "active" | "busy"}) => {
-      state.status = action.payload;
+    setUserVideoCallStatus: (state, action: {type: string, payload: "active" | "busy"}) => {
+      state.videoCallStatus = action.payload;
+    },
+    setChatStatus: (state, action: {type: string, payload: UserAvailability}) => {
+      state.chatStatus = action.payload;
     }
   }
 });
@@ -50,5 +56,6 @@ export const {
   removeCurrentUser,
   setPeerId,
   setHasMediaDevice,
-  setUserStatus
+  setUserVideoCallStatus,
+  setChatStatus
 } = userSlice.actions;

@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { TfiWorld } from "react-icons/tfi";
-import { MdMailOutline, MdEmail } from "react-icons/md";
+import { MdMailOutline, MdEmail, MdNotificationsNone, MdOutlineNotificationsOff } from "react-icons/md";
 import { AiOutlineLogout } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 import ChatsList from "./ChatsList";
 import { NotificationsRootState, UserRootState } from "../redux/store";
 import { api, useLogoutUserMutation } from "../redux/api";
-import { removeCurrentUser } from "../redux/features/userSlice";
+import { removeCurrentUser, setChatStatus } from "../redux/features/userSlice";
 import { clearMapState } from "../redux/features/mapSlice";
 import { setReadNotifications } from "../redux/features/notificationsSlice";
 import { socketClient } from "../socket/socketClient";
@@ -17,6 +17,7 @@ import { socketClient } from "../socket/socketClient";
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const {chatStatus} = useSelector((state: UserRootState) => state.user);
   const {currentUser} = useSelector((state: UserRootState) => state.user);
   const {unread} = useSelector((state: NotificationsRootState) => state.notifications);
 
@@ -41,6 +42,9 @@ const Navbar = () => {
     navigate("/login", {replace: true});
   };
   
+  /**
+   * Cambiar el status de las notificaciones a leídas
+   */
   const onClickNotificationsHandler = () => {
     setIsNotificationsOpen((prev) => {      
       setTimeout(() => {
@@ -50,11 +54,25 @@ const Navbar = () => {
     });
   };
 
+
+  /**
+   * Alternar la disponibilidad del usuario para chatear
+   */
+  const availabilityChangeHandler = () => {
+    const currentChatStatus = chatStatus === "available" ? "unavailable" : "available";
+    
+    dispatch(setChatStatus(currentChatStatus));
+    
+    socketClient.setUserAvailability(currentUser!._id, currentChatStatus);
+  };
+
+
   return (
     <nav className="absolute top-2 left-[50%] mx-2 -translate-x-[50%] flex justify-between items-center w-[95%] max-w-[600px] px-3 py-2 rounded border border-gray-500 bg-slate-50 z-[2]">
       {/* Tooltips de los botones del navbar */}
       <Tooltip id="msg-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}}/>
       <Tooltip id="user-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}} />
+      <Tooltip id="status-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}} />
       <Tooltip id="logout-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}} />
 
       <div className="flex justify-between items-center gap-2">
@@ -107,6 +125,17 @@ const Navbar = () => {
             {currentUser!.firstName}
           </p> */}
         </div>
+
+        {/* Botón para alternar la disponibilidad del usuario para chatear y recibir llamadas */}
+        <button
+          className="px-0 py-1 text-center text-base font-normal text-gray-600 uppercase rounded disabled:bg-slate-300 disabled:cursor-default transition-colors"
+          data-tooltip-id="status-button-tooltip"
+          data-tooltip-content={chatStatus === "available" ? "Set chat to unavailable" : "Set chat to available"}
+          onClick={availabilityChangeHandler}
+        >
+          {chatStatus === "available" && <MdNotificationsNone className="w-8 h-8" />}
+          {chatStatus === "unavailable" && <MdOutlineNotificationsOff className="w-8 h-8" />}
+        </button>
 
         <button
           className="px-0 py-1 text-center text-base font-normal text-gray-600 uppercase rounded disabled:bg-slate-300 disabled:cursor-default transition-colors"

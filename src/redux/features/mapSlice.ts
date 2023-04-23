@@ -6,10 +6,12 @@ export interface UserLocation {
   lon: number;
 };
 
+export type UserAvailability = "available" | "unavailable";
+
 export interface OnlineUser {
-  // socketId: string;
   userId: string;
   peerId: string;
+  status: UserAvailability;
   location: UserLocation
 };
 
@@ -25,7 +27,6 @@ interface OnlineUsersAction {
 
 export interface SelectedUser {
   user: User;
-  // socketId: string;
   peerId: string;
   address: string;
   location: UserLocation;
@@ -37,8 +38,7 @@ export interface MapState {
   onlineUsers: OnlineUser[];
   selectedUser: SelectedUser | null;
   selectedUserPrefetch: {
-    selectedUserId: string | null;
-    // selectedUserSocketId: string | null;
+    selectedUserId: string | null
   }
 };
 
@@ -47,8 +47,7 @@ const initialState: MapState = {
   onlineUsers: [],
   selectedUser: null,
   selectedUserPrefetch: {
-    selectedUserId: null,
-    // selectedUserSocketId: null
+    selectedUserId: null
   }
 };
 
