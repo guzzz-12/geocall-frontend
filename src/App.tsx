@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
+import RefetchCurrentUser from "./components/RefetchCurrentUser";
 import ReconnectUser from "./components/ReconnectUser";
 import Spinner from "./components/Spinner";
 import ChatWindow from "./components/ChatWindow";
@@ -17,6 +18,7 @@ const HomePage = lazy(() => import("./pages/HomePage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const SignupPage = lazy(() => import("./pages/SignupPage"));
 const MapPage = lazy(() => import("./pages/MapPage"));
+const AccountPage = lazy(() => import("./pages/AccountPage"));
 
 const App = () => {
   // Verificar la cantidad de espacio consumido y disponible
@@ -31,6 +33,7 @@ const App = () => {
 
   return (
     <Provider store={store}>
+      <RefetchCurrentUser />
       <ReconnectUser />
       <Suspense fallback={<Spinner size="large" />}>
         <main className="relative min-h-screen bg-slate-100">
@@ -40,6 +43,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<HomePage />}  />
               <Route path="/map" element={<MapPage />}  />
+              <Route path="/account" element={<AccountPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="*" element={<h1>Page not found...</h1>} />
