@@ -8,8 +8,8 @@ import { FiPhoneCall } from "react-icons/fi";
 import IconButton from "../IconButton";
 import { MapRootState, VideoCallRootState } from "../../redux/store";
 import { setActiveVideoCallData, setVideoCall } from "../../redux/features/videoCallSlice";
+import { setUserVideoCallStatus } from "../../redux/features/userSlice";
 import { SocketEvents, socketClient } from "../../socket/socketClient";
-import { setUserStatus } from "../../redux/features/userSlice";
 
 const VideoCallModal = () => {
   const myVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -82,7 +82,7 @@ const VideoCallModal = () => {
     videoCall.callObj!.close();
     dispatch(setVideoCall(null));
     dispatch(setActiveVideoCallData(null));
-    dispatch(setUserStatus("active"));
+    dispatch(setUserVideoCallStatus("active"));
   };
 
 
@@ -150,7 +150,7 @@ const VideoCallModal = () => {
               onClick={() => {
                 dispatch(setVideoCall(null));
                 dispatch(setActiveVideoCallData(null));
-                dispatch(setUserStatus("active"));
+                dispatch(setUserVideoCallStatus("active"));
               }}
             >
               Accept
@@ -168,7 +168,7 @@ const VideoCallModal = () => {
               onClick={() => {
                 dispatch(setVideoCall(null));
                 dispatch(setActiveVideoCallData(null));
-                dispatch(setUserStatus("active"));
+                dispatch(setUserVideoCallStatus("active"));
               }}
             >
               Accept

@@ -33,7 +33,7 @@ const ChatWindow = () => {
   const otherUserData = selectedChat?.recipientId === currentUser?._id ? selectedChat?.senderData : selectedChat?.recipientData;
 
   // Verificar si el usuario está online
-  const isOnline = !!onlineUsers.find(user => user.userId === otherUserId);
+  const isUserOnline = onlineUsers.find(user => user.userId === otherUserId);
 
 
   /*----------------------------------------------------------------*/
@@ -55,7 +55,13 @@ const ChatWindow = () => {
    * Enviar el mensaje
    */
   const onNewMessageHandler = () => {
-    if (!otherUserData || !otherUserId || !isOnline || (!messageText.trim().length && !imageData)) {
+    if (
+      !otherUserData ||
+      !otherUserId ||
+      !isUserOnline ||
+      isUserOnline.status === "unavailable" ||
+      (!messageText.trim().length && !imageData)
+    ) {
       return false
     };
 
@@ -138,7 +144,8 @@ const ChatWindow = () => {
 
             {/* Indicador de status online */}
             <div
-              style={{backgroundColor: isOnline ? "#16a34a" : "#9ca3af"}}
+              style={{
+                backgroundColor: isUserOnline && isUserOnline.status === "unavailable" ? "#ea580c" : isUserOnline ? "#16a34a" : "#9ca3af"}}
               className="absolute -bottom-[2px] right-[1px] w-[11px] h-[11px] rounded-full outline outline-2 outline-gray-100"
             />
           </div>
@@ -178,9 +185,13 @@ const ChatWindow = () => {
       <div className="relative flex flex-col w-full flex-shrink-0 border-t border-gray-400 bg-white">
         <textarea
           className="block w-full min-h-[70px] mb-1 px-2 pt-1 flex-grow resize-none focus:outline-none scrollbar-thin scrollbar-thumb-slate-500"
-          placeholder={isOnline ? "Type your message..." : "The user is offline..."}
+          placeholder={
+            isUserOnline && isUserOnline.status === "unavailable" ? "The user is currently unavailable..." :
+            !isUserOnline ? "The user is offline..." :
+            "Type your message..."
+          }
           value={messageText}
-          disabled={!isOnline}
+          disabled={!isUserOnline || (isUserOnline && isUserOnline.status == "unavailable")}
           onChange={(e) => setMessageText(e.currentTarget.value)}
         />
         <div className="flex justify-end items-center gap-3 mt-1 pr-3 py-1 flex-shrink-0 border border-t border-gray-200">
@@ -215,7 +226,7 @@ const ChatWindow = () => {
             type="file"
             hidden
             multiple={false}
-            disabled={!isOnline}
+            disabled={!isUserOnline || (isUserOnline && isUserOnline.status == "unavailable")}
             accept="image/png, image/jpg, image/jpeg"
             onChange={onImagePickHandler}
           />

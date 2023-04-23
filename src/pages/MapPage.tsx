@@ -67,10 +67,9 @@ const MapPage = () => {
       const isSelected = theme.name === mapTheme.name;
 
       return (
-        <>
+        <div key={theme.name}>
           <Tooltip id={`${theme.name}-button`} style={{color: "black", background: "#f8fafc"}} />
           <div
-            key={theme.name}
             style={{
               transform: `scale(${isSelected ? 1.05 : 1})`,
               outline: isSelected ? "2px solid #ef4444" : "none"
@@ -86,7 +85,7 @@ const MapPage = () => {
               alt={theme.name}
             />
           </div>
-        </>
+        </div>
       )
     })
   };
@@ -125,7 +124,7 @@ const MapPage = () => {
         initialViewState={{
           latitude: myLocation.lat,
           longitude: myLocation.lon,
-          zoom: 3
+          zoom: 2
         }}
         onLoad={() => setShotPopup(true)}
       >
