@@ -1,5 +1,5 @@
 import { Socket, io } from "socket.io-client";
-import { UserLocation } from "../redux/features/mapSlice";
+import { UserAvailability, UserLocation } from "../redux/features/mapSlice";
 import { Message } from "../redux/features/chatsSlice";
 import { Notification } from "../redux/features/notificationsSlice";
 import { VideoCallData } from "../redux/features/videoCallSlice";
@@ -17,6 +17,7 @@ export enum SocketEvents {
   CALL_ENDED = "CALL_ENDED",
   CALL_REJECTED = "CALL_REJECTED",
   CALL_USER_UNAVAILABLE = "CALL_USER_UNAVAILABLE",
+  SET_USER_AVAILABILITY = "SET_USER_AVAILABILITY",
   DISCONNECT = "DISCONNECT"
 };
 
@@ -30,10 +31,6 @@ class SocketClient {
 
   userReconnected(userId: string, location: UserLocation, peerId: string) {
     this.socketInstance.emit(SocketEvents.USER_RECONNECTED, {userId, location, peerId})
-  };
-
-  userLogin(userId: string, location: UserLocation) {
-    this.socketInstance.emit(SocketEvents.USER_LOGIN, {userId, location})
   };
 
   userLogout(userId: string) {
@@ -52,8 +49,12 @@ class SocketClient {
     this.socketInstance.emit(SocketEvents.INCOMING_CALL, videoCall);
   };
 
-  userUnavailable(remitentId: string) {
+  userCallUnavailable(remitentId: string) {
     this.socketInstance.emit(SocketEvents.CALL_USER_UNAVAILABLE, remitentId)
+  };
+
+  setUserAvailability(userId: string, availability: UserAvailability) {
+    this.socketInstance.emit(SocketEvents.SET_USER_AVAILABILITY, {userId, availability})
   };
 
   get socket() {
