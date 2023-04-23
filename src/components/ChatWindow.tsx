@@ -7,7 +7,7 @@ import { FaTimesCircle } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import { BsImage } from "react-icons/bs";
 import MessageItem from "./MessageItem";
-import { ChatsRootState, UserRootState } from "../redux/store";
+import { ChatsRootState, MapRootState, UserRootState } from "../redux/store";
 import { Message, closeChat, createMessage } from "../redux/features/chatsSlice";
 import { socketClient } from "../socket/socketClient";
 import { Notification } from "../redux/features/notificationsSlice";
@@ -20,6 +20,7 @@ const ChatWindow = () => {
   const dispatch = useDispatch();
   const {currentUser} = useSelector((state: UserRootState) => state.user);
   const {selectedChat} = useSelector((state: ChatsRootState) => state.chats);
+  const {onlineUsers} = useSelector((state: MapRootState) => state.map);
 
   const [messageText, setMessageText] = useState("");
   const [imageData, setImageData] = useState<string | null>(null);
@@ -27,8 +28,11 @@ const ChatWindow = () => {
   // Extraer la ID del otro usuario de la conversación
   const otherUserId = selectedChat?.senderId === currentUser?._id ? selectedChat?.recipientId : selectedChat?.senderId;
 
-  // Extraer la data del otro usuario de la conversación
+  // Extraer la id y la data del otro usuario de la conversación
   const otherUserData = selectedChat?.recipientId === currentUser?._id ? selectedChat?.senderData : selectedChat?.recipientData;
+
+  // Verificar si el usuario está online
+  const isOnline = !!onlineUsers.find(user => user.userId === otherUserId);
 
 
   /*----------------------------------------------------------------*/
@@ -50,7 +54,7 @@ const ChatWindow = () => {
    * Enviar el mensaje
    */
   const onNewMessageHandler = () => {
-    if (!otherUserData || !otherUserId || !messageText.trim().length && !imageData) {
+    if (!otherUserData || !otherUserId || !isOnline || (!messageText.trim().length && !imageData)) {
       return false
     };
 
@@ -124,11 +128,17 @@ const ChatWindow = () => {
       {/* Header de la bandeja */}
       <div className="flex justify-between items-stretch w-full px-3 py-2 flex-shrink-0 border-b border-gray-400 bg-gray-300">
         <div className="flex justify-start items-center gap-2">
-          <div className="w-8 h-8 rounded-full border-2 border-gray-500 overflow-hidden">
+          <div className="relative w-8 h-8">
             <img
-              className="block w-full h-full object-cover object-center"
+              className="block w-full h-full object-cover object-center rounded-full border-2 border-gray-500"
               src={otherUserData.avatar}
               alt={otherUserData.firstName}
+            />
+
+            {/* Indicador de status online */}
+            <div
+              style={{backgroundColor: isOnline ? "#16a34a" : "#9ca3af"}}
+              className="absolute -bottom-[2px] right-[1px] w-[11px] h-[11px] rounded-full outline outline-2 outline-gray-100"
             />
           </div>
           <p className="font-semibold text-lg">
@@ -182,8 +192,9 @@ const ChatWindow = () => {
 
         <textarea
           className="block w-full min-h-[70px] mb-1 px-2 pt-1 flex-grow resize-none focus:outline-none scrollbar-thin scrollbar-thumb-slate-500"
-          placeholder="Type your message..."
+          placeholder={isOnline ? "Type your message..." : "The user is offline..."}
           value={messageText}
+          disabled={!isOnline}
           onChange={(e) => setMessageText(e.currentTarget.value)}
         />
         <div className="flex justify-end items-center gap-3 mt-1 pr-3 py-1 flex-shrink-0 border border-t border-gray-200">
@@ -196,6 +207,7 @@ const ChatWindow = () => {
             type="file"
             hidden
             multiple={false}
+            disabled={!isOnline}
             accept="image/png, image/jpg, image/jpeg"
             onChange={onImagePickHandler}
           />
