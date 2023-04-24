@@ -19,6 +19,8 @@ const LoginPage = lazy(() => import("./pages/LoginPage"));
 const SignupPage = lazy(() => import("./pages/SignupPage"));
 const MapPage = lazy(() => import("./pages/MapPage"));
 const AccountPage = lazy(() => import("./pages/AccountPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 
 const App = () => {
   // Verificar la cantidad de espacio consumido y disponible
@@ -46,6 +48,8 @@ const App = () => {
               <Route path="/account" element={<AccountPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="*" element={<h1>Page not found...</h1>} />
             </Routes>
           </BrowserRouter>
