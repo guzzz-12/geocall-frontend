@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { ReactNode, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { TfiWorld } from "react-icons/tfi";
 import { MdMailOutline, MdEmail, MdNotificationsNone, MdOutlineNotificationsOff } from "react-icons/md";
@@ -14,7 +14,11 @@ import { clearMapState } from "../redux/features/mapSlice";
 import { setReadNotifications } from "../redux/features/notificationsSlice";
 import { socketClient } from "../socket/socketClient";
 
-const Navbar = () => {
+interface Props {
+  navbarType: "floating" | "static";
+};
+
+const Navbar = ({navbarType}: Props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {chatStatus} = useSelector((state: UserRootState) => state.user);
@@ -65,22 +69,49 @@ const Navbar = () => {
     
     socketClient.setUserAvailability(currentUser!._id, currentChatStatus);
   };
+  
+
+  if (!currentUser) {
+    return null;
+  };
+
+
+  // Contenedor de los elementos del navbar, el cual define el tipo de navbar
+  const Wrapper = ({children}: {children: ReactNode}) => {
+    // Navbar flotante
+    if (navbarType === "floating") {
+      return (
+        <nav className="absolute top-2 left-[50%] mx-2 -translate-x-[50%] flex justify-between items-center w-[95%] max-w-[600px] px-3 py-2 rounded border border-gray-500 bg-slate-50 z-[2]">
+          {children}
+        </nav>
+      )
+    };
+
+    // Navbar estático de ancho completo
+    return (
+      <nav className="flex justify-center items-center w-screen px-3 py-2 border-b border-gray-500 bg-slate-50">
+        <div className="flex justify-between items-center w-full max-w-[950px]">
+          {children}
+        </div>
+      </nav>
+    )
+  };
 
 
   return (
-    <nav className="absolute top-2 left-[50%] mx-2 -translate-x-[50%] flex justify-between items-center w-[95%] max-w-[600px] px-3 py-2 rounded border border-gray-500 bg-slate-50 z-[2]">
+    <Wrapper>
       {/* Tooltips de los botones del navbar */}
       <Tooltip id="msg-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}}/>
       <Tooltip id="user-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}} />
       <Tooltip id="status-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}} />
       <Tooltip id="logout-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}} />
 
-      <div className="flex justify-between items-center gap-2">
+      <Link className="flex justify-between items-center gap-2" to="/">
         <TfiWorld className="w-9 h-9 text-gray-400" />
         <h1 className="text-lg font-bold uppercase text-gray-600">
           GeoCall
         </h1>
-      </div>
+      </Link>
 
       <div className="relative flex justify-center items-stretch gap-3">
         <ChatsList
@@ -88,7 +119,7 @@ const Navbar = () => {
           setIsOpen={setIsNotificationsOpen}
         />
 
-        <div
+        <button
           className="relative flex justify-center items-center w-8 cursor-pointer"
           data-tooltip-id="msg-button-tooltip"
           data-tooltip-content="Messages"
@@ -101,30 +132,31 @@ const Navbar = () => {
           {unread.length > 0 && (
             <>
               <MdEmail className="w-full h-full text-gray-600" />
-              <div className="absolute -top-1 -right-1 flex justify-center items-center w-5 h-5 rounded-full bg-orange-600">
+              <span className="absolute -top-1 -right-1 flex justify-center items-center w-5 h-5 rounded-full bg-orange-600">
                 <span className="font-bold text-white text-sm">
                   {unread.length}
                 </span>
-              </div>
+              </span>
             </>
           )}
-        </div>
+        </button>
 
-        <div
-          className="flex justify-center items-center gap-2 rounded-full cursor-pointer"
+        <Link
+          className="flex justify-center items-center gap-2 rounded- cursor-pointer"
+          to="/account"
           data-tooltip-id="user-button-tooltip"
           data-tooltip-content="Account"
         >
-          <div className="w-8 h-8 overflow-hidden">
+          <span className="block w-8 h-8 overflow-hidden">
             <img
               src={currentUser!.avatar}
               className="block w-full h-full object-cover object-center rounded-full outline-2 outline-blue-500"
             />
-          </div>
+          </span>
           {/* <p className="text-base font-bold text-gray-600">
             {currentUser!.firstName}
           </p> */}
-        </div>
+        </Link>
 
         {/* Botón para alternar la disponibilidad del usuario para chatear y recibir llamadas */}
         <button
@@ -147,7 +179,7 @@ const Navbar = () => {
           <AiOutlineLogout className="w-8 h-8" />
         </button>
       </div>
-    </nav>
+    </Wrapper>
   )
 };
 
