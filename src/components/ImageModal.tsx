@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { MouseEvent, useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { TfiClose, TfiZoomIn, TfiZoomOut } from "react-icons/tfi";
 import { BsArrowsAngleContract } from "react-icons/bs";
@@ -6,10 +6,47 @@ import { ImageModalRootState } from "../redux/store";
 import { closeImageModal } from "../redux/features/imageModalSlice";
 
 const ImageModal = () => {
+  const imageWrapperRef = useRef<HTMLDivElement | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
+
   const dispatch = useDispatch();
   const {image, isOpen} = useSelector((state: ImageModalRootState) => state.imageModal);
 
   const [zoomLevel, setZoomLevel] = useState<number>(0);
+  
+  const [isDragging, setIsDragging] = useState(false);
+  const [imagePosition, setImagePosition] = useState<{x: number, y: number}>({x: 0, y: 0});
+
+  // Restablecer la posición de la imagen si el nivel de zoom es cero
+  useEffect(() => {
+    if (zoomLevel === 0) {
+      setImagePosition({x: 0, y: 0})
+    };
+  }, [zoomLevel]);
+
+
+  /**
+   * Actualizar el state del drag al clickear
+   */
+  const onMouseDownHandler = () => {
+    setIsDragging(true);
+  };
+  
+
+  /**
+   * Mover la imagen al mover el cursor mientras se tiene el mouse presionado
+   */
+  const onMouseMoveImageHandler = (e: MouseEvent<HTMLImageElement>) => {
+    if (isDragging && zoomLevel > 0) {
+      setImagePosition((prev) => {
+        return {
+          x: prev.x + e.movementX,
+          y: prev.y + e.movementY
+        }
+      });
+    }
+  };
+
 
   /**
    * Aumentar/disminuir/restaurar el nivel de zoom de la imagen
@@ -82,14 +119,25 @@ const ImageModal = () => {
       </div>
 
       <div
-        className="flex justify-center items-end h-[98%] aspect-[4/3] p-2 rounded-md bg-gray-900 overflow-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-white select-none"
+        ref={imageWrapperRef}
+        className="relative flex justify-center items-end h-[98%] aspect-[4/3] p-2 rounded-md bg-gray-900 overflow-hidden scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-white select-none"
         onClick={(e) => e.stopPropagation()}
       >
         <img
-          style={{transform: `scale(${1 + zoomLevel * 0.5})`}}
-          className="block w-full h-full object-contain object-center origin-top-left transition-transform"
+          ref={imageRef}
+          style={{
+            top: imagePosition.y,
+            left: imagePosition.x,
+            transform: `scale(${1 + zoomLevel * 0.5})`,
+            cursor: zoomLevel > 0 && !isDragging ? "grab" : zoomLevel > 0 && isDragging ? "grabbing" : "default"
+          }}
+          className="absolute block w-full h-full object-contain object-center origin-center transition-transform"
           src={image}
           alt="File attachment"
+          draggable={false}
+          onMouseDown={onMouseDownHandler}
+          onMouseUp={() => setIsDragging(false)}
+          onMouseMove={onMouseMoveImageHandler}
         />
       </div>
     </div>

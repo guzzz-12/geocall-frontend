@@ -131,7 +131,7 @@ const ChatWindow = () => {
 
 
   return (
-    <div className="absolute right-2 bottom-0 flex flex-col w-[330px] h-[450px] rounded-t-lg bg-slate-100 overflow-hidden z-10">
+    <div className="absolute right-2 bottom-0 flex flex-col w-[330px] h-[450px] rounded-t-lg bg-slate-100 overflow-hidden shadow-lg z-10">
       {/* Header de la bandeja */}
       <div className="flex justify-between items-stretch w-full px-3 py-2 flex-shrink-0 border-b border-gray-400 bg-gray-300">
         <div className="flex justify-start items-center gap-2">
