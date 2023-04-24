@@ -4,14 +4,14 @@
 
 @layer components {
   .auth-btn {
-    @apply flex justify-center items-center gap-2 flex-shrink-0 h-[45px] px-2 border border-slate-400 rounded
+    @apply flex justify-center items-center gap-2 flex-shrink-0 h-[35px] px-2 rounded
   }
 
   .auth-btn:disabled {
-    @apply cursor-default
+    @apply cursor-default bg-gray-300 text-gray-500
   }
 
   .auth-btn:hover {
-    @apply bg-white/25 transition-colors ease-in-out duration-300
+    @apply bg-gray-200 transition-colors ease-in-out duration-300
   }
 }

@@ -115,7 +115,7 @@ const LoginPage = () => {
             Icon={HiOutlineKey}
           />
           <button
-            className="auth-btn mt-3 text-black bg-white hover:bg-slate-300 disabled:bg-gray-300 disabled:text-gray-500"
+            className="auth-btn text-black bg-white"
             type="submit"
             disabled={isLoading}
           >
