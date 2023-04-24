@@ -5,6 +5,7 @@ import { Notification } from "../redux/features/notificationsSlice";
 import { VideoCallData } from "../redux/features/videoCallSlice";
 
 export enum SocketEvents {
+  SERVER_RESTARTED = "SERVER_RESTARTED",
   USER_RECONNECTED = "USER_RECONNECTED",
   USER_LOGIN = "USER_LOGIN",
   USER_LOGOUT = "USER_LOGOUT",

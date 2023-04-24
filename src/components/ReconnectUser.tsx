@@ -114,6 +114,11 @@ const ReconnectUser = () => {
         dispatch(setHasMediaDevice(false));
       });
 
+      // Restablecer el usuario en la lista de usuarios online al reiniciarse el servidor
+      socketClient.socket.on(SocketEvents.SERVER_RESTARTED, () => {
+        socketClient.userReconnected(currentUser._id, myLocation, peerId); 
+      });
+
       // Agregar/actualizar el usuario en la lista de
       // los usuarios online del servidor de socket
       // al autenticarse o actualizar la página
