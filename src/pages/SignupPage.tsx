@@ -173,12 +173,12 @@ const SignupPage = () => {
           />
 
           <button
-            className="auth-btn text-black bg-white"
+            className="auth-btn"
             type="submit"
             disabled={isLoading}
           >
             <span className="block mx-auto">
-              Sign up with email and password
+              Sign up
             </span>
           </button>
         </form>

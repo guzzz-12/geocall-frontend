@@ -115,12 +115,12 @@ const LoginPage = () => {
             Icon={HiOutlineKey}
           />
           <button
-            className="auth-btn text-black bg-white"
+            className="auth-btn"
             type="submit"
             disabled={isLoading}
           >
             <span className="block mx-auto">
-              Sign in with email and password
+              Login
             </span>
           </button>
         </form>

@@ -125,7 +125,7 @@ const ResetPasswordPage = () => {
           {!success &&
             <div className="flex gap-1">
               <button
-                className="auth-btn mt-3 text-black bg-green-100"
+                className="auth-btn mt-3"
                 type="submit"
                 disabled={isLoading}
               >
@@ -136,7 +136,7 @@ const ResetPasswordPage = () => {
               <Link
                 to="/login"
                 replace
-                className="auth-btn mt-3 text-black bg-white"
+                className="auth-btn mt-3"
                 onClick={(e) => isLoading && e.preventDefault()}
               >
                 <span className="block mx-auto">
@@ -148,7 +148,7 @@ const ResetPasswordPage = () => {
 
           {success &&
             <Link
-              className="auth-btn mt-3 text-black bg-white"
+              className="auth-btn mt-3"
               to="/login"
             >
               <span className="block mx-auto">

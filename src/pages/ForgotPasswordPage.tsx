@@ -96,7 +96,7 @@ const ForgotPassword = () => {
           />
 
           <button
-            className="auth-btn mt-3 text-black bg-white"
+            className="auth-btn mt-3"
             type="submit"
             disabled={isLoading}
           >
