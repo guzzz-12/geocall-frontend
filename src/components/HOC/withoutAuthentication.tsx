@@ -10,8 +10,9 @@ import { UserRootState } from "../../redux/store";
 const withoutAuthentication = (Component: ComponentType) => {
   return () => {
     const {isLoading, currentUser} = useSelector((state: UserRootState) => state.user);
+    const currentToken = localStorage.getItem("token")
 
-    if(!isLoading && currentUser) {
+    if(!isLoading && currentUser && currentToken && currentToken !== "null") {
       return <Navigate to="/map" replace />
     };
 

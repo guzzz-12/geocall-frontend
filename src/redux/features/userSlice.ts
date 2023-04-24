@@ -48,7 +48,10 @@ const userSlice = createSlice({
     },
     setChatStatus: (state, action: {type: string, payload: UserAvailability}) => {
       state.chatStatus = action.payload;
-    }
+    },
+    setIsLoadingUser: (state, action: {type: string, payload: boolean}) => {
+      state.isLoading = action.payload;
+    },
   }
 });
 
@@ -60,5 +63,6 @@ export const {
   setPeerId,
   setHasMediaDevice,
   setUserVideoCallStatus,
-  setChatStatus
+  setChatStatus,
+  setIsLoadingUser
 } = userSlice.actions;
