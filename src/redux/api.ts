@@ -16,8 +16,7 @@ export interface User {
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    // baseUrl: "http://localhost:5000/api",
-    baseUrl: "http://192.168.0.114:5000/api",
+    baseUrl: "http://localhost:5000/api",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
       headers.set("authorization", token || "");
@@ -85,7 +84,29 @@ export const api = createApi({
           const message = (response.data as {message: string}).message;
           throw Error(message);
         }
-      })
+      }),
+      forgotPassword: build.mutation<void, {email: string}>({
+        query: ({email}) => ({
+          method: "POST",
+          url: "/account/forgot-password",
+          body: {email}
+        }),
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
+      }),
+      resetPassword: build.mutation<void, {newPassword: string, token: string}>({
+        query: ({newPassword, token}) => ({
+          method: "POST",
+          url: "/account/reset-password",
+          body: {newPassword, token}
+        }),
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
+      }),
     };
   }
 });
@@ -95,5 +116,7 @@ export const {
   useLoginUserMutation,
   useSignupUserMutation,
   useLogoutUserMutation,
-  useGetUserQuery
+  useGetUserQuery,
+  useForgotPasswordMutation,
+  useResetPasswordMutation
 } = api;
