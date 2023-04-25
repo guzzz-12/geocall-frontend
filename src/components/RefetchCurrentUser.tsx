@@ -19,7 +19,6 @@ const RefetchCurrentUser = () => {
 
   useEffect(() => {
     if (data) {
-      dispatch(setIsLoadingUser(false));
       dispatch(setCurrentUser({...data, token: currentToken!}));
     };
   }, [data]);
