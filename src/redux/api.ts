@@ -9,6 +9,7 @@ export interface User {
   lastName: string;
   username: string;
   email: string;
+  emailVerified: boolean;
   avatar: string;
   token: string;
   createdAt: Date
