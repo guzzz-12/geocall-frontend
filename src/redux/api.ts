@@ -108,6 +108,24 @@ export const api = createApi({
           throw Error(message);
         }
       }),
+      getVerificationCode: build.query<void, void>({
+        query: () => "/account/get-verification-code",
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
+      }),
+      verifyAccount: build.mutation<User, {code: string}>({
+        query: ({code}) => ({
+          method: "POST",
+          url: "/account/verify-email",
+          body: {code}
+        }),
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
+      })
     };
   }
 });
@@ -119,5 +137,7 @@ export const {
   useLogoutUserMutation,
   useGetUserQuery,
   useForgotPasswordMutation,
-  useResetPasswordMutation
+  useResetPasswordMutation,
+  useGetVerificationCodeQuery,
+  useVerifyAccountMutation
 } = api;
