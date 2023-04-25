@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AiOutlineMail } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
 
+import FormsWrapper from "../components/FormsWrapper";
 import Input from "../components/AuthFormInputs/Input";
 import Alert from "../components/Alert";
 import withoutAuthentication from "../components/HOC/withoutAuthentication";
@@ -65,7 +66,7 @@ const LoginPage = () => {
 
 
   return (
-    <section className="flex flex-col justify-start items-center w-full h-screen py-10">
+    <FormsWrapper>
       <FormProvider {...methods}>
         <form
           className="flex flex-col justify-between gap-5 w-[450px] p-5 rounded bg-white shadow-lg"
@@ -148,7 +149,7 @@ const LoginPage = () => {
           </Link>
         </p>
       </div>
-    </section>
+    </FormsWrapper>
   )
 };
 

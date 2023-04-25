@@ -6,6 +6,7 @@ import { z } from "zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiOutlineKey } from "react-icons/hi";
 
+import FormsWrapper from "../components/FormsWrapper";
 import Input from "../components/AuthFormInputs/Input";
 import Alert from "../components/Alert";
 import withoutAuthentication from "../components/HOC/withoutAuthentication";
@@ -65,7 +66,7 @@ const ResetPasswordPage = () => {
   };
 
   return (
-    <section className="flex flex-col justify-start items-center w-full h-screen py-10">
+    <FormsWrapper>
       <FormProvider {...methods}>
         <form
           className="flex flex-col justify-between gap-3 w-[450px] p-5 rounded bg-white shadow-lg"
@@ -158,7 +159,7 @@ const ResetPasswordPage = () => {
           }
         </form>
       </FormProvider>
-    </section>
+    </FormsWrapper>
   )
 };
 
