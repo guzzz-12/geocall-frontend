@@ -1,13 +1,15 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "./Spinner";
-import { useGetCurrentUserQuery } from "../redux/api";
-import { setCurrentUser, setIsLoadingUser } from "../redux/features/userSlice";
+import { api, useGetCurrentUserQuery } from "../redux/api";
+import { removeCurrentUser, setCurrentUser, setIsLoadingUser } from "../redux/features/userSlice";
 import { UserRootState } from "../redux/store";
+import { clearMapState } from "../redux/features/mapSlice";
+import { socketClient } from "../socket/socketClient";
 
 const RefetchCurrentUser = () => {
   const dispatch = useDispatch();
-  const {isLoading: isLoadingUser} = useSelector((state: UserRootState) => state.user);
+  const {isLoading: isLoadingUser, currentUser} = useSelector((state: UserRootState) => state.user);
   const currentToken = localStorage.getItem("token");
 
   // No realizar la consulta si no hay token
@@ -20,14 +22,21 @@ const RefetchCurrentUser = () => {
       dispatch(setIsLoadingUser(false));
       dispatch(setCurrentUser({...data, token: currentToken!}));
     };
+  }, [data]);
 
-    // Si hay error en la consulta o no hay token
-    // pasar el state loading a false
-    if (isError || !currentToken || currentToken === "null") {
-      dispatch(setIsLoadingUser(false))
+
+  // Si hay error en la consulta
+  // pasar el state loading a false
+  // y resetear el state global del usuario
+  useEffect(() => {
+    if (isError) {
+      currentUser && socketClient.userLogout(currentUser!._id);
+      dispatch(api.util.resetApiState());
+      dispatch(removeCurrentUser());
+      dispatch(clearMapState());
+      dispatch(setIsLoadingUser(false));
     };
-
-  }, [data, isError, currentToken]);
+  }, [isError, currentUser]);
 
 
   if(isLoading || isLoadingUser) {
