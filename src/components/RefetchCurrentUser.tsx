@@ -36,6 +36,10 @@ const RefetchCurrentUser = () => {
       dispatch(clearMapState());
       dispatch(setIsLoadingUser(false));
     };
+    
+    if (!currentUser) {
+      dispatch(setIsLoadingUser(false));
+    }
   }, [isError, currentUser]);
 
 
