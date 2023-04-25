@@ -10,7 +10,7 @@ import peerClient from "../utils/peerClient";
  */
 const usePeerConnection = () => {
   const dispatch = useDispatch();
-  const {status} = useSelector((state: UserRootState) => state.user);
+  const {videoCallStatus} = useSelector((state: UserRootState) => state.user);
   const {localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
   
   const [peerId, setPeerId] = useState<string | null>(null);
@@ -27,7 +27,7 @@ const usePeerConnection = () => {
         return false;
       };
 
-      if (status === "busy") {
+      if (videoCallStatus === "busy") {
         return false;
       };
 
@@ -49,7 +49,7 @@ const usePeerConnection = () => {
         console.log("Call ended by the other user")
       });
     });
-  }, [localStream, status]);
+  }, [localStream, videoCallStatus]);
 
   return {peerId};
 };
