@@ -7,7 +7,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import Navbar from "../components/Navbar";
 import SelectedUserCard from "../components/SelectedUserCard";
-import withAuthentication from "../components/HOC/withAuthentication";
+import withVerification from "../components/HOC/withVerification";
 import { MapRootState, UserRootState } from "../redux/store";
 import { OnlineUser, setMyLocation, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { closeChat } from "../redux/features/chatsSlice";
@@ -169,4 +169,4 @@ const MapPage = () => {
   )
 };
 
-export default withAuthentication(MapPage);
+export default withVerification(MapPage);
