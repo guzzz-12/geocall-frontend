@@ -10,9 +10,10 @@ import { UserRootState } from "../../redux/store";
 const withVerification = (Component: ComponentType) => {
   return () => {
     const {isLoading, currentUser}= useSelector((state: UserRootState) => state.user);
+    const token = localStorage.getItem("token");
     
     // Si no está autenticado, redirigir a la página de login
-    if(!isLoading && !currentUser) {
+    if(!isLoading && !currentUser && !token) {
       return <Navigate to="/login" replace />
     };
 
