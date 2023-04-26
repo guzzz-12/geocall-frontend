@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Map, { Marker, Popup, FullscreenControl, NavigationControl, GeolocateControl } from "react-map-gl";
 import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import { Tooltip } from "react-tooltip";
+import { toast } from "react-toastify";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import Navbar from "../components/Navbar";
 import SelectedUserCard from "../components/SelectedUserCard";
 import withVerification from "../components/HOC/withVerification";
 import { MapRootState, UserRootState } from "../redux/store";
-import { OnlineUser, setMyLocation, setSelectedUserPrefetch } from "../redux/features/mapSlice";
+import { OnlineUser, setMyLocation, setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { closeChat } from "../redux/features/chatsSlice";
 
 interface MapTheme {
@@ -29,14 +30,30 @@ const MAP_THEMES = [
 
 const MapPage = () => {
   const dispatch = useDispatch();
-  const {onlineUsers, myLocation, selectedUserPrefetch: {selectedUserId}} = useSelector((state: MapRootState) => state.map);
+  const {onlineUsers, myLocation, selectedUser, selectedUserPrefetch: {selectedUserId}} = useSelector((state: MapRootState) => state.map);
   const {currentUser} = useSelector((state: UserRootState) => state.user);
+
+  // Verificar si el usuario está offline
+  const isUserOffline = !onlineUsers.find(user => user.userId === selectedUserId);
 
   // State del popup de la ubicación del usuario logueado
   const [showPopup, setShotPopup] = useState(false);
 
   // State del theme del mapa
   const [mapTheme, setMapTheme] = useState<MapTheme>(MAP_THEMES[2]);
+
+
+  // Si el usuario seleccionado se desconecta, cerrar el card
+  // y limpiar el state del usuario seleccionado
+  useEffect(() => {
+    if (selectedUser && isUserOffline) {
+      dispatch(setSelectedUser(null));
+      dispatch(setSelectedUserPrefetch({selectedUserId: null}));
+
+      toast.info(`${selectedUser.user.firstName} disconnected`);
+    }
+  }, [isUserOffline, selectedUser]);
+
 
   if (!myLocation || !currentUser) {
     return null;
@@ -102,7 +119,7 @@ const MapPage = () => {
       </div>
 
       <AnimatePresence>
-        {selectedUserId && (
+        {selectedUserId && !isUserOffline && (
           <motion.aside
             key="selectedUserCard"
             className="absolute top-[50%] left-2 z-10"
