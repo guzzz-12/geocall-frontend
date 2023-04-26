@@ -39,7 +39,7 @@ const App = () => {
       <RefetchCurrentUser />
       <ReconnectUser />
       <Suspense fallback={<Spinner size="large" />}>
-        <main className="relative min-h-screen bg-slate-100">
+        <main className="relative min-h-screen bg-slate-100 overflow-x-hidden">
           <ImageModal />
           <VideoCallModal />
           <BrowserRouter>
