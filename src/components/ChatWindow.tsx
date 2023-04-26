@@ -10,9 +10,9 @@ import { BsImage } from "react-icons/bs";
 import MessageItem from "./MessageItem";
 import { ChatsRootState, MapRootState, UserRootState } from "../redux/store";
 import { Message, closeChat, createMessage } from "../redux/features/chatsSlice";
-import { socketClient } from "../socket/socketClient";
 import { Notification } from "../redux/features/notificationsSlice";
 import { imageResizer } from "../utils/imgResizer";
+import { socketClient } from "../socket/socketClient";
 
 const ChatWindow = () => {
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
@@ -129,6 +129,35 @@ const ChatWindow = () => {
     return null;
   };
 
+  
+  /**
+   * Texto animado indicador de estado offline o unavailable
+   */
+  const StatusText = ({status}: {status: "offline" | "unavailable"}) => {
+    let text = "";
+
+    if (status === "offline") {
+      text = "is offline"
+    };
+
+    if (status === "unavailable") {
+      text = "is currently unavailable"
+    };
+
+    return (
+      <motion.div
+        className="absolute -top-5 left-0 w-full px-2 text-center text-sm uppercase z-10"
+        initial={{translateY: "100%", opacity: 0}}
+        animate={{translateY: "0", opacity: 1}}
+        exit={{translateY: "100%", opacity: 0}}
+      >
+        <p className="text-red-600 overflow-ellipsis whitespace-nowrap overflow-hidden">
+          {otherUserData.firstName} {text}
+        </p>
+      </motion.div>
+    )
+  };
+
 
   return (
     <div className="absolute right-2 bottom-0 flex flex-col w-[330px] h-[450px] rounded-t-lg bg-slate-100 overflow-hidden shadow-lg z-10">
@@ -145,7 +174,8 @@ const ChatWindow = () => {
             {/* Indicador de status online */}
             <div
               style={{
-                backgroundColor: isUserOnline && isUserOnline.status === "unavailable" ? "#ea580c" : isUserOnline ? "#16a34a" : "#9ca3af"}}
+                backgroundColor: isUserOnline && isUserOnline.status === "unavailable" ? "#ea580c" : isUserOnline ? "#16a34a" : "#9ca3af"
+              }}
               className="absolute -bottom-[2px] right-[1px] w-[11px] h-[11px] rounded-full outline outline-2 outline-gray-100"
             />
           </div>
@@ -162,9 +192,7 @@ const ChatWindow = () => {
       </div>
 
       {/* Bandeja con la lista de mensajes */}
-      <div
-        className="w-full flex-grow p-3 scrollbar-thin scrollbar-thumb-gray-400 overflow-y-auto"
-      >
+      <div className="w-full flex-grow p-3 scrollbar-thin scrollbar-thumb-gray-400 overflow-y-auto">
         <div className="relative flex flex-col justify-start gap-4">
           {selectedChat.messages.map(msg => {
             return (
@@ -175,28 +203,43 @@ const ChatWindow = () => {
               />
             )
           })}
-          
+
           {/* Elemento vacío para referencia del scroll to bottom */}
           <div ref={chatBottomRef} className="absolute bottom-0" />
         </div>
       </div>
       
       {/* Input y botonera */}
-      <div className="relative flex flex-col w-full flex-shrink-0 border-t border-gray-400 bg-white">
+      <div
+        style={{
+          pointerEvents: isUserOnline && isUserOnline.status === "available" ? "all" : "none",
+          backgroundColor: isUserOnline && isUserOnline.status === "available" ? "white" : "#eee"
+        }}
+        className="flex flex-col w-full flex-shrink-0 border-t border-gray-400 bg-white transition-colors overflow-hidden"
+      >
         <textarea
           className="block w-full min-h-[70px] mb-1 px-2 pt-1 flex-grow resize-none focus:outline-none scrollbar-thin scrollbar-thumb-slate-500"
-          placeholder={
-            isUserOnline && isUserOnline.status === "unavailable" ? "The user is currently unavailable..." :
-            !isUserOnline ? "The user is offline..." :
-            "Type your message..."
-          }
+          placeholder="Type your message..."
           value={messageText}
-          disabled={!isUserOnline || (isUserOnline && isUserOnline.status == "unavailable")}
+          disabled={!isUserOnline || (isUserOnline && isUserOnline.status === "unavailable")}
           onChange={(e) => setMessageText(e.currentTarget.value)}
         />
-        <div className="flex justify-end items-center gap-3 mt-1 pr-3 py-1 flex-shrink-0 border border-t border-gray-200">
+        
+        <div className="relative flex justify-end items-center gap-3 mt-1 pr-3 py-1 flex-shrink-0 border border-t border-gray-200">
           <Tooltip id="send-message-button" />
           <Tooltip id="select-image-button" />
+
+          {/* Texto de estado offline */}
+          <AnimatePresence>
+            {!isUserOnline && <StatusText status="offline" />}
+          </AnimatePresence>
+
+          {/* Texto de estado unavailable */}
+          <AnimatePresence>
+            {isUserOnline && isUserOnline.status === "unavailable" &&
+              <StatusText status="unavailable" />
+            }
+          </AnimatePresence>
 
           {/* Preview de la imagen seleccionada */}
           <AnimatePresence>
@@ -226,7 +269,7 @@ const ChatWindow = () => {
             type="file"
             hidden
             multiple={false}
-            disabled={!isUserOnline || (isUserOnline && isUserOnline.status == "unavailable")}
+            disabled={!isUserOnline || (isUserOnline && isUserOnline.status === "unavailable")}
             accept="image/png, image/jpg, image/jpeg"
             onChange={onImagePickHandler}
           />
