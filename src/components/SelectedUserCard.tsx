@@ -1,6 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
+import { MediaConnection } from "peerjs";
 import dayjs from "dayjs";
 import { v4 } from "uuid";
+import { toast } from "react-toastify";
 import { GrClose } from "react-icons/gr";
 import { AiOutlineWechat } from "react-icons/ai";
 import { MdVideocam } from "react-icons/md";
@@ -31,11 +33,14 @@ interface Props {
 const SelectedUserCard = ({selectedUserId}: Props) => {
   const dispatch = useDispatch();
   const {currentUser} = useSelector((state: UserRootState) => state.user);
-  const {selectedUser} = useSelector((state: MapRootState) => state.map);
+  const {selectedUser, onlineUsers} = useSelector((state: MapRootState) => state.map);
   const {localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
 
   // Consultar la data del usuario seleccionado y actualizar el state global
   const {isLoading, isFetching} = useSelectedUser({selectedUserId});
+
+  // Verificar si el usuario está offline
+  const isUserOffline = !onlineUsers.find(user => user.userId === selectedUser?.user._id);
 
 
   /**
@@ -68,7 +73,7 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
    * Iniciar una videollamada con el usuario seleccionado
    */
   const onVideoCallClickHandler = () => {
-    if (!localStream || !selectedUser) {
+    if (!localStream || !selectedUser || isUserOffline) {
       return false;
     };
 
@@ -88,38 +93,64 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
         avatar: selectedUser.user.avatar
       }
     };
+
+    let call: MediaConnection | null = null;
     
     try {
-      const call = peerClient.getInstance.call(recipientPeerId, localStream);
+      // Intentar iniciar la videollamada
+      call = peerClient.getInstance.call(recipientPeerId, localStream);
 
-      // Almacenar el objeto call en el state global
-      // para acceder a éste desde el resto de la app
-      dispatch(setVideoCall({callObj: call, status: "calling"}));
-
-      // Almacenar la data del usuario recipiente en el state global
-      dispatch(setActiveVideoCallData(videoCallData.recipient));
-
-      // Pasar el status del usuario a busy
-      dispatch(setUserVideoCallStatus("busy"));
-
-      // Emitir el evento de videollamada al usuario recipiente
-      socketClient.videoCall(videoCallData);
-  
-      call.on("error", (err) => {
-        console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`)
-      });
-  
-      // Almacenar el stream remoto en el state global
-      // cuando el usuario recipiente acepta la llamada
-      call.on("stream", (remoteStream) => {
-        console.log(`Videocall with ${selectedUser.user.firstName} initialized`);
-        dispatch(setRemoteStream(remoteStream));
-      });
-      
     } catch (err: any) {
       console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`);
+
+      // Restaurar el state de la videollamada en caso de error
       dispatch(setUserVideoCallStatus("active"));
-    }
+      dispatch(setActiveVideoCallData(null));
+      dispatch(setVideoCall(null));
+
+      // Cerrar la videollamada en caso de error
+      if (call) {
+        call.close()
+      };
+
+      return false;
+    };
+
+    if (!call) {
+      return false;
+    };
+
+    // Almacenar el objeto call en el state global
+    // para acceder a éste desde el resto de la app
+    dispatch(setVideoCall({callObj: call, status: "calling"}));
+
+    // Almacenar la data del usuario recipiente en el state global
+    dispatch(setActiveVideoCallData(videoCallData.recipient));
+
+    // Pasar el status del usuario a busy
+    dispatch(setUserVideoCallStatus("busy"));
+
+    // Emitir el evento de videollamada al usuario recipiente
+    socketClient.videoCall(videoCallData);
+
+    call.on("error", (err) => {
+      console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`);
+
+      // Mostrar notificación de error de llamada
+      toast.error(
+        "Error establishing connection with the user. Refresh the page and try again...",
+        {
+          position: "bottom-right"
+        }
+      );
+    });
+
+    // Almacenar el stream remoto en el state global
+    // cuando el usuario recipiente acepta la llamada
+    call.on("stream", (remoteStream) => {
+      console.log(`Videocall with ${selectedUser.user.firstName} initialized`);
+      dispatch(setRemoteStream(remoteStream));
+    });
   };
 
 
@@ -185,9 +216,11 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
                   tooltipText={
                     !localStream ? `Connect your camera to start a videocall with ${selectedUser.user.firstName}`
                     :
+                    isUserOffline ? "The user is offline"
+                    :
                     "Start videocall"
                   }
-                  disabled={!localStream}
+                  disabled={!localStream || isUserOffline}
                   onClickHandler={onVideoCallClickHandler}
                 />
               </div>
