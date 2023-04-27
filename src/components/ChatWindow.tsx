@@ -113,7 +113,7 @@ const ChatWindow = () => {
 
     if(files) {
       const file = files[0];
-      const imageBase64 = await imageResizer(file);
+      const imageBase64 = await imageResizer(file, "base64") as string;
       setImageData(imageBase64);
     };
 

@@ -1,6 +1,6 @@
 import Resizer from "react-image-file-resizer";
 
-const resizeFile = (file: File) => {
+const resizeFile = (file: File, type: "file" | "base64") => {
   return new Promise((resolve) => {
     Resizer.imageFileResizer(
       file,
@@ -12,14 +12,14 @@ const resizeFile = (file: File) => {
       (uri) => {
         resolve(uri);
       },
-      "base64"
+      type
     );
   });
 };
 
-export const imageResizer = async (file: File) => {
+export const imageResizer = async (file: File, type: "file" | "base64") => {
   try {
-    const resizedImage = await resizeFile(file) as string;
+    const resizedImage = await resizeFile(file, type) as File | string;
     return resizedImage;
     
   } catch (error: any) {
