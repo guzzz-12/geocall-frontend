@@ -56,7 +56,7 @@ const DeleteAccountForm = ({error, loading, animationProps, methods, setError, o
         <div className="w-full h-[1px] mb-3 bg-gray-200" />
 
         <Input
-          id="password"
+          id="password-3"
           type="password"
           name="password"
           placeholder="Your password"

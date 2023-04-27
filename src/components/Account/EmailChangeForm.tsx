@@ -72,7 +72,7 @@ const EmailChangeForm = ({success, error, setSuccess, setError, loading, animati
         />
 
         <Input
-          id="emailFormPassword"
+          id="password-2"
           type="password"
           name="password"
           placeholder="Password"
