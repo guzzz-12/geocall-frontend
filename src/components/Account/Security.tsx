@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,7 +11,7 @@ import PasswordChangeForm from "./PasswordChangeForm";
 import DeleteAccountForm from "./DeleteAccountForm";
 import EmailChangeForm from "./EmailChangeForm";
 import { INVALID_PASSWORD_MSG, PASSWORD_REGEX } from "../../utils/consts";
-import { useChangeEmailMutation } from "../../redux/accountApi";
+import { useChangeEmailMutation, useChangePasswordMutation } from "../../redux/accountApi";
 import { setCurrentUser } from "../../redux/features/userSlice";
 
 const PasswordFormSchema = z.object({
@@ -79,6 +79,7 @@ const Security = () => {
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
 
   const [changeEmail] = useChangeEmailMutation();
+  const [changePassword] = useChangePasswordMutation();
 
   const passwordMethods = useForm<PasswordFormSchemaType>({resolver: zodResolver(PasswordFormSchema)});
   const emailMethods = useForm<EmailFormSchemaType>({resolver: zodResolver(EmailFormSchema)});
@@ -92,12 +93,16 @@ const Security = () => {
     setPasswordChangeSuccess(null);
     setPasswordChangeError(null);
     
-    setTimeout(() => {
-      setChangingPassword(false);
-      setPasswordChangeSuccess("Password changed successfully");
-      console.log({values});
+    try {
+      const updatedUser = await changePassword(values).unwrap();
+      setPasswordChangeSuccess("Password updated successfully.");
+      dispatch(setCurrentUser(updatedUser));
       passwordMethods.reset();
-    }, 1500);
+    } catch (error: any) {
+      setPasswordChangeError(error.message);
+    } finally {
+      setChangingPassword(false);      
+    };
   };
 
   /**

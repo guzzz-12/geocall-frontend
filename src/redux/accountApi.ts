@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { EmailFormSchemaType, PasswordFormSchemaType } from "../components/Account/Security";
 import { User } from "./api";
-import { EmailFormSchemaType } from "../components/Account/Security";
 
 export const accountApi = createApi({
   baseQuery: fetchBaseQuery({
@@ -28,8 +28,25 @@ export const accountApi = createApi({
           throw Error(message);
         }
       }),
+      changePassword: build.mutation<User, PasswordFormSchemaType>({
+        query: ({password, newPassword}) => ({
+          url: "/account/change-password",
+          method: "POST",
+          body: {password, newPassword},
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }),
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
+      }),
     }
   }
 });
 
-export const {useChangeEmailMutation} = accountApi;
+export const {
+  useChangeEmailMutation,
+  useChangePasswordMutation
+} = accountApi;
