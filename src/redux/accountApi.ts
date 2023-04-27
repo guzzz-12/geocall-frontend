@@ -4,7 +4,7 @@ import { User } from "./api";
 
 export const accountApi = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api",
+    baseUrl: "http://localhost:5000/api/account",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
       headers.set("authorization", token || "");
@@ -14,9 +14,20 @@ export const accountApi = createApi({
   reducerPath: "accountApi",
   endpoints: (build) => {
     return {
+      updateAvatar: build.mutation<User, {data: FormData}>({
+        query: ({data}) => ({
+          url: "/update-avatar",
+          method: "POST",
+          body: data
+        }),
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
+      }),
       changeEmail: build.mutation<User, EmailFormSchemaType>({
         query: ({newEmail, password}) => ({
-          url: "/account/change-email",
+          url: "/change-email",
           method: "POST",
           body: {newEmail, password},
           headers: {
@@ -30,7 +41,7 @@ export const accountApi = createApi({
       }),
       changePassword: build.mutation<User, PasswordFormSchemaType>({
         query: ({password, newPassword}) => ({
-          url: "/account/change-password",
+          url: "/change-password",
           method: "POST",
           body: {password, newPassword},
           headers: {
@@ -44,7 +55,7 @@ export const accountApi = createApi({
       }),
       deleteAccount: build.mutation<void, DeleteAccountFormSchemaType>({
         query: ({password}) => ({
-          url: "/account/delete-account",
+          url: "/delete-account",
           method: "POST",
           body: {password},
           headers: {
@@ -61,6 +72,7 @@ export const accountApi = createApi({
 });
 
 export const {
+  useUpdateAvatarMutation,
   useChangeEmailMutation,
   useChangePasswordMutation,
   useDeleteAccountMutation
