@@ -6,6 +6,7 @@ import { NotificationsState, notificationsReducer } from "./features/notificatio
 import { VideoCallState, videoCallReducer } from "./features/videoCallSlice";
 import { ImageModalState, imageModalReducer } from "./features/imageModalSlice";
 import { api } from "./api";
+import { accountApi } from "./accountApi";
 
 export interface MapRootState {
   map: MapState;
@@ -39,14 +40,15 @@ const store = configureStore({
     notifications: notificationsReducer,
     videoCall: videoCallReducer,
     imageModal: imageModalReducer,
-    [api.reducerPath]: api.reducer
+    [api.reducerPath]: api.reducer,
+    [accountApi.reducerPath]: accountApi.reducer
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
     serializableCheck: {
       ignoredActions: ["videoCall/setVideoCall", "videoCall/setLocalStream", "videoCall/setRemoteStream"],
       ignoredPaths: ["videoCall.videoCall", "videoCall.localStream", "videoCall.remoteStream"]
     }
-  }).concat(api.middleware)
+  }).concat([api.middleware, accountApi.middleware])
 });
 
 export default store;

@@ -1,14 +1,18 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AnimationProps } from "framer-motion";
+import { toast } from "react-toastify";
 
 import ContentWrapper from "./ContentWrapper";
 import PasswordChangeForm from "./PasswordChangeForm";
 import DeleteAccountForm from "./DeleteAccountForm";
 import EmailChangeForm from "./EmailChangeForm";
 import { INVALID_PASSWORD_MSG, PASSWORD_REGEX } from "../../utils/consts";
+import { useChangeEmailMutation } from "../../redux/accountApi";
+import { setCurrentUser } from "../../redux/features/userSlice";
 
 const PasswordFormSchema = z.object({
   password: z
@@ -34,7 +38,7 @@ const EmailFormSchema = z.object({
     .string({required_error: "The email address is required"})
     .nonempty("The email is required")
     .email("Invalid email address"),
-  emailFormPassword: z
+  password: z
     .string({required_error: "The password is required"})
     .nonempty("The password is required")
 });
@@ -61,6 +65,8 @@ const animationProps: AnimationProps = {
 
 
 const Security = () => {
+  const dispatch = useDispatch();
+
   const [changingPassword, setChangingPassword] = useState(false);
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState<string | null>(null);
   const [passwordChangeError, setPasswordChangeError] = useState<string | null>(null);
@@ -71,6 +77,8 @@ const Security = () => {
 
   const [deletingAccount, setDeletingAccount] = useState(false);
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
+
+  const [changeEmail] = useChangeEmailMutation();
 
   const passwordMethods = useForm<PasswordFormSchemaType>({resolver: zodResolver(PasswordFormSchema)});
   const emailMethods = useForm<EmailFormSchemaType>({resolver: zodResolver(EmailFormSchema)});
@@ -99,13 +107,22 @@ const Security = () => {
     setChangingEmail(true);
     setEmailChangeSuccess(null);
     setEmailChangeError(null);
-    
-    setTimeout(() => {
+
+    try {
+      const updatedUser = await changeEmail(values).unwrap();
+      
+      toast.success(
+        "Email updated successfully. Check your inbox to verify the new email address"
+      );
+      
+      dispatch(setCurrentUser(updatedUser));
+      
+    } catch (error: any) {
+      setEmailChangeError(error.message);
+
+    } finally {
       setChangingEmail(false);
-      setEmailChangeSuccess("Email changed successfully. Verify your new email address.");
-      console.log({values});
-      emailMethods.reset();
-    }, 1500);
+    };
   };
 
   /**
