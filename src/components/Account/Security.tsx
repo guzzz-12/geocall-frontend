@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,7 +14,7 @@ import { INVALID_PASSWORD_MSG, PASSWORD_REGEX } from "../../utils/consts";
 import { useChangeEmailMutation, useChangePasswordMutation, useDeleteAccountMutation } from "../../redux/accountApi";
 import { setCurrentUser, removeCurrentUser } from "../../redux/features/userSlice";
 import { socketClient } from "../../socket/socketClient";
-import { UserRootState } from "../../redux/store";
+import { User } from "../../redux/api";
 
 const PasswordFormSchema = z.object({
   password: z
@@ -66,9 +66,12 @@ const animationProps: AnimationProps = {
 };
 
 
-const Security = () => {
+interface Props {
+  currentUser: User;
+};
+
+const Security = ({currentUser}: Props) => {
   const dispatch = useDispatch();
-  const {currentUser} = useSelector((state: UserRootState) => state.user);
 
   const [changingPassword, setChangingPassword] = useState(false);
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState<string | null>(null);

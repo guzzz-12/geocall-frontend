@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { AnimatePresence, motion, AnimationProps } from "framer-motion";
 import { FaCog } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
@@ -8,6 +9,7 @@ import Navbar from "../components/Navbar";
 import withVerification from "../components/HOC/withVerification";
 import Profile from "../components/Account/Profile";
 import Security from "../components/Account/Security";
+import { UserRootState } from "../redux/store";
 
 const animationProps: AnimationProps = {
   initial: "hidden",
@@ -22,7 +24,13 @@ const animationProps: AnimationProps = {
 };
 
 const AccountPage = () => {
+  const {currentUser} = useSelector((state: UserRootState) => state.user);
+
   const [activeTab, setActiveTab] = useState(1);
+
+  if (!currentUser) {
+    return null;
+  };
 
   return (
     <section className="flex flex-col justify-start h-[100dvh] overflow-hidden">
@@ -67,7 +75,7 @@ const AccountPage = () => {
                 className="h-full -z-20"
                 {...animationProps}
               >
-                <Profile />
+                <Profile currentUser={currentUser} />
               </motion.div>
             }
             {activeTab === 2 &&
@@ -76,7 +84,7 @@ const AccountPage = () => {
                 className="h-full -z-20"
                 {...animationProps}
               >
-                <Security />
+                <Security currentUser={currentUser} />
               </motion.div>
             }
           </AnimatePresence>
