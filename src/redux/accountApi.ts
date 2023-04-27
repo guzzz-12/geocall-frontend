@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { EmailFormSchemaType, PasswordFormSchemaType } from "../components/Account/Security";
+import { DeleteAccountFormSchemaType, EmailFormSchemaType, PasswordFormSchemaType } from "../components/Account/Security";
 import { User } from "./api";
 
 export const accountApi = createApi({
@@ -42,11 +42,26 @@ export const accountApi = createApi({
           throw Error(message);
         }
       }),
+      deleteAccount: build.mutation<void, DeleteAccountFormSchemaType>({
+        query: ({password}) => ({
+          url: "/account/delete-account",
+          method: "POST",
+          body: {password},
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }),
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
+      })
     }
   }
 });
 
 export const {
   useChangeEmailMutation,
-  useChangePasswordMutation
+  useChangePasswordMutation,
+  useDeleteAccountMutation
 } = accountApi;

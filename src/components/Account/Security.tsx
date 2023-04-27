@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,8 +11,10 @@ import PasswordChangeForm from "./PasswordChangeForm";
 import DeleteAccountForm from "./DeleteAccountForm";
 import EmailChangeForm from "./EmailChangeForm";
 import { INVALID_PASSWORD_MSG, PASSWORD_REGEX } from "../../utils/consts";
-import { useChangeEmailMutation, useChangePasswordMutation } from "../../redux/accountApi";
-import { setCurrentUser } from "../../redux/features/userSlice";
+import { useChangeEmailMutation, useChangePasswordMutation, useDeleteAccountMutation } from "../../redux/accountApi";
+import { setCurrentUser, removeCurrentUser } from "../../redux/features/userSlice";
+import { socketClient } from "../../socket/socketClient";
+import { UserRootState } from "../../redux/store";
 
 const PasswordFormSchema = z.object({
   password: z
@@ -66,6 +68,7 @@ const animationProps: AnimationProps = {
 
 const Security = () => {
   const dispatch = useDispatch();
+  const {currentUser} = useSelector((state: UserRootState) => state.user);
 
   const [changingPassword, setChangingPassword] = useState(false);
   const [passwordChangeSuccess, setPasswordChangeSuccess] = useState<string | null>(null);
@@ -80,6 +83,7 @@ const Security = () => {
 
   const [changeEmail] = useChangeEmailMutation();
   const [changePassword] = useChangePasswordMutation();
+  const [deleteAccount] = useDeleteAccountMutation();
 
   const passwordMethods = useForm<PasswordFormSchemaType>({resolver: zodResolver(PasswordFormSchema)});
   const emailMethods = useForm<EmailFormSchemaType>({resolver: zodResolver(EmailFormSchema)});
@@ -137,11 +141,19 @@ const Security = () => {
     setDeletingAccount(true);
     setDeleteAccountError(null);
 
-    setTimeout(() => {
+    try {
+      await deleteAccount(values).unwrap();
+
+      socketClient.userLogout(currentUser!._id);
+
+      dispatch(removeCurrentUser());
+
+      toast.success("Account deleted successfully.");
+      
+    } catch (error: any) {
       setDeletingAccount(false);
-      console.log({values});
-      deleteAccountMethods.reset();
-    }, 1500);
+      setDeleteAccountError(error.message);
+    }
   };
 
   return (
