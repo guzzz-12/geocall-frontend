@@ -151,7 +151,7 @@ const ChatWindow = () => {
         animate={{translateY: "0", opacity: 1}}
         exit={{translateY: "100%", opacity: 0}}
       >
-        <p className="text-red-600 overflow-ellipsis whitespace-nowrap overflow-hidden">
+        <p className="text-red-600 text-ellipsis">
           {otherUserData.firstName} {text}
         </p>
       </motion.div>

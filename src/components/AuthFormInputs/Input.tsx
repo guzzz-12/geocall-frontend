@@ -51,7 +51,7 @@ const Input = ({id, name, type, placeholder, disabled, Icon}: Props) => {
 
         {/* Íconos al final del input */}
         <div className="absolute right-0 top-0 bottom-0 flex items-center pr-3 pointer-event-none">
-          {(name === "password" || name === "passwordConfirm") &&
+          {(name === "password" || name === "passwordConfirm" || name === "newPassword") &&
             <>
               {!showPassword && (
                 <AiOutlineEye

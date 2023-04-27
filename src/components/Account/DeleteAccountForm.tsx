@@ -21,6 +21,7 @@ const DeleteAccountForm = ({error, loading, animationProps, methods, setError, o
     <FormProvider {...methods}>
       <form
         className="flex flex-col gap-3 w-[450px] mx-auto px-4 py-3 rounded-md bg-white shadow-md"
+        noValidate
         onSubmit={methods.handleSubmit(onSubmitHandler)}
       >
         <div>

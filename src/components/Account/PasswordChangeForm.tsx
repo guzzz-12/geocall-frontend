@@ -22,6 +22,7 @@ const PasswordChangeForm = ({success, error, setSuccess, setError, loading, anim
     <FormProvider {...methods}>
       <form
         className="flex flex-col gap-3 w-[450px] mx-auto px-4 py-3 rounded-md bg-white shadow-md"
+        noValidate
         onSubmit={methods.handleSubmit(onSubmitHandler)}
       >
         <div className="flex justify-center items-center gap-3 w-full">

@@ -199,7 +199,7 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
             {/* Nombre y botones de mensaje y llamada */}
             <div className="flex flex-col justify-center items-center grow-0 gap-2 w-[50%] max-w-[50%] overflow-hidden">
               <p
-                className="max-w-[100%] font-semibold text-center text-2xl overflow-ellipsis whitespace-nowrap overflow-hidden text-gray-700"
+                className="max-w-[100%] font-semibold text-center text-2xl text-gray-700 text-ellipsis"
                 title={`${selectedUser.user.firstName} ${selectedUser.user.lastName}`}
               >
                 {selectedUser.user.firstName} {selectedUser.user.lastName}

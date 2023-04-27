@@ -23,6 +23,7 @@ const EmailChangeForm = ({success, error, setSuccess, setError, loading, animati
     <FormProvider {...methods}>
       <form
         className="flex flex-col gap-3 w-[450px] mx-auto px-4 py-3 rounded-md bg-white shadow-md"
+        noValidate
         onSubmit={methods.handleSubmit(onSubmitHandler)}
       >
         <div>
@@ -33,7 +34,9 @@ const EmailChangeForm = ({success, error, setSuccess, setError, loading, animati
             </p>
           </div>
           <p className="text-xs text-center text-red-700">
-            You will be required to verify your new email address
+            You will be required to verify your new email address. <br />
+            Make sure to use a real email address <br />
+            or you will lose access to your account!
           </p>
         </div>
 
@@ -71,7 +74,7 @@ const EmailChangeForm = ({success, error, setSuccess, setError, loading, animati
         <Input
           id="emailFormPassword"
           type="password"
-          name="emailFormPassword"
+          name="password"
           placeholder="Password"
           disabled={loading}
           Icon={HiOutlineKey}

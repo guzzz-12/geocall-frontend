@@ -89,8 +89,8 @@ const Navbar = ({navbarType}: Props) => {
 
     // Navbar estático de ancho completo
     return (
-      <nav className="flex justify-center items-center w-screen px-3 py-2 border-b border-gray-500 bg-slate-50">
-        <div className="flex justify-between items-center w-full max-w-[950px]">
+      <nav className="w-full px-3 py-2 border-b bg-slate-50 shadow-sm">
+        <div className="flex justify-between items-center container-md">
           {children}
         </div>
       </nav>
