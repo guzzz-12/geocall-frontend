@@ -97,14 +97,28 @@ const Navbar = ({navbarType}: Props) => {
     )
   };
 
+  
+  /**
+   * Generar tooltip especificando la ID.
+   */
+  const RenderTooltip = ({id}: {id: string}) => {
+    return (
+      <Tooltip
+        style={{color: "black", background: "#f8fafc", zIndex: 30}}
+        id={id}
+        noArrow
+      />
+    )
+  };
+
 
   return (
     <Wrapper>
       {/* Tooltips de los botones del navbar */}
-      <Tooltip id="msg-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}}/>
-      <Tooltip id="user-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}} />
-      <Tooltip id="status-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}} />
-      <Tooltip id="logout-button-tooltip" noArrow style={{color: "black", background: "#f8fafc"}} />
+      <RenderTooltip id="msg-button-tooltip" />
+      <RenderTooltip id="user-button-tooltip" />
+      <RenderTooltip id="status-button-tooltip" />
+      <RenderTooltip id="logout-button-tooltip" />
 
       <Link className="flex justify-between items-center gap-2" to="/">
         <TfiWorld className="w-9 h-9 text-gray-400" />
