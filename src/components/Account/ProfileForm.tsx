@@ -28,7 +28,16 @@ const FormSchema = z.object({
     .string()
     .min(3, "The username must be at least 3 characters")
     .max(32, "The username must be maximum 32 character")
-    .regex(USERNAME_REGEX, "The username must start with a letter and can contain only alphanumeric characters, underscores (_) and hyphens (-)")
+    .regex(USERNAME_REGEX, "The username must start with a letter and can contain only alphanumeric characters, underscores (_) and hyphens (-)"),
+  instagram: z
+  .string()
+  .min(0),
+  facebook: z
+  .string()
+  .min(0),
+  twitter: z
+  .string()
+  .min(0)
 });
 
 export type ProfileFormSchemaType = z.infer<typeof FormSchema>;
