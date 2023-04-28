@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { distance } from "@turf/turf";
 import { MapRootState } from "../redux/store";
 import { SelectedUser, UserLocation, setSelectedUser } from "../redux/features/mapSlice";
-import { useGetUserQuery } from "../redux/api";
+import { useGetUserWithLocationQuery } from "../redux/api";
 
 interface Props {
   selectedUserId: string;
@@ -22,7 +22,7 @@ const useSelectedUser = ({selectedUserId}: Props) => {
   const [selectedUserPeerId, setSelectedUserPeerId] = useState("");
 
   // Consultar la data del usuario seleccionado
-  const {data, isLoading, isFetching} = useGetUserQuery(
+  const {data, isLoading, isFetching} = useGetUserWithLocationQuery(
     {userId: selectedUserId, location: selectedUserLocation!},
     {skip: !selectedUserId || !selectedUserLocation}
   );

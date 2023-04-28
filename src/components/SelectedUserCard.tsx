@@ -52,11 +52,13 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
       senderId: currentUser!._id,
       recipientId: selectedUserId,
       senderData: {
+        _id: currentUser!._id,
         firstName: currentUser!.firstName,
         lastName: currentUser!.lastName,
         avatar: currentUser!.avatar,
       },
       recipientData: {
+        _id: selectedUser!.user._id,
         firstName: selectedUser!.user.firstName,
         lastName: selectedUser!.user.lastName,
         avatar: selectedUser!.user.avatar,
@@ -65,7 +67,15 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
       createdAt: new Date().toISOString()
     };
 
-    dispatch(createOrSelectChat(chat));
+    dispatch(createOrSelectChat({
+      chat,
+      otherMember: {
+        _id: selectedUser!.user._id,
+        firstName: selectedUser!.user.firstName,
+        lastName: selectedUser!.user.lastName,
+        avatar: selectedUser!.user.avatar,
+      }
+    }));
   };
 
 
@@ -165,7 +175,7 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
   
 
   return (
-    <div className="w-[300px] min-h-[400px] max-h-[500px] translate-y-[-50%] rounded-md border border-gray-500 bg-slate-50 scrollbar-thumb-gray-600 scrollbar-thin overflow-y-auto overflow-x-hidden">
+    <div className="w-[300px] min-h-[500px] max-h-[500px] translate-y-[-50%] rounded-md border border-gray-500 bg-slate-50 scrollbar-thumb-gray-600 scrollbar-thin overflow-y-auto overflow-x-hidden">
       <div
         className="absolute top-1 right-1 p-1 cursor-pointer"
         onClick={() => {
@@ -186,7 +196,7 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
 
       {!isLoading && selectedUser && (
         <div className="flex flex-col justify-start items-center w-full max-w-full h-full">
-          <div className="flex justify-center items-center gap-4 w-full max-w-[100%] mb-4 p-4 bg-gradient-to-b from-transparent to-gray-300 shadow-sm">
+          <div className="flex flex-col justify-center items-center gap-4 w-full max-w-[100%] mb-4 p-4 bg-gradient-to-b from-transparent to-gray-300 shadow-sm">
             {/* Avatar del usuario */}
             <div className="w-32 h-32 shrink-0 rounded-full border-4 border-blue-600 overflow-hidden">
               <img
@@ -197,7 +207,7 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
             </div>
 
             {/* Nombre y botones de mensaje y llamada */}
-            <div className="flex flex-col justify-center items-center grow-0 gap-2 w-[50%] max-w-[50%] overflow-hidden">
+            <div className="flex flex-col justify-center items-center grow-0 gap-2 max-w-[100%] overflow-hidden">
               <p
                 className="max-w-[100%] font-semibold text-center text-2xl text-gray-700 text-ellipsis"
                 title={`${selectedUser.user.firstName} ${selectedUser.user.lastName}`}

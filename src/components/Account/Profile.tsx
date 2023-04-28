@@ -172,7 +172,7 @@ const Profile = ({currentUser}: Props) => {
         {/* Botón para editar el perfil */}
         <div
           style={{display: isFormEnabled ? "none" : "flex"}}
-          className="absolute top-5 right-4 justify-center items-center w-10 h-10 p-1 rounded-full border-2 border-blue-500 hover:bg-gray-300 transition-colors cursor-pointer z-20"
+          className="absolute top-5 right-4 justify-center items-center w-10 h-10 p-1 rounded-full border-2 border-blue-500 hover:bg-gray-300 transition-colors cursor-pointer z-[15]"
           data-tooltip-id="edit-profile-tooltip"
           data-tooltip-content="Edit profile"
           onClick={() => setIsFormEnabled(true)}
@@ -231,7 +231,7 @@ const Profile = ({currentUser}: Props) => {
                   data-tooltip-content="Save changes"
                   onClick={() => !savingAvatar && updateAvatarHandler()}
                 >
-                  <BsFillCheckCircleFill className="w-full h-full" color="green" />
+                  <BsFillCheckCircleFill className="w-full h-full" color="#16a34a" />
                 </div>
 
                 {/* Botón para descartar el avatar seleccionado */}
