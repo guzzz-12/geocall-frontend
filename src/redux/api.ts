@@ -84,7 +84,14 @@ export const api = createApi({
         },
         invalidatesTags: ["User"]
       }),
-      getUser: build.query<{user: User, address: string}, {userId: string, location: UserLocation}>({
+      getUser: build.query<User, {userId: string}>({
+        query: ({userId}) => `/users/user/${userId}`,
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
+      }),
+      getUserWithLocation: build.query<{user: User, address: string}, {userId: string, location: UserLocation}>({
         query: ({userId, location: {lat, lon}}) => `/users/user/${userId}/${lat}/${lon}`,
         providesTags: ["SelectedUser"],
         transformErrorResponse: (response) => {
@@ -142,6 +149,7 @@ export const {
   useSignupUserMutation,
   useLogoutUserMutation,
   useGetUserQuery,
+  useGetUserWithLocationQuery,
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useGetVerificationCodeQuery,
