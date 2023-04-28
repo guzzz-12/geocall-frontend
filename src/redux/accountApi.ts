@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { DeleteAccountFormSchemaType, EmailFormSchemaType, PasswordFormSchemaType } from "../components/Account/Security";
+import { ProfileFormSchemaType } from "../components/Account/ProfileForm";
 import { User } from "./api";
 
 export const accountApi = createApi({
@@ -20,6 +21,30 @@ export const accountApi = createApi({
           method: "POST",
           body: data
         }),
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
+      }),
+      updateProfile: build.mutation<User, ProfileFormSchemaType>({
+        query: ({firstName, lastName, username, facebook, instagram, twitter}) => {
+          const ig = {name: "instagram", link: instagram || null};
+          const fb = {name: "facebook", link: facebook || null};
+          const tw = {name: "twitter", link: twitter || null};
+
+          const socialLinks = [ig, fb, tw];
+
+          return {
+            url: "/update-profile",
+            method: "POST",
+            body: {
+              firstName,
+              lastName,
+              username,
+              socialLinks
+            }
+          }
+        },
         transformErrorResponse: (response) => {
           const message = (response.data as {message: string}).message;
           throw Error(message);
@@ -73,6 +98,7 @@ export const accountApi = createApi({
 
 export const {
   useUpdateAvatarMutation,
+  useUpdateProfileMutation,
   useChangeEmailMutation,
   useChangePasswordMutation,
   useDeleteAccountMutation
