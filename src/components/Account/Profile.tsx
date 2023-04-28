@@ -187,9 +187,9 @@ const Profile = ({currentUser}: Props) => {
               alt={username}
             />
 
-            {/* Botón para seleccionar el nuevo avatar */}
+            {/* Botones para seleccionar el nuevo avatar y eliminar el actual avatar */}
             {!imageData &&
-              <div className="absolute bottom-0 -right-5 flex gap-1 z-10">
+              <div className="absolute bottom-0 -right-5 flex gap-1 w-16 z-10">
                 <div
                   className="flex justify-center items-center w-8 h-8 p-1 rounded-full border-2 border-blue-500 bg-white cursor-pointer"
                   data-tooltip-id="change-avatar-tooltip"
@@ -198,8 +198,10 @@ const Profile = ({currentUser}: Props) => {
                 >
                   <AiOutlineEdit className="w-6 h-6" />
                 </div>
+
                 <div
-                  className="flex justify-center items-center rounded-full bg-white cursor-pointer"
+                  style={{display: currentUser.avatarPublicId.length ? "flex" : "none"}}
+                  className="justify-center items-start rounded-full bg-white cursor-pointer"
                   data-tooltip-id="delete-avatar-tooltip"
                   data-tooltip-content="Delete avatar"
                   onClick={() => !savingAvatar && deleteAvatarHandler()}

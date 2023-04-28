@@ -11,6 +11,7 @@ export interface User {
   email: string;
   emailVerified: boolean;
   avatar: string;
+  avatarPublicId: string;
   socialLinks: [{
     _id: string;
     name: "instagram" | "facebook" | "twitter";
