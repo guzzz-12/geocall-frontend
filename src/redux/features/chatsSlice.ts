@@ -1,21 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 import db from "../../db/GeoCallDB";
 
+export interface ChatMember {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+};
+
 export interface Message {
   messageId: string;
   chatId: string;
   senderId: string;
   recipientId: string;
-  senderData: {
-    firstName: string;
-    lastName: string;
-    avatar: string;
-  };
-  recipientData: {
-    firstName: string;
-    lastName: string;
-    avatar: string;
-  },
+  senderData: ChatMember;
+  recipientData: ChatMember,
   content: string;
   attachment: string | null,
   unread: boolean;
@@ -26,16 +25,8 @@ export interface Chat {
   chatId: string;
   senderId: string;
   recipientId: string;
-  senderData: {
-    firstName: string;
-    lastName: string;
-    avatar: string;
-  },
-  recipientData: {
-    firstName: string;
-    lastName: string;
-    avatar: string;
-  },
+  senderData: ChatMember,
+  recipientData: ChatMember,
   messages: Message[];
   createdAt: string;
 };
@@ -72,22 +63,32 @@ const chatsSlice = createSlice({
     initStoredChats: (state, action: {type: string, payload: Chat[]}) => {
       state.chats = action.payload;
     },
-    createOrSelectChat: (state, action: {type: string, payload: Chat}) => {
-      const {senderId, recipientId} = action.payload;
+    createOrSelectChat: (state, action: {type: string, payload: {chat: Chat, otherMember: ChatMember}}) => {
+      const {chat: {senderId, recipientId}, otherMember} = action.payload;
 
       // Verificar si existe un chat entre ambos usuarios
       const chatExists = checkIfChatExists(state, senderId, recipientId);
 
-      // Si ya existe un chat con el usuario que seleccioné, seleccionarlo
-      // Si el chat no existe, crearlo y seleccionarlo
+      // Si ya existe un chat con el usuario seleccionado
+      // seleccionarlo y actualizar su data con la data del backend
+      // en caso de que el usuario haya actualizado su perfil
+      // Si el chat no existe, crearlo y seleccionarlo.
       if (chatExists) {
+        if (chatExists.senderId === otherMember._id) {
+          chatExists.senderData = otherMember;
+        };
+
+        if (chatExists.recipientId === otherMember._id) {
+          chatExists.recipientData === otherMember
+        };
+
         state.selectedChat = chatExists;
       } else {
-        state.chats = [action.payload, ...state.chats];
-        state.selectedChat = action.payload;
+        state.chats = [action.payload.chat, ...state.chats];
+        state.selectedChat = action.payload.chat;
 
         // Agregar el chat a la base de datos local
-        db.chats.add(action.payload);
+        db.chats.add(action.payload.chat);
       };
     },
     closeChat: (state) => {
