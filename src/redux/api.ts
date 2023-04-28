@@ -11,6 +11,11 @@ export interface User {
   email: string;
   emailVerified: boolean;
   avatar: string;
+  socialLinks: [{
+    _id: string;
+    name: "instagram" | "facebook" | "twitter";
+    link: string;
+  }];
   token: string;
   createdAt: Date
 };

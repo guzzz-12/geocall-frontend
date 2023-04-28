@@ -1,17 +1,24 @@
 import { ChangeEvent, useRef, useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import dayjs from "dayjs";
+import { toast } from "react-toastify";
 import { Tooltip } from "react-tooltip";
+import { FiMail } from "react-icons/fi";
+import { HiAtSymbol } from "react-icons/hi";
+import { BsCalendarDay } from "react-icons/bs";
 import { AiOutlineEdit } from "react-icons/ai";
 import { GoVerified } from "react-icons/go";
 import { BsFillCheckCircleFill } from "react-icons/bs";
 import { MdCancel } from "react-icons/md";
 import { CgSpinner } from "react-icons/cg";
+import { FaInstagram, FaFacebookSquare, FaTwitter } from "react-icons/fa";
+import dayjs from "dayjs";
+
+import ProfileForm from "./ProfileForm";
+import SocialLink from "./SocialLink";
 import { User } from "../../redux/api";
 import { imageResizer } from "../../utils/imgResizer";
 import { useUpdateAvatarMutation } from "../../redux/accountApi";
 import { setCurrentUser } from "../../redux/features/userSlice";
-import { toast } from "react-toastify";
 
 interface Props {
   currentUser: User;
@@ -19,15 +26,17 @@ interface Props {
 
 const Profile = ({currentUser}: Props) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const formButtonsRef = useRef<HTMLDivElement | null>(null);
 
   const dispatch = useDispatch();
 
-  const {avatar, email, emailVerified, firstName, lastName, username, createdAt} = currentUser;
+  const {avatar, email, emailVerified, firstName, lastName, username, socialLinks, createdAt} = currentUser;
 
   const [imageData, setImageData] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-
   const [savingAvatar, setSavingAvatar] = useState(false);
+
+  const [isFormEnabled, setIsFormEnabled] = useState(false);
 
   // Actualizar o eliminar el avatar
   const [updateAvatar] = useUpdateAvatarMutation();
@@ -39,6 +48,23 @@ const Profile = ({currentUser}: Props) => {
       setImagePreview(url)
     }
   }, [imageData]);
+
+  // Scrollear al fondo del formulario de
+  // actualización del perfil al habilitarlo
+  useEffect(() => {
+    if (isFormEnabled && formButtonsRef) {
+      formButtonsRef.current?.scrollIntoView({behavior: "smooth"})
+    }
+  }, [isFormEnabled, formButtonsRef]);
+
+  /**
+   * Obtener el ref del parent de los botones del formulario
+   * de actualización del perfil para scrollear
+   * al bottom al activar el formulario.
+   */
+  const getProfileFormBtnsRef = (ref: HTMLDivElement) => {
+    formButtonsRef.current = ref;
+  };
 
   /**
    * Seleccionar una imagen
@@ -114,7 +140,8 @@ const Profile = ({currentUser}: Props) => {
   };
 
   return (
-    <section>
+    <section className="w-full h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400">
+      <Tooltip id="edit-profile-tooltip" style={{zIndex: 1000}} />
       <Tooltip id="verified-icon-tooltip" style={{zIndex: 1000}} />
       <Tooltip id="change-avatar-tooltip" style={{zIndex: 1000}} />
       <Tooltip id="discard-avatar-tooltip" style={{zIndex: 1000}} />
@@ -131,7 +158,18 @@ const Profile = ({currentUser}: Props) => {
         onChange={onImagePickHandler}
       />
 
-      <article className="relative w-full shadow-lg overflow-hidden">
+      <article className="relative w-full shadow-md">
+        {/* Botón para editar el perfil */}
+        <div
+          style={{display: isFormEnabled ? "none" : "flex"}}
+          className="absolute top-5 right-4 justify-center items-center w-10 h-10 p-1 rounded-full border-2 border-blue-500 hover:bg-gray-300 transition-colors cursor-pointer z-20"
+          data-tooltip-id="edit-profile-tooltip"
+          data-tooltip-content="Edit profile"
+          onClick={() => setIsFormEnabled(true)}
+        >
+          <AiOutlineEdit className="w-8 h-8" />
+        </div>
+
         <div className="relative flex flex-col justify-start items-center gap-6 px-4 py-5 z-[10]">
           <div className="relative w-[180px] h-[180px]">
             {/* Overlay y spinner del avatar para indicar que se está subiendo */}
@@ -174,6 +212,7 @@ const Profile = ({currentUser}: Props) => {
             {/* Botones para guardar y descartar el nuevo avatar */}
             {imageData && (
               <div className="absolute bottom-0 -right-5 flex gap-1">
+                {/* Botón para confirmar el cambio de avatar */}
                 <div
                   className="flex justify-center items-center w-8 h-8 rounded-full bg-white cursor-pointer z-10"
                   data-tooltip-id="change-avatar-tooltip"
@@ -182,11 +221,17 @@ const Profile = ({currentUser}: Props) => {
                 >
                   <BsFillCheckCircleFill className="w-full h-full" color="green" />
                 </div>
+
+                {/* Botón para descartar el avatar seleccionado */}
                 <div
                   className="flex justify-center items-center w-8 h-8 rounded-full bg-white cursor-pointer z-10"
                   data-tooltip-id="discard-avatar-tooltip"
                   data-tooltip-content="Discard changes"
-                  onClick={() => !savingAvatar && setImageData(null)}
+                  onClick={() => {
+                    if (savingAvatar) return false;
+                    setImageData(null);
+                    setImagePreview(null);
+                  }}
                 >
                   <MdCancel className="w-full h-full" color="rgb(234 88 12)" />
                 </div>
@@ -195,7 +240,7 @@ const Profile = ({currentUser}: Props) => {
           </div>
 
           {/* Contenedor del texto */}
-          <div className="flex flex-col justify-start items-start">
+          <div className="flex flex-col justify-start items-start gap-1">
             <div className="flex justify-start items-baseline gap-2 mb-2 text-3xl font-bold">
               <span>{firstName}</span>
               <span>{lastName}</span>
@@ -206,15 +251,26 @@ const Profile = ({currentUser}: Props) => {
                 data-tooltip-content="Account verified"
               />
             </div>
-            <p className="text-base text-gray-900">
-              @{username}
+            <p className="flex justify-start items-center gap-2 text-base text-gray-900">
+              <HiAtSymbol className="w-4 h-4 opacity-60" /> {username}
             </p>
-            <p className="text-base text-gray-900">
-              {email}
+            <p className="flex justify-start items-center gap-2 text-base text-gray-900">
+              <FiMail className="w-4 h-4 opacity-60" /> {email}
             </p>
-            <p className="text-base text-gray-900">
-              In GeoCall since {dayjs(createdAt).format("MMM DD, YYYY")}
+            <p className="flex justify-start items-center gap-2 text-base text-gray-900">
+              <BsCalendarDay className="w-4 h-4 opacity-60" />
+              {`In GeoCall since ${dayjs(createdAt).format("MMM DD, YYYY")}`}
             </p>
+          </div>
+
+          <div className="flex justify-center items-center gap-10 w-full">
+            {socialLinks.map((item) => {
+              const {_id, name, link} = item;
+
+              const icon = name === "instagram" ? FaInstagram : name === "facebook" ? FaFacebookSquare : FaTwitter;
+
+              return <SocialLink key={_id} Icon={icon} name={name} link={link} />
+            })}
           </div>
         </div>
 
@@ -228,6 +284,11 @@ const Profile = ({currentUser}: Props) => {
         </div>
       </article>
 
+      <ProfileForm
+        enabled={isFormEnabled}
+        setEnabled={setIsFormEnabled}
+        getProfileFormBtnsRef={getProfileFormBtnsRef}
+      />
     </section>
   )
 };

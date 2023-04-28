@@ -20,7 +20,7 @@ const animationProps: AnimationProps = {
     visible: {translateX: 0},
     exit: {translateX: "100%"}
   },
-  transition: {type: "spring", bounce: 0.15, mass: 0.35, stiffness: 150}
+  transition: {type: "spring", bounce: 0.1, mass: 0.3, stiffness: 130}
 };
 
 const AccountPage = () => {
