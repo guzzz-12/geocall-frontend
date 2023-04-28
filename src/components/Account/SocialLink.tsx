@@ -12,7 +12,7 @@ const SocialLink = ({name, link, Icon}: Props) => {
       <Icon className="w-6 h-6"/>
       {link &&
         <a
-          className="text-blue-700 underline"
+          className="text-blue-700 underline capitalize"
           href={link}
           referrerPolicy="no-referrer"
           target="_blank"
@@ -21,7 +21,7 @@ const SocialLink = ({name, link, Icon}: Props) => {
         </a>
       }
       {!link &&
-        <p className="font-normal text-left text-gray-700">
+        <p className="font-normal text-left text-gray-700 capitalize">
           {name}
         </p>
       }
