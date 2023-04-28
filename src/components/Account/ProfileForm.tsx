@@ -125,7 +125,7 @@ const ProfileForm = ({enabled, getProfileFormBtnsRef, setEnabled}: Props) => {
   };
 
   return (
-    <article className="w-full max-w-[500px] mx-auto px-4 py-10">
+    <article className="w-full max-w-[500px] mx-auto px-4 py-8">
       <FormProvider {...methods}>
         <form
           className="flex flex-col gap-5"

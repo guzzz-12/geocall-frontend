@@ -25,6 +25,7 @@ interface Props {
 };
 
 const Profile = ({currentUser}: Props) => {
+  const sectionRef = useRef<HTMLDivElement | null>(null); 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const formButtonsRef = useRef<HTMLDivElement | null>(null);
 
@@ -56,6 +57,12 @@ const Profile = ({currentUser}: Props) => {
       formButtonsRef.current?.scrollIntoView({behavior: "smooth"})
     }
   }, [isFormEnabled, formButtonsRef]);
+
+  useEffect(() => {
+    if (!isFormEnabled && sectionRef) {
+      sectionRef.current?.scrollTo({top: 0, behavior: "smooth"})
+    }
+  }, [sectionRef, isFormEnabled]);
 
   /**
    * Obtener el ref del parent de los botones del formulario
@@ -140,7 +147,10 @@ const Profile = ({currentUser}: Props) => {
   };
 
   return (
-    <section className="w-full h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400">
+    <section
+      ref={sectionRef}
+      className="w-full h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400"
+    >
       <Tooltip id="edit-profile-tooltip" style={{zIndex: 1000}} />
       <Tooltip id="verified-icon-tooltip" style={{zIndex: 1000}} />
       <Tooltip id="change-avatar-tooltip" style={{zIndex: 1000}} />
