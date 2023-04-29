@@ -7,7 +7,7 @@ interface Props {
 
 const EmojiPicker = ({pickEmojiHandler}: Props) => {
   return (
-    <div className="absolute bottom-[120px] right-[24px] w-max h-auto z-30000000">
+    <div className="absolute bottom-[120px] right-[24px] w-max h-auto z-[100]">
       <Picker
         data={facebookEmojisData}
         set="facebook"

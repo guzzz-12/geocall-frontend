@@ -21,8 +21,13 @@ const MessageItem = ({message, currentUser}: Props) => {
   return (
     <div
       style={{ marginLeft: isSender ? "auto" : 0}}
-      className="w-[max-content] max-w-[85%]"
+      className="relative w-[max-content] max-w-[85%]"
     >
+      <Tooltip
+        style={{color: "black", background: "#f8fafc", zIndex: 100}}
+        id="image-attachement-tooltip"
+      />
+
       {message.content.length > 0 &&
         <div
           style={{backgroundColor: isSender ? "#bae6fd" : "#d1d5db"}}
@@ -37,17 +42,13 @@ const MessageItem = ({message, currentUser}: Props) => {
       {message.attachment &&
         <div
           className="relative"
-          data-tooltip-id="open-image-tooltip"
+          data-tooltip-id="image-attachement-tooltip"
           data-tooltip-content="View full screen"
           data-tooltip-float={true}
           onClick={() => dispatch(openImageModal(message.attachment!))}
         >
-          <Tooltip
-            style={{color: "black", background: "#f8fafc"}}
-            id="open-image-tooltip"
-          />
           <div
-            className="absolute top-0 left-0 flex flex-col justify-center items-center w-full h-full opacity-0 hover:bg-[rgba(0,0,0,0.55)] hover:opacity-100 transition-all cursor-pointer"
+            className="absolute top-0 left-0 flex flex-col justify-center items-center w-full h-full opacity-0 rounded-lg hover:bg-[rgba(0,0,0,0.55)] hover:opacity-100 transition-all cursor-pointer"
           >
             <BiFullscreen className="w-10 h-10 fill-white" />
           </div>
