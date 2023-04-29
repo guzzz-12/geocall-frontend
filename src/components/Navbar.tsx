@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { TfiWorld } from "react-icons/tfi";
@@ -7,12 +7,12 @@ import { AiOutlineLogout } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 import ChatsList from "./ChatsList";
-import { NotificationsRootState, UserRootState } from "../redux/store";
-import { api } from "../redux/api";
+import { ChatsRootState, NotificationsRootState, UserRootState } from "../redux/store";
+import { api, useGetUsersMutation } from "../redux/api";
 import { removeCurrentUser, setChatStatus } from "../redux/features/userSlice";
 import { clearMapState } from "../redux/features/mapSlice";
 import { setReadNotifications } from "../redux/features/notificationsSlice";
-import { clearSelectedChatState } from "../redux/features/chatsSlice";
+import { ChatMember, clearSelectedChatState } from "../redux/features/chatsSlice";
 import { socketClient } from "../socket/socketClient";
 
 interface Props {
@@ -22,11 +22,36 @@ interface Props {
 const Navbar = ({navbarType}: Props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const {chats} = useSelector((state: ChatsRootState) => state.chats);
   const {chatStatus} = useSelector((state: UserRootState) => state.user);
   const {currentUser} = useSelector((state: UserRootState) => state.user);
   const {unread} = useSelector((state: NotificationsRootState) => state.notifications);
 
+  const [chatsMembersIds, setChatsMembersIds] = useState<string[]>([]);
+  const [chatUsersData, setChatUsersData] = useState<ChatMember[]>([]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+  /*------------------------------------------------*/
+  // Consultar la data de los usuarios de los chats
+  /*------------------------------------------------*/
+  const [getUsers, {isLoading, isError}] = useGetUsersMutation();
+
+  /*----------------------------------------------------*/
+  // Extraer las ids de los participantes de cada chat
+  /*----------------------------------------------------*/
+  useEffect(() => {
+    const userIds: string[] = [];
+
+    if (currentUser && chats.length) {
+      chats.forEach((chat) => {
+        const {senderId, senderData, recipientData} = chat;
+        const otherUser = senderId === currentUser._id ? recipientData : senderData;
+        userIds.push(otherUser._id);
+      })
+    };
+
+    setChatsMembersIds(userIds);
+  }, [currentUser, chats]);
 
   /**
    * Cerrar la sesión del usuario,
@@ -48,13 +73,21 @@ const Navbar = ({navbarType}: Props) => {
   /**
    * Cambiar el status de las notificaciones a leídas
    */
-  const onClickNotificationsHandler = () => {
+  const onClickNotificationsHandler = async () => {
     setIsNotificationsOpen((prev) => {      
       setTimeout(() => {
         dispatch(setReadNotifications())
       }, 1000);
       return !prev
     });
+
+    try {
+      setChatUsersData([]);
+      const {users} = await getUsers({ids: chatsMembersIds}).unwrap();
+      setChatUsersData(users);      
+    } catch (error: any) {
+      console.log(error.message)
+    }
   };
 
 
@@ -129,6 +162,9 @@ const Navbar = ({navbarType}: Props) => {
       <div className="relative flex justify-center items-stretch gap-3">
         <ChatsList
           isOpen={isNotificationsOpen}
+          isLoading={isLoading}
+          isError={isError}
+          chatUsersData={chatUsersData}
           setIsOpen={setIsNotificationsOpen}
         />
 
