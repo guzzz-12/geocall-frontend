@@ -1,5 +1,6 @@
 import { useDispatch } from "react-redux";
 import { Tooltip } from "react-tooltip";
+import { Twemoji } from "react-emoji-render";
 import dayjs from "dayjs";
 import { BiFullscreen } from "react-icons/bi";
 import { Message } from "../redux/features/chatsSlice";
@@ -23,12 +24,14 @@ const MessageItem = ({message, currentUser}: Props) => {
       className="w-[max-content] max-w-[85%]"
     >
       {message.content.length > 0 &&
-        <p
+        <div
           style={{backgroundColor: isSender ? "#bae6fd" : "#d1d5db"}}
           className="w-full px-4 py-2 text-left text-sm whitespace-pre-line leading-normal rounded-lg shadow-md"
         >
-          {message.content}
-        </p>
+          <Twemoji className="msg-body">
+            {message.content}
+          </Twemoji>
+        </div>
       }
 
       {message.attachment &&

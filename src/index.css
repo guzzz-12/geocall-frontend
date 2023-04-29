@@ -7,6 +7,11 @@
     @apply w-full max-w-[1200px] mx-auto px-2
   }
 
+  /* Sobreescribir los estilos por defecto del renderizador de emojis de los mensajes */
+  .msg-body img {
+    @apply inline-block w-4 h-4 !important
+  }
+
   .text-ellipsis {
     @apply overflow-ellipsis whitespace-nowrap overflow-hidden
   }
