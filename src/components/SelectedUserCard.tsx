@@ -11,12 +11,13 @@ import { FiMail } from "react-icons/fi";
 import { HiAtSymbol } from "react-icons/hi";
 import { BsCalendar3 } from "react-icons/bs";
 import { GoLocation } from "react-icons/go";
-import { FaAddressCard } from "react-icons/fa";
+import { FaAddressCard, FaFacebookSquare, FaInstagram, FaTwitter } from "react-icons/fa";
 import { GiPathDistance } from "react-icons/gi";
 import { IconType } from "react-icons/lib";
 
 import IconButton from "./IconButton";
 import Spinner from "./Spinner";
+import SocialLink from "./Account/SocialLink";
 import { setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { closeChat } from "../redux/features/chatsSlice";
 import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
@@ -222,6 +223,7 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
               >
                 {selectedUser.user.firstName} {selectedUser.user.lastName}
               </p>
+              
               <div className="flex justify-between items-center gap-1">
                 <IconButton
                   Icon={AiOutlineWechat}
@@ -241,6 +243,23 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
                   disabled={!localStream || isUserOffline}
                   onClickHandler={onVideoCallClickHandler}
                 />
+              </div>
+
+              {/* Links de las redes sociales */}
+              <div className="flex justify-center items-center gap-3 w-full pt-2">
+                {selectedUser.user.socialLinks.map((item) => {
+                  const {_id, name, link} = item;
+                  const icon = name === "instagram" ? FaInstagram : name === "facebook" ? FaFacebookSquare : FaTwitter;
+                  return (
+                    <SocialLink
+                      key={_id}
+                      Icon={icon}
+                      name={name}
+                      link={link}
+                      size="sm"
+                    />
+                  )
+                })}
               </div>
             </div>
           </div>
