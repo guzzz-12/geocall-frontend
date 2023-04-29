@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { MediaConnection } from "peerjs";
 import dayjs from "dayjs";
 import { v4 } from "uuid";
+import { Tooltip } from "react-tooltip";
 import { toast } from "react-toastify";
 import { GrClose } from "react-icons/gr";
 import { AiOutlineWechat } from "react-icons/ai";
@@ -25,6 +26,7 @@ import peerClient from "../utils/peerClient";
 import { socketClient } from "../socket/socketClient";
 import useSelectedUser from "../hooks/useSelectedUser";
 import { setUserVideoCallStatus } from "../redux/features/userSlice";
+import { openImageModal } from "../redux/features/imageModalSlice";
 
 interface Props {
   selectedUserId: string;
@@ -198,11 +200,17 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
         <div className="flex flex-col justify-start items-center w-full max-w-full h-full">
           <div className="flex flex-col justify-center items-center gap-4 w-full max-w-[100%] mb-4 p-4 bg-gradient-to-b from-transparent to-gray-300 shadow-sm">
             {/* Avatar del usuario */}
-            <div className="w-32 h-32 shrink-0 rounded-full border-4 border-blue-600 overflow-hidden">
+            <div
+              className="w-32 h-32 shrink-0 rounded-full border-4 border-blue-600 bg-black overflow-hidden"
+              onClick={() => dispatch(openImageModal(selectedUser.user.avatar))}
+            >
+              <Tooltip id="open-image-tooltip"/>
               <img
-                className="block w-full h-full object-cover object-center"
+                className="block w-full h-full object-cover object-center hover:opacity-75 transition-opacity cursor-pointer"
                 src={selectedUser.user.avatar}
                 alt={selectedUser.user.firstName}
+                data-tooltip-id="open-image-tooltip"
+                data-tooltip-content="Open image"
               />
             </div>
 

@@ -24,7 +24,7 @@ const useSelectedUser = ({selectedUserId}: Props) => {
   // Consultar la data del usuario seleccionado
   const {data, isLoading, isFetching} = useGetUserWithLocationQuery(
     {userId: selectedUserId, location: selectedUserLocation!},
-    {skip: !selectedUserId || !selectedUserLocation}
+    {skip: !selectedUserId || !selectedUserLocation, refetchOnMountOrArgChange: 20}
   );
 
   // Buscar al usuario seleccionado en el state global
