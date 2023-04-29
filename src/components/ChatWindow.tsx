@@ -71,6 +71,7 @@ const ChatWindow = () => {
       senderId: currentUser!._id,
       recipientId: otherUserId,
       senderData: {
+        _id: currentUser!._id,
         firstName: currentUser!.firstName,
         lastName: currentUser!.lastName,
         avatar: currentUser!.avatar,

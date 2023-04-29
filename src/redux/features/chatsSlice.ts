@@ -64,25 +64,44 @@ const chatsSlice = createSlice({
       state.chats = action.payload;
     },
     createOrSelectChat: (state, action: {type: string, payload: {chat: Chat, otherMember: ChatMember}}) => {
-      const {chat: {senderId, recipientId}, otherMember} = action.payload;
+      const {chat: {chatId}, otherMember} = action.payload;
 
       // Verificar si existe un chat entre ambos usuarios
-      const chatExists = checkIfChatExists(state, senderId, recipientId);
-
+      const chatIndex = state.chats.findIndex(chat => chat.chatId === chatId);
+      const chat = state.chats[chatIndex];
+      const updatedChats = [...state.chats];
+      
       // Si ya existe un chat con el usuario seleccionado
       // seleccionarlo y actualizar su data con la data del backend
       // en caso de que el usuario haya actualizado su perfil
       // Si el chat no existe, crearlo y seleccionarlo.
-      if (chatExists) {
-        if (chatExists.senderId === otherMember._id) {
-          chatExists.senderData = otherMember;
+      if (chat) {
+        let updatedChat: Chat = {
+          chatId,
+            messages: chat.messages,
+            senderId: chat.senderId,
+            recipientId: chat.recipientId,
+            senderData: chat.senderData,
+            recipientData: chat.recipientData,
+            createdAt: chat.createdAt
         };
 
-        if (chatExists.recipientId === otherMember._id) {
-          chatExists.recipientData === otherMember
+        if (chat.senderId === otherMember._id) {
+          updatedChat.senderData = otherMember;
+        };
+        
+        if (chat.recipientId === otherMember._id) {
+          updatedChat.recipientData = otherMember;
         };
 
-        state.selectedChat = chatExists;
+        updatedChats.splice(chatIndex, 1, updatedChat);
+
+        state.selectedChat = updatedChat;
+        state.chats = updatedChats;
+
+        // Actualizar el chat en la base de datos local
+        db.chats.update(chatId, updatedChat);
+
       } else {
         state.chats = [action.payload.chat, ...state.chats];
         state.selectedChat = action.payload.chat;

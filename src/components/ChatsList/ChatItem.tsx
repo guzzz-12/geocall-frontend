@@ -23,8 +23,6 @@ const ChatItem = ({chat, setIsOpen}: Props) => {
     {skip: !otherUserId, refetchOnMountOrArgChange: 20},
   );
 
-  console.log({isLoading, isFetching});
-
   // Verificar si el usuario está online
   const isOnline = !!onlineUsers.find(user => user.userId === otherUserId);
 
@@ -44,7 +42,17 @@ const ChatItem = ({chat, setIsOpen}: Props) => {
     if (!otherUserData) return false;
     
     const {_id, firstName, lastName, avatar} = otherUserData;
-    dispatch(createOrSelectChat({chat, otherMember: {_id, firstName, lastName, avatar}}));
+
+    dispatch(createOrSelectChat({
+      chat,
+      otherMember: {
+        _id,
+        firstName,
+        lastName,
+        avatar
+      }
+    }));
+
     dispatch(setReadMessages({chatId: chat.chatId}));
     
     setTimeout(() => {
