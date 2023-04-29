@@ -2,6 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { LoginFormSchemaType } from "../pages/LoginPage";
 import { SignupFormSchemaType } from "../pages/SignupPage";
 import { UserLocation } from "./features/mapSlice";
+import { ChatMember } from "./features/chatsSlice";
 
 export interface User {
   _id: string;
@@ -91,6 +92,13 @@ export const api = createApi({
           throw Error(message);
         }
       }),
+      getUsers: build.mutation<{users: ChatMember[]}, {ids: string[]}>({
+        query: ({ids}) => ({
+          method: "POST",
+          url: "/users/get-users",
+          body: {users: ids}
+        })
+      }),
       getUserWithLocation: build.query<{user: User, address: string}, {userId: string, location: UserLocation}>({
         query: ({userId, location: {lat, lon}}) => `/users/user/${userId}/${lat}/${lon}`,
         providesTags: ["SelectedUser"],
@@ -149,6 +157,7 @@ export const {
   useSignupUserMutation,
   useLogoutUserMutation,
   useGetUserQuery,
+  useGetUsersMutation,
   useGetUserWithLocationQuery,
   useForgotPasswordMutation,
   useResetPasswordMutation,
