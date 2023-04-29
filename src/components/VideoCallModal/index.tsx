@@ -90,7 +90,7 @@ const VideoCallModal = () => {
     <div
       className="fixed top-0 left-0 flex flex-col justify-center items-center w-screen h-screen bg-[rgba(0,0,0,0.8)] z-[10000]">
       <div
-        className="relative flex justify-center items-center w-[80%] aspect-[16/9] p-6 rounded-xl bg-white"
+        className="relative flex justify-center items-center h-[95dvh] max-w-[98%] aspect-[4/3] p-6 rounded-xl bg-white"
         onClick={(e) => e.stopPropagation()}
       >
         {(videoCall.status === "calling"  || videoCall.status === "pending") && (
@@ -180,7 +180,7 @@ const VideoCallModal = () => {
         {videoCall.status === "accepted" && (
           <div className="flex flex-col justify-start items-center gap-6 h-full">
             {localStream && (
-              <div className="flex flex-col justify-start items-center gap-3 mb-3">
+              <div className="flex flex-col justify-start items-center gap-3 mb-1">
                 <p className="font-bold text-2xl text-center text-gray-600">
                   Active video call with {activeCallWith?.firstName} (@{activeCallWith?.username})
                 </p>
@@ -201,34 +201,34 @@ const VideoCallModal = () => {
               </div>
             )}
 
-            <div className="flex justify-between gap-3 w-full">
+            <div className="relative w-full h-full">
               {/* Stream local */}
-              <div className="flex justify-center items-center w-[50%] aspect-[4/3] p-1 border border-gray-300 rounded">
-                {localStream && (
+              <div className="absolute top-2 left-2 w-[250px] px-1 aspect-[4/3] z-10">
+                {!localStream && (
                   <video
                     ref={myVideoRef}
-                    className="w-100"
+                    className="w-full aspect-[4/3]"
                     playsInline
                     autoPlay
                     controls
                   />
                 )}
-                {!localStream && (
-                  <div className="flex flex-col justify-center items-center gap-3 w-full h-full">
-                    <p className="text-base text-center">
-                      Sorry. You don't have any video device connected!
+                {localStream && (
+                  <div className="flex flex-col justify-center items-center gap-3 w-full h-full bg-[rgba(0,0,0,0.65)]">
+                    <p className="text-sm text-white text-center">
+                      Your video device is disconnected!
                     </p>
-                    <BsCameraVideoOff className="w-[120px] h-[120px] opacity-60" />
+                    <BsCameraVideoOff className="w-[120px] h-[120px] opacity-60" color="white" />
                   </div>
                 )}
               </div>
 
               {/* Stream remoto */}
-              <div className="flex justify-center items-center w-[50%] aspect-[4/3] p-1 border border-gray-300 rounded">
+              <div className="w-full h-full p-1 rounded shadow border border-gray-100">
                 {remoteStream && (
                   <video
                     ref={myPeerVideoRef}
-                    className="w-100"
+                    className="w-full h-full"
                     playsInline
                     autoPlay
                     controls
