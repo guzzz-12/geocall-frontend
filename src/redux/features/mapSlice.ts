@@ -70,6 +70,7 @@ const mapSlice = createSlice({
     clearMapState: (state) => {
       state.onlineUsers = [];
       state.selectedUser = null;
+      state.selectedUserPrefetch = {selectedUserId: null};
     }
   }
 });

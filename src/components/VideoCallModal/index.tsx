@@ -204,7 +204,7 @@ const VideoCallModal = () => {
             <div className="relative w-full h-full">
               {/* Stream local */}
               <div className="absolute top-2 left-2 w-[250px] px-1 aspect-[4/3] z-10">
-                {!localStream && (
+                {localStream && (
                   <video
                     ref={myVideoRef}
                     className="w-full aspect-[4/3]"
@@ -213,7 +213,7 @@ const VideoCallModal = () => {
                     controls
                   />
                 )}
-                {localStream && (
+                {!localStream && (
                   <div className="flex flex-col justify-center items-center gap-3 w-full h-full bg-[rgba(0,0,0,0.65)]">
                     <p className="text-sm text-white text-center">
                       Your video device is disconnected!

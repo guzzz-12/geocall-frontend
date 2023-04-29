@@ -8,10 +8,11 @@ import { Tooltip } from "react-tooltip";
 
 import ChatsList from "./ChatsList";
 import { NotificationsRootState, UserRootState } from "../redux/store";
-import { api, useLogoutUserMutation } from "../redux/api";
+import { api } from "../redux/api";
 import { removeCurrentUser, setChatStatus } from "../redux/features/userSlice";
 import { clearMapState } from "../redux/features/mapSlice";
 import { setReadNotifications } from "../redux/features/notificationsSlice";
+import { clearSelectedChatState } from "../redux/features/chatsSlice";
 import { socketClient } from "../socket/socketClient";
 
 interface Props {
@@ -25,8 +26,6 @@ const Navbar = ({navbarType}: Props) => {
   const {currentUser} = useSelector((state: UserRootState) => state.user);
   const {unread} = useSelector((state: NotificationsRootState) => state.notifications);
 
-  const [logoutUser, {isLoading}] = useLogoutUserMutation();
-
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   /**
@@ -38,10 +37,10 @@ const Navbar = ({navbarType}: Props) => {
    * redirigir a la pantalla de login.
    */
   const logoutHandler = async () => {
-    await logoutUser();
     dispatch(api.util.resetApiState());
     dispatch(removeCurrentUser());
     dispatch(clearMapState());
+    dispatch(clearSelectedChatState());
     socketClient.userLogout(currentUser!._id);
     navigate("/login", {replace: true});
   };
@@ -185,7 +184,6 @@ const Navbar = ({navbarType}: Props) => {
 
         <button
           className="px-0 py-1 text-center text-base font-normal text-gray-600 uppercase rounded disabled:bg-slate-300 disabled:cursor-default transition-colors"
-          disabled={isLoading}
           data-tooltip-id="logout-button-tooltip"
           data-tooltip-content="Logout"
           onClick={logoutHandler}
