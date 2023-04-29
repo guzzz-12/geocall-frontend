@@ -8,7 +8,7 @@ class GeoCallDB extends Dexie {
     super("GeoCallDB");
 
     this.version(1).stores({
-      chats: "chatId, senderId, recipientId, messages, createdAt"
+      chats: "chatId, localUser, senderId, recipientId, messages, createdAt"
     });
   };
 };

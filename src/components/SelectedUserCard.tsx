@@ -52,6 +52,7 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
   const onChatClickHandler = () => {
     const chat: Chat = {
       chatId: v4(),
+      localUser: currentUser!._id,
       senderId: currentUser!._id,
       recipientId: selectedUserId,
       senderData: {

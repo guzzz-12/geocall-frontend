@@ -23,6 +23,7 @@ export interface Message {
 
 export interface Chat {
   chatId: string;
+  localUser: string;
   senderId: string;
   recipientId: string;
   senderData: ChatMember,
@@ -46,13 +47,21 @@ const initialState: ChatsState = {
  * Verificar si existe un chat entre los usuarios especificados
  */
 const checkIfChatExists = (state: ChatsState, senderId: string, recipientId: string) => {
-  return state.chats.find((chat) => {
+  const index = state.chats.findIndex((chat) => {
     return (
       (chat.senderId === senderId && chat.recipientId === recipientId)
       ||
       (chat.senderId === recipientId && chat.recipientId === senderId)
     )
   });
+
+  const chat = state.chats[index];
+
+  if (!chat) {
+    return false
+  };
+
+  return {chatIndex: index, chat};
 };
 
 
@@ -64,26 +73,28 @@ const chatsSlice = createSlice({
       state.chats = action.payload;
     },
     createOrSelectChat: (state, action: {type: string, payload: {chat: Chat, otherMember: ChatMember}}) => {
-      const {chat: {chatId}, otherMember} = action.payload;
+      const {chat: {chatId, senderId, recipientId}, otherMember} = action.payload;
 
       // Verificar si existe un chat entre ambos usuarios
-      const chatIndex = state.chats.findIndex(chat => chat.chatId === chatId);
-      const chat = state.chats[chatIndex];
+      const chatExists = checkIfChatExists(state, senderId, recipientId);
       const updatedChats = [...state.chats];
       
       // Si ya existe un chat con el usuario seleccionado
       // seleccionarlo y actualizar su data con la data del backend
       // en caso de que el usuario haya actualizado su perfil
       // Si el chat no existe, crearlo y seleccionarlo.
-      if (chat) {
+      if (chatExists) {
+        const {chat, chatIndex} = chatExists;
+
         let updatedChat: Chat = {
           chatId,
-            messages: chat.messages,
-            senderId: chat.senderId,
-            recipientId: chat.recipientId,
-            senderData: chat.senderData,
-            recipientData: chat.recipientData,
-            createdAt: chat.createdAt
+          localUser: chat.localUser,
+          messages: chat.messages,
+          senderId: chat.senderId,
+          recipientId: chat.recipientId,
+          senderData: chat.senderData,
+          recipientData: chat.recipientData,
+          createdAt: chat.createdAt
         };
 
         if (chat.senderId === otherMember._id) {
@@ -145,7 +156,7 @@ const chatsSlice = createSlice({
       .modify((item: Chat) => item.messages.push(action.payload.message))
       .catch((err) => console.log({error_updating_chat: err.message}))
     },
-    incomingMessage: (state, action: {type: string, payload: {message: Message}}) => {
+    incomingMessage: (state, action: {type: string, payload: {message: Message, localUser: string}}) => {
       const {
         message: {
           chatId,
@@ -192,6 +203,7 @@ const chatsSlice = createSlice({
       } else {
         const chat: Chat = {
           chatId,
+          localUser: action.payload.localUser,
           senderId,
           recipientId,
           senderData,
@@ -252,6 +264,9 @@ const chatsSlice = createSlice({
       .equals(action.payload.chatId)
       .modify((item: Chat) => item.messages = updatedMessages)
       .catch((err) => console.log({error_updating_unread_messages: err.message}))
+    },
+    clearSelectedChatState: (state) => {
+      state.selectedChat = null;
     }
   }
 });
@@ -266,5 +281,6 @@ export const {
   closeChat,
   deleteChat,
   deleteMessage,
-  setReadMessages
+  setReadMessages,
+  clearSelectedChatState
 } = chatsSlice.actions;
