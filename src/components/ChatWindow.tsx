@@ -106,6 +106,7 @@ const ChatWindow = () => {
 
     setMessageText("");
     setImageData(null);
+    setOpenEmojiPicker(false);
   };
 
 
@@ -113,7 +114,7 @@ const ChatWindow = () => {
    * Seleccionar emoji
    */
   const onEmojiPickHandler = (emoji: any) => {
-    setMessageText(prev => prev + <span>{emoji.native}</span>)
+    setMessageText(prev => prev + emoji.native)
   };
 
   
