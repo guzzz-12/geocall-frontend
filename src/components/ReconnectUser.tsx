@@ -10,7 +10,7 @@ import { socketClient, SocketEvents } from "../socket/socketClient";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
 import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
 import { setHasMediaDevice, setPeerId, setUserVideoCallStatus } from "../redux/features/userSlice";
-import { Message, incomingMessage } from "../redux/features/chatsSlice";
+import { Message, deleteMessage, incomingMessage } from "../redux/features/chatsSlice";
 import { Notification, setNotifications } from "../redux/features/notificationsSlice";
 import { VideoCallData, setActiveVideoCallData, setVideoCall } from "../redux/features/videoCallSlice";
 
@@ -133,6 +133,11 @@ const ReconnectUser = () => {
             </p>
           </div>
         );
+      });
+
+      // Escuchar evento de mensaje eliminado
+      socketClient.socket.on(SocketEvents.DELETED_MESSAGE, (data: {chatId: string, messageId: string}) => {
+        dispatch(deleteMessage(data));
       });
 
       // Escuchar el evento de nueva notificación
