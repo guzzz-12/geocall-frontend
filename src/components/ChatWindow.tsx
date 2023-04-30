@@ -184,6 +184,12 @@ const ChatWindow = () => {
     const {msgId} = openDeleteMessageModal;
 
     dispatch(deleteMessage({chatId: selectedChat.chatId, messageId: msgId!}));
+    
+    // Si se selecciona la opción de borrar para todos,
+    // eliminar en el usuario remoto si está conectado
+    if (mode === "all" && isUserOnline) {
+      socketClient.deletedMessage(otherUserId!, selectedChat.chatId, msgId!);
+    };
 
     setOpenDeleteMessageModal({open: false, msgId: null});
   };
@@ -310,7 +316,7 @@ const ChatWindow = () => {
                 )
               })}
             </div>
-            
+
             {/* Elemento vacío para referencia del scroll to bottom */}
             <div ref={chatBottomRef}/>
           </div>

@@ -42,6 +42,10 @@ class SocketClient {
     this.socketInstance.emit(SocketEvents.NEW_MESSAGE, message)
   };
 
+  deletedMessage(userId: string, chatId: string, messageId: string) {
+    this.socketInstance.emit(SocketEvents.DELETED_MESSAGE, {userId, chatId, messageId})
+  };
+
   newNotification(notification: Notification) {
     this.socketInstance.emit(SocketEvents.NEW_NOTIFICATION, notification)
   };
