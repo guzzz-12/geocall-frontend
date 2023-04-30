@@ -6,9 +6,8 @@ import { Tooltip } from "react-tooltip";
 import { toast } from "react-toastify";
 import { GrClose } from "react-icons/gr";
 import { AiOutlineWechat } from "react-icons/ai";
-import { MdVideocam } from "react-icons/md";
+import { BiVideoPlus } from "react-icons/bi";
 import { FiMail } from "react-icons/fi";
-import { HiAtSymbol } from "react-icons/hi";
 import { BsCalendar3 } from "react-icons/bs";
 import { GoLocation } from "react-icons/go";
 import { FaAddressCard, FaFacebookSquare, FaInstagram, FaTwitter } from "react-icons/fa";
@@ -200,7 +199,7 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
 
       {!isLoading && selectedUser && (
         <div className="flex flex-col justify-start items-center w-full max-w-full h-full">
-          <div className="flex flex-col justify-center items-center gap-4 w-full max-w-[100%] mb-4 p-4 bg-gradient-to-b from-transparent to-gray-300 shadow-sm">
+          <div className="flex flex-col justify-center items-center w-full max-w-[100%] mb-4 p-4 bg-gradient-to-b from-transparent to-gray-300 shadow-sm">
             {/* Avatar del usuario */}
             <div
               className="w-32 h-32 shrink-0 rounded-full border-4 border-blue-600 bg-black overflow-hidden"
@@ -217,15 +216,19 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
             </div>
 
             {/* Nombre y botones de mensaje y llamada */}
-            <div className="flex flex-col justify-center items-center grow-0 gap-2 max-w-[100%] overflow-hidden">
+            <div className="flex flex-col justify-center items-center grow-0 max-w-[100%] overflow-hidden">
               <p
                 className="max-w-[100%] font-semibold text-center text-2xl text-gray-700 text-ellipsis"
                 title={`${selectedUser.user.firstName} ${selectedUser.user.lastName}`}
               >
                 {selectedUser.user.firstName} {selectedUser.user.lastName}
               </p>
+
+              <span className="block mb-4">
+                @{selectedUser.user.username}
+              </span>
               
-              <div className="flex justify-between items-center gap-1">
+              <div className="flex justify-between items-center gap-1 mb-2">
                 <IconButton
                   Icon={AiOutlineWechat}
                   tooltipText={`Chat with ${selectedUser.user.firstName}`}
@@ -233,7 +236,7 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
                   onClickHandler={onChatClickHandler}
                 />
                 <IconButton
-                  Icon={MdVideocam}
+                  Icon={BiVideoPlus}
                   tooltipText={
                     !localStream ? `Connect your camera to start a videocall with ${selectedUser.user.firstName}`
                     :
@@ -267,7 +270,6 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
 
           <div className="flex flex-col justify-start items-start gap-3 px-4 pb-5 text-base font-semibold">
             <UserMetadata Icon={FiMail} text={selectedUser.user.email} />
-            <UserMetadata Icon={HiAtSymbol} text={selectedUser.user.username} />
             <UserMetadata
               Icon={BsCalendar3}
               text={`In GeoCall since ${dayjs(selectedUser.user.createdAt).format("MM/DD/YYYY")}`}

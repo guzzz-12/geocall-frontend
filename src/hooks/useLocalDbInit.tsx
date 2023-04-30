@@ -29,7 +29,7 @@ const useLocalDbInit = () => {
   
   useEffect(() => {
     if (currentUser && chats) {
-      dispatch(initStoredChats(chats || []));
+      dispatch(initStoredChats(chats));
     }
   }, [currentUser, chats]);
 

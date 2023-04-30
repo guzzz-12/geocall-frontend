@@ -167,7 +167,7 @@ const Navbar = ({navbarType}: Props) => {
 
       <div className="relative flex justify-center items-stretch gap-3">
         <Link
-          className="flex justify-center items-center gap-1 max-w-[80px] rounded- cursor-pointer"
+          className="flex justify-center items-center gap-1 max-w-[120px] rounded- cursor-pointer"
           to="/account"
           data-tooltip-id="user-button-tooltip"
           data-tooltip-content="Account"
