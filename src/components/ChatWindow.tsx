@@ -15,6 +15,12 @@ import { Notification } from "../redux/features/notificationsSlice";
 import { imageResizer } from "../utils/imgResizer";
 import { socketClient } from "../socket/socketClient";
 
+export interface DeleteMessageModalState {
+  open: boolean;
+  msgId: string | null;
+  isSender: boolean;
+};
+
 const ChatWindow = () => {
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -28,9 +34,10 @@ const ChatWindow = () => {
   const [imageData, setImageData] = useState<string | null>(null);
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
 
-  const [openDeleteMessageModal, setOpenDeleteMessageModal] = useState<{open: boolean, msgId: string | null}>({
+  const [deleteMessageModal, setDeleteMessageModal] = useState<DeleteMessageModalState>({
     open: false,
-    msgId: null
+    msgId: null,
+    isSender: false
   });
 
   // Extraer la ID del otro usuario de la conversación
@@ -181,24 +188,25 @@ const ChatWindow = () => {
    * Eliminar un mensaje para el usuario o para todos los usuarios.
    */
   const deleteMessageHandler = async (mode: "me" | "all") => {
-    const {msgId} = openDeleteMessageModal;
+    const {msgId, isSender} = deleteMessageModal;
 
     dispatch(deleteMessage({chatId: selectedChat.chatId, messageId: msgId!}));
     
     // Si se selecciona la opción de borrar para todos,
     // eliminar en el usuario remoto si está conectado
-    if (mode === "all" && isUserOnline) {
+    // y si es el remitente del mensaje.
+    if (mode === "all" && isUserOnline && isSender) {
       socketClient.deletedMessage(otherUserId!, selectedChat.chatId, msgId!);
     };
 
-    setOpenDeleteMessageModal({open: false, msgId: null});
+    setDeleteMessageModal({open: false, msgId: null, isSender: false});
   };
 
 
   return (
     <>
       <AnimatePresence>
-        {openDeleteMessageModal.open &&
+        {deleteMessageModal.open &&
           <motion.div
             key="modal-wrapper"
             className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen bg-[rgba(0,0,0,0.75)] z-[1000]"
@@ -228,24 +236,30 @@ const ChatWindow = () => {
                 >
                   For me
                 </button>
-                <span
-                  data-tooltip-id="delete-for-both"
-                  data-tooltip-content={isUserOnline ? "Delete for both users" : "The user is offline"}
-                >
-                  <button
-                    className="basis-full flex-grow auth-btn text-sm"
-                    disabled={!isUserOnline}
-                    onClick={() => deleteMessageHandler("all")}
+
+                {/* Mostrar el botón de eliminar para ambos sólo si es el remitente del mensaje */}
+                {deleteMessageModal.isSender &&
+                  <span
+                    data-tooltip-id="delete-for-both"
+                    data-tooltip-content={isUserOnline ? "Delete for both users" : "The user is offline"}
                   >
-                    For both
-                  </button>
-                </span>
+                    <button
+                      className="basis-full flex-grow auth-btn text-sm"
+                      disabled={!isUserOnline}
+                      onClick={() => deleteMessageHandler("all")}
+                    >
+                      For both
+                    </button>
+                  </span>
+                }
+
                 <button
-                  className="basis-full flex-grow auth-btn text-sm bg-transparent"
+                  className="basis-full flex-grow auth-btn text-sm text-red-700 bg-red-50"
                   onClick={() => {
-                    setOpenDeleteMessageModal({
+                    setDeleteMessageModal({
                       open: false,
-                      msgId: null
+                      msgId: null,
+                      isSender: false
                     })
                   }}
                 >
@@ -311,7 +325,7 @@ const ChatWindow = () => {
                     key={msg.messageId}
                     message={msg}
                     currentUser={currentUser}
-                    openDeleteModal={setOpenDeleteMessageModal}
+                    openDeleteModal={setDeleteMessageModal}
                   />
                 )
               })}

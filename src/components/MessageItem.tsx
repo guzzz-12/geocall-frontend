@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react";
 import { useDispatch } from "react-redux";
 import { Tooltip } from "react-tooltip";
 import { Twemoji } from "react-emoji-render";
@@ -7,12 +8,12 @@ import { BsTrash } from "react-icons/bs";
 import { Message } from "../redux/features/chatsSlice";
 import { User } from "../redux/api";
 import { openImageModal } from "../redux/features/imageModalSlice";
-import { Dispatch, SetStateAction } from "react";
+import { DeleteMessageModalState } from "./ChatWindow";
 
 interface Props {
   message: Message;
   currentUser: User;
-  openDeleteModal: Dispatch<SetStateAction<{open: boolean, msgId: string | null}>>;
+  openDeleteModal: Dispatch<SetStateAction<DeleteMessageModalState>>;
 };
 
 
@@ -31,6 +32,7 @@ const MessageItem = ({message, currentUser, openDeleteModal}: Props) => {
         id="image-attachement-tooltip"
       />
 
+      {/* Botón para eliminar el mensaje */}
       <BsTrash
         style={{
           display: !message.deleted ? "block" : "none",
@@ -38,7 +40,9 @@ const MessageItem = ({message, currentUser, openDeleteModal}: Props) => {
           left: isSender ? -14 : "unset"
         }}
         className="absolute w-[14px] h-[14px] text-red-700 cursor-pointer"
-        onClick={() => openDeleteModal({open: true, msgId: message.messageId})}
+        onClick={() => {
+          openDeleteModal({open: true, msgId: message.messageId, isSender})
+        }}
       />
 
       {message.content.length > 0 &&
