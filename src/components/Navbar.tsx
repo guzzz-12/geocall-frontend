@@ -82,6 +82,11 @@ const Navbar = ({navbarType}: Props) => {
       return !prev
     });
 
+    // No realizar la consulta si no hay chats creados
+    if (chatsMembersIds.length === 0) {
+      return false;
+    };
+
     try {
       setChatUsersData([]);
       const {users} = await getUsers({ids: chatsMembersIds}).unwrap();
@@ -161,6 +166,23 @@ const Navbar = ({navbarType}: Props) => {
       </Link>
 
       <div className="relative flex justify-center items-stretch gap-3">
+        <Link
+          className="flex justify-center items-center gap-1 max-w-[80px] rounded- cursor-pointer"
+          to="/account"
+          data-tooltip-id="user-button-tooltip"
+          data-tooltip-content="Account"
+        >
+          <span className="block w-8 h-8 flex-shrink-0 rounded-full border-2 border-blue-500 overflow-hidden">
+            <img
+              src={currentUser!.avatar}
+              className="block w-full h-full object-cover object-center "
+            />
+          </span>
+          <p className="max-w-[100%] text-base font-bold text-gray-600 text-ellipsis whitespace-nowrap">
+            {currentUser!.firstName}
+          </p>
+        </Link>
+
         <ChatsList
           isOpen={isNotificationsOpen}
           isLoading={isLoading}
@@ -190,23 +212,6 @@ const Navbar = ({navbarType}: Props) => {
             </>
           )}
         </button>
-
-        <Link
-          className="flex justify-center items-center gap-2 rounded- cursor-pointer"
-          to="/account"
-          data-tooltip-id="user-button-tooltip"
-          data-tooltip-content="Account"
-        >
-          <span className="block w-8 h-8 overflow-hidden">
-            <img
-              src={currentUser!.avatar}
-              className="block w-full h-full object-cover object-center rounded-full outline-2 outline-blue-500"
-            />
-          </span>
-          {/* <p className="text-base font-bold text-gray-600">
-            {currentUser!.firstName}
-          </p> */}
-        </Link>
 
         {/* Botón para alternar la disponibilidad del usuario para chatear y recibir llamadas */}
         <button
