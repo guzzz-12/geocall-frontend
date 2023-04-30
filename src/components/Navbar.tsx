@@ -72,6 +72,7 @@ const Navbar = ({navbarType}: Props) => {
   
   /**
    * Cambiar el status de las notificaciones a leídas
+   * y consultar la data de los usuarios de los chats.
    */
   const onClickNotificationsHandler = async () => {
     setIsNotificationsOpen((prev) => {      

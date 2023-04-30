@@ -19,6 +19,7 @@ import { User } from "../../redux/api";
 import { imageResizer } from "../../utils/imgResizer";
 import { useUpdateAvatarMutation } from "../../redux/accountApi";
 import { setCurrentUser } from "../../redux/features/userSlice";
+import { openImageModal } from "../../redux/features/imageModalSlice";
 
 interface Props {
   currentUser: User;
@@ -191,11 +192,16 @@ const Profile = ({currentUser}: Props) => {
             }
 
             {/* Avatar */}
-            <img
-              className="block w-full h-full object-cover object-center rounded-full border-4 border-blue-500 shadow-md"
-              src={imagePreview || avatar}
-              alt={username}
-            />
+            <div
+              className="relative flex flex-col justify-center items-center w-full h-full bg-black rounded-full border-4 border-blue-500 shadow-md overflow-hidden"
+              onClick={() => dispatch(openImageModal(imagePreview || avatar))}
+            >
+              <img
+                className="block w-full h-full object-cover object-center cursor-pointer transition-opacity hover:opacity-75"
+                src={imagePreview || avatar}
+                alt={username}
+              />
+            </div>
 
             {/* Botones para seleccionar el nuevo avatar y eliminar el actual avatar */}
             {!imageData &&
@@ -234,7 +240,8 @@ const Profile = ({currentUser}: Props) => {
                   <BsFillCheckCircleFill className="w-full h-full" color="#16a34a" />
                 </div>
 
-                {/* Botón para descartar el avatar seleccionado */}
+                {/* Botón para descartar el avatar seleccionado si no ha comenzado la subida */}
+                {/* Si ya comenzó la subida, el botón cancela la solicitud y restaura el avatar original */}
                 <div
                   className="flex justify-center items-center w-8 h-8 rounded-full bg-white cursor-pointer z-10"
                   data-tooltip-id="discard-avatar-tooltip"
