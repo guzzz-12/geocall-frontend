@@ -3,20 +3,23 @@ import { Tooltip } from "react-tooltip";
 import { Twemoji } from "react-emoji-render";
 import dayjs from "dayjs";
 import { BiFullscreen } from "react-icons/bi";
+import { BsTrash } from "react-icons/bs";
 import { Message } from "../redux/features/chatsSlice";
 import { User } from "../redux/api";
 import { openImageModal } from "../redux/features/imageModalSlice";
+import { Dispatch, SetStateAction } from "react";
 
 interface Props {
   message: Message;
   currentUser: User;
+  openDeleteModal: Dispatch<SetStateAction<{open: boolean, msgId: string | null}>>;
 };
 
 
-const MessageItem = ({message, currentUser}: Props) => {
-  const isSender = message.senderId === currentUser._id;
-
+const MessageItem = ({message, currentUser, openDeleteModal}: Props) => {
   const dispatch = useDispatch();
+  
+  const isSender = message.senderId === currentUser._id;
 
   return (
     <div
@@ -28,9 +31,22 @@ const MessageItem = ({message, currentUser}: Props) => {
         id="image-attachement-tooltip"
       />
 
+      <BsTrash
+        style={{
+          display: !message.deleted ? "block" : "none",
+          right: isSender ? "unset" : -14,
+          left: isSender ? -14 : "unset"
+        }}
+        className="absolute w-[14px] h-[14px] text-red-700 cursor-pointer"
+        onClick={() => openDeleteModal({open: true, msgId: message.messageId})}
+      />
+
       {message.content.length > 0 &&
         <div
-          style={{backgroundColor: isSender ? "#bae6fd" : "#d1d5db"}}
+          style={{
+            fontStyle: message.deleted ? "italic" : "normal",
+            backgroundColor: (isSender && !message.deleted) ? "#bae6fd" : "#d1d5db"
+          }}
           className="w-full px-4 py-2 text-left text-sm whitespace-pre-line leading-normal rounded-lg shadow-md"
         >
           <Twemoji className="msg-body">

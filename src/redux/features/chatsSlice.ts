@@ -18,6 +18,7 @@ export interface Message {
   content: string;
   attachment: string | null,
   unread: boolean;
+  deleted: boolean;
   createdAt: string;
 };
 
@@ -227,12 +228,33 @@ const chatsSlice = createSlice({
         return state;
       };
 
-      const updatedMessages = chat.messages.filter(msg => msg.messageId !== messageId);
+      const updatedMessages: Message[] = chat.messages.map((msg) => {
+        // Eliminar el contenido del mensaje eliminado y pasar su status a deleted
+        const content = msg.messageId === messageId ? "Message deleted..." : msg.content;
+        const attachment = msg.messageId === messageId ? null : msg.attachment;
+        const deleted = msg.messageId === messageId ? true : msg.deleted;
+
+        return {
+          chatId: msg.chatId,
+          attachment,
+          content,
+          createdAt: msg.createdAt,
+          messageId: msg.messageId,
+          recipientData: msg.recipientData,
+          recipientId: msg.recipientId,
+          senderData: msg.senderData,
+          senderId: msg.senderId,
+          unread: msg.unread,
+          deleted
+        }
+      });
+
       chat.messages = updatedMessages;
 
       const updatedChats = [...state.chats];
       updatedChats.splice(chatIndex, 1, chat);
       state.chats = updatedChats;
+      state.selectedChat = chat;
 
       // Actualizar los mensajes del chat en la DB local
       db.chats

@@ -10,7 +10,7 @@ import { BsImage, BsEmojiSmile } from "react-icons/bs";
 import MessageItem from "./MessageItem";
 import EmojiPicker from "./EmojiPicker";
 import { ChatsRootState, MapRootState, UserRootState } from "../redux/store";
-import { Message, closeChat, createMessage } from "../redux/features/chatsSlice";
+import { Message, closeChat, createMessage, deleteMessage } from "../redux/features/chatsSlice";
 import { Notification } from "../redux/features/notificationsSlice";
 import { imageResizer } from "../utils/imgResizer";
 import { socketClient } from "../socket/socketClient";
@@ -26,8 +26,12 @@ const ChatWindow = () => {
 
   const [messageText, setMessageText] = useState("");
   const [imageData, setImageData] = useState<string | null>(null);
-
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
+
+  const [openDeleteMessageModal, setOpenDeleteMessageModal] = useState<{open: boolean, msgId: string | null}>({
+    open: false,
+    msgId: null
+  });
 
   // Extraer la ID del otro usuario de la conversación
   const otherUserId = selectedChat?.senderId === currentUser?._id ? selectedChat?.recipientId : selectedChat?.senderId;
@@ -55,7 +59,7 @@ const ChatWindow = () => {
 
 
   /**
-   * Enviar el mensaje
+   * Enviar el mensaje.
    */
   const onNewMessageHandler = () => {
     if (
@@ -83,6 +87,7 @@ const ChatWindow = () => {
       content: messageText,
       attachment: imageData,
       unread: true,
+      deleted: false,
       createdAt: new Date().toISOString()
     };
 
@@ -111,7 +116,7 @@ const ChatWindow = () => {
 
 
   /**
-   * Seleccionar emoji
+   * Seleccionar emoji.
    */
   const onEmojiPickHandler = (emoji: any) => {
     setMessageText(prev => prev + emoji.native)
@@ -119,7 +124,7 @@ const ChatWindow = () => {
 
   
   /**
-   * Seleccionar una imagen
+   * Seleccionar una imagen.
    */
   const onImagePickHandler = async (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -144,7 +149,7 @@ const ChatWindow = () => {
 
   
   /**
-   * Texto indicador de estado offline o unavailable
+   * Texto indicador de estado offline o unavailable.
    */
   const StatusText = ({status}: {status: "offline" | "unavailable"}) => {
     let text = "";
@@ -172,158 +177,233 @@ const ChatWindow = () => {
   };
 
 
+  /**
+   * Eliminar un mensaje para el usuario o para todos los usuarios.
+   */
+  const deleteMessageHandler = async (mode: "me" | "all") => {
+    const {msgId} = openDeleteMessageModal;
+
+    dispatch(deleteMessage({chatId: selectedChat.chatId, messageId: msgId!}));
+
+    setOpenDeleteMessageModal({open: false, msgId: null});
+  };
+
+
   return (
-    <div className="absolute right-2 bottom-0 z-[100]">
-      {/* Seleccionador de emojis */}
-      {openEmojiPicker &&
-        <>
-          <div
-            className="fixed bottom-0 left-0 w-screen h-screen bg-transparent"
-            onClick={() => setOpenEmojiPicker(false)}
-          />
-          <EmojiPicker pickEmojiHandler={onEmojiPickHandler}/>
-        </>
-      }
+    <>
+      <AnimatePresence>
+        {openDeleteMessageModal.open &&
+          <motion.div
+            key="modal-wrapper"
+            className="fixed top-0 left-0 flex justify-center items-center w-screen h-screen bg-[rgba(0,0,0,0.75)] z-[1000]"
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+          >
+            <motion.div
+              key="modal-content"
+              className="flex flex-col justify-start items-center w-[350px] h-[150px] p-3 bg-white rounded-lg"
+              initial={{y: -10}}
+              animate={{y: 0}}
+              exit={{y: -10}}
+            >
+              <p className="font-bold text-xl text-center text-gray-700">
+                Delete message
+              </p>
+              <div className="flex justify-between items-center gap-2 w-full my-auto">
+                <Tooltip id="delete-for-me" />
+                <Tooltip id="delete-for-both" />
 
-      {/* Contenido */}
-      <div className="flex flex-col w-[330px] h-[450px] bg-slate-100 shadow-lg rounded-t-lg">
-        {/* Header de la bandeja */}
-        <div className="flex justify-between items-stretch w-full px-3 py-2 flex-shrink-0 border-b border-gray-400 bg-gray-300 rounded-t-lg">
-          <div className="flex justify-start items-center gap-2">
-            <div className="relative w-8 h-8">
-              <img
-                className="block w-full h-full object-cover object-center rounded-full border-2 border-gray-500"
-                src={otherUserData.avatar}
-                alt={otherUserData.firstName}
-              />
+                <button
+                  className="basis-full flex-grow auth-btn text-sm"
+                  data-tooltip-id="delete-for-me"
+                  data-tooltip-content="Delete for me only"
+                  onClick={() => deleteMessageHandler("me")}
+                >
+                  For me
+                </button>
+                <span
+                  data-tooltip-id="delete-for-both"
+                  data-tooltip-content={isUserOnline ? "Delete for both users" : "The user is offline"}
+                >
+                  <button
+                    className="basis-full flex-grow auth-btn text-sm"
+                    disabled={!isUserOnline}
+                    onClick={() => deleteMessageHandler("all")}
+                  >
+                    For both
+                  </button>
+                </span>
+                <button
+                  className="basis-full flex-grow auth-btn text-sm bg-transparent"
+                  onClick={() => {
+                    setOpenDeleteMessageModal({
+                      open: false,
+                      msgId: null
+                    })
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        }
+      </AnimatePresence>
 
-              {/* Indicador de status online */}
-              <div
-                style={{
-                  backgroundColor: isUserOnline && isUserOnline.status === "unavailable" ? "#ea580c" : isUserOnline ? "#16a34a" : "#9ca3af"
-                }}
-                className="absolute -bottom-[2px] right-[1px] w-[11px] h-[11px] rounded-full outline outline-2 outline-gray-100"
+      <div className="absolute right-2 bottom-0 z-[100]">
+        {/* Seleccionador de emojis */}
+        {openEmojiPicker &&
+          <>
+            <div
+              className="fixed bottom-0 left-0 w-screen h-screen bg-transparent"
+              onClick={() => setOpenEmojiPicker(false)}
+            />
+            <EmojiPicker pickEmojiHandler={onEmojiPickHandler}/>
+          </>
+        }
+
+        {/* Contenido */}
+        <div className="flex flex-col w-[330px] h-[450px] bg-slate-100 shadow-lg rounded-t-lg">
+          {/* Header de la bandeja */}
+          <div className="flex justify-between items-stretch w-full px-3 py-2 flex-shrink-0 border-b border-gray-400 bg-gray-300 rounded-t-lg">
+            <div className="flex justify-start items-center gap-2">
+              <div className="relative w-8 h-8">
+                <img
+                  className="block w-full h-full object-cover object-center rounded-full border-2 border-gray-500"
+                  src={otherUserData.avatar}
+                  alt={otherUserData.firstName}
+                />
+
+                {/* Indicador de status online */}
+                <div
+                  style={{
+                    backgroundColor: isUserOnline && isUserOnline.status === "unavailable" ? "#ea580c" : isUserOnline ? "#16a34a" : "#9ca3af"
+                  }}
+                  className="absolute -bottom-[2px] right-[1px] w-[11px] h-[11px] rounded-full outline outline-2 outline-gray-100"
+                />
+              </div>
+              <p className="font-semibold text-lg">
+                {otherUserData.firstName} {otherUserData.lastName}
+              </p>
+            </div>
+
+            <div className="flex justify-center items-center ml-auto cursor-pointer">
+              <GrClose
+                className="w-5 h-5"
+                onClick={onCloseHandler}
               />
             </div>
-            <p className="font-semibold text-lg">
-              {otherUserData.firstName} {otherUserData.lastName}
-            </p>
           </div>
 
-          <div className="flex justify-center items-center ml-auto cursor-pointer">
-            <GrClose
-              className="w-5 h-5"
-              onClick={onCloseHandler}
-            />
-          </div>
-        </div>
-
-        {/* Bandeja con la lista de mensajes */}
-        <div className="w-full flex-grow p-3 scrollbar-thin scrollbar-thumb-gray-400 overflow-y-auto">
-          <div className="flex flex-col justify-start gap-4">
-            {selectedChat.messages.map(msg => {
-              return (
-                <MessageItem
-                  key={msg.messageId}
-                  message={msg}
-                  currentUser={currentUser}
-                />
-              )
-            })}
-
+          {/* Bandeja con la lista de mensajes */}
+          <div className="w-full flex-grow p-3 scrollbar-thin scrollbar-thumb-gray-400 overflow-y-auto">
+            <div className="flex flex-col justify-start gap-4">
+              {selectedChat.messages.map(msg => {
+                return (
+                  <MessageItem
+                    key={msg.messageId}
+                    message={msg}
+                    currentUser={currentUser}
+                    openDeleteModal={setOpenDeleteMessageModal}
+                  />
+                )
+              })}
+            </div>
+            
             {/* Elemento vacío para referencia del scroll to bottom */}
-            <div ref={chatBottomRef} className="absolute bottom-0" />
+            <div ref={chatBottomRef}/>
           </div>
-        </div>
-        
-        {/* Input y botonera */}
-        <div
-          style={{
-            pointerEvents: isUserOnline && isUserOnline.status === "available" ? "all" : "none",
-            backgroundColor: isUserOnline && isUserOnline.status === "available" ? "white" : "#eee"
-          }}
-          className="flex flex-col w-full flex-shrink-0 border-t border-gray-400 bg-white transition-colors overflow-hidden"
-        >
-          <textarea
-            className="block w-full min-h-[70px] mb-1 px-2 pt-1 flex-grow resize-none focus:outline-none scrollbar-thin scrollbar-thumb-slate-500"
-            placeholder="Type your message..."
-            value={messageText}
-            disabled={!isUserOnline || (isUserOnline && isUserOnline.status === "unavailable")}
-            onChange={(e) => setMessageText(e.currentTarget.value)}
-          />
           
-          <div className="relative flex justify-end items-center gap-3 mt-1 pr-3 py-1 flex-shrink-0 border border-t border-gray-200">
-            <Tooltip id="pick-emoji-button" />
-            <Tooltip id="select-image-button" />
-            <Tooltip id="send-message-button" />
-
-            {/* Texto de estado offline */}
-            <AnimatePresence>
-              {!isUserOnline && <StatusText status="offline" />}
-            </AnimatePresence>
-
-            {/* Texto de estado unavailable */}
-            <AnimatePresence>
-              {isUserOnline && isUserOnline.status === "unavailable" &&
-                <StatusText status="unavailable" />
-              }
-            </AnimatePresence>
-
-            {/* Preview de la imagen seleccionada */}
-            <AnimatePresence>
-              {imageData && (
-                <motion.div
-                  className="relative ml-1 mr-auto p-[2px] rounded-md border border-gray-400"
-                  initial={{width: 0, height: 0, opacity: 0}}
-                  animate={{width: 60, height: 60, opacity: 1}}
-                  exit={{width: 0, height: 0, opacity: 0}}
-                >
-                  <FaTimesCircle
-                    className="absolute -top-2 -right-2 w-4 h-4 rounded-full fill-red-500 bg-white cursor-pointer"
-                    onClick={() => setImageData(null)}
-                  />
-                  <img
-                    className="block w-full h-full object-cover object-center rounded-md"
-                    src={imageData}
-                    alt={"Picked image"}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Input del selector de imágenes */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              hidden
-              multiple={false}
+          {/* Input y botonera */}
+          <div
+            style={{
+              pointerEvents: isUserOnline && isUserOnline.status === "available" ? "all" : "none",
+              backgroundColor: isUserOnline && isUserOnline.status === "available" ? "white" : "#eee"
+            }}
+            className="flex flex-col w-full flex-shrink-0 border-t border-gray-400 bg-white transition-colors overflow-hidden"
+          >
+            <textarea
+              className="block w-full min-h-[70px] mb-1 px-2 pt-1 flex-grow resize-none focus:outline-none scrollbar-thin scrollbar-thumb-slate-500"
+              placeholder="Type your message..."
+              value={messageText}
               disabled={!isUserOnline || (isUserOnline && isUserOnline.status === "unavailable")}
-              accept="image/png, image/jpg, image/jpeg"
-              onChange={onImagePickHandler}
+              onChange={(e) => setMessageText(e.currentTarget.value)}
             />
+            
+            <div className="relative flex justify-end items-center gap-3 mt-1 pr-3 py-1 flex-shrink-0 border border-t border-gray-200">
+              <Tooltip id="pick-emoji-button" />
+              <Tooltip id="select-image-button" />
+              <Tooltip id="send-message-button" />
 
-            <BsEmojiSmile
-              className="w-[27px] h-[27px] opacity-80 cursor-pointer"
-              data-tooltip-id="pick-emoji-button"
-              data-tooltip-content="Add emoji"
-              onClick={() => setOpenEmojiPicker((prev) => !prev)}
-            />
-            <BsImage
-              className="w-[27px] h-[27px] opacity-80 cursor-pointer"
-              data-tooltip-id="select-image-button"
-              data-tooltip-content={imageData ? "Change image" : "Add image"}
-              onClick={() => fileInputRef.current?.click()}
-            />
-            <FiSend
-              className="w-[27px] h-[27px] opacity-80 cursor-pointer"
-              data-tooltip-id="send-message-button"
-              data-tooltip-content="Send message"
-              onClick={onNewMessageHandler}
-            />
+              {/* Texto de estado offline */}
+              <AnimatePresence>
+                {!isUserOnline && <StatusText status="offline" />}
+              </AnimatePresence>
+
+              {/* Texto de estado unavailable */}
+              <AnimatePresence>
+                {isUserOnline && isUserOnline.status === "unavailable" &&
+                  <StatusText status="unavailable" />
+                }
+              </AnimatePresence>
+
+              {/* Preview de la imagen seleccionada */}
+              <AnimatePresence>
+                {imageData && (
+                  <motion.div
+                    className="relative ml-1 mr-auto p-[2px] rounded-md border border-gray-400"
+                    initial={{width: 0, height: 0, opacity: 0}}
+                    animate={{width: 60, height: 60, opacity: 1}}
+                    exit={{width: 0, height: 0, opacity: 0}}
+                  >
+                    <FaTimesCircle
+                      className="absolute -top-2 -right-2 w-4 h-4 rounded-full fill-red-500 bg-white cursor-pointer"
+                      onClick={() => setImageData(null)}
+                    />
+                    <img
+                      className="block w-full h-full object-cover object-center rounded-md"
+                      src={imageData}
+                      alt={"Picked image"}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Input del selector de imágenes */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                hidden
+                multiple={false}
+                disabled={!isUserOnline || (isUserOnline && isUserOnline.status === "unavailable")}
+                accept="image/png, image/jpg, image/jpeg"
+                onChange={onImagePickHandler}
+              />
+
+              <BsEmojiSmile
+                className="w-[27px] h-[27px] opacity-80 cursor-pointer"
+                data-tooltip-id="pick-emoji-button"
+                data-tooltip-content="Add emoji"
+                onClick={() => setOpenEmojiPicker((prev) => !prev)}
+              />
+              <BsImage
+                className="w-[27px] h-[27px] opacity-80 cursor-pointer"
+                data-tooltip-id="select-image-button"
+                data-tooltip-content={imageData ? "Change image" : "Add image"}
+                onClick={() => fileInputRef.current?.click()}
+              />
+              <FiSend
+                className="w-[27px] h-[27px] opacity-80 cursor-pointer"
+                data-tooltip-id="send-message-button"
+                data-tooltip-content="Send message"
+                onClick={onNewMessageHandler}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 };
 
