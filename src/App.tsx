@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
+import ErrorBoundary from "./components/ErrorBoundary";
 import RefetchCurrentUser from "./components/RefetchCurrentUser";
 import ReconnectUser from "./components/ReconnectUser";
 import Spinner from "./components/Spinner";
@@ -36,36 +37,38 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <RefetchCurrentUser />
-      <ReconnectUser />
-      <Suspense fallback={<Spinner size="large" />}>
-        <main className="w-full min-h-screen bg-slate-100">
-          <section className="relative w-full max-w-[1440px] mx-auto overflow-x-hidden">
-            <ImageModal />
-            <VideoCallModal />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<LandingPage />}  />
-                <Route path="/map" element={<MapPage />}  />
-                <Route path="/account" element={<AccountPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                <Route path="/verify-account" element={<VerifiAccountPage />} />
-                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-                <Route path="*" element={<h1>Page not found...</h1>} />
-              </Routes>
-            </BrowserRouter>
-            <ChatWindow />
-            <ToastContainer
-              position="bottom-left"
-              autoClose={5000}
-              hideProgressBar={true}
-              theme="dark"
-            />
-          </section>
-        </main>
-      </Suspense>
+      <ErrorBoundary>
+        <RefetchCurrentUser />
+        <ReconnectUser />
+        <Suspense fallback={<Spinner size="large" />}>
+          <main className="w-full min-h-screen bg-slate-100">
+            <section className="relative w-full max-w-[1440px] mx-auto overflow-x-hidden">
+              <ImageModal />
+              <VideoCallModal />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<LandingPage />}  />
+                  <Route path="/map" element={<MapPage />}  />
+                  <Route path="/account" element={<AccountPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/verify-account" element={<VerifiAccountPage />} />
+                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
+                  <Route path="*" element={<h1>Page not found...</h1>} />
+                </Routes>
+              </BrowserRouter>
+              <ChatWindow />
+              <ToastContainer
+                position="bottom-left"
+                autoClose={5000}
+                hideProgressBar={true}
+                theme="dark"
+              />
+            </section>
+          </main>
+        </Suspense>
+      </ErrorBoundary>
     </Provider>
   )
 };
