@@ -22,12 +22,14 @@ export enum SocketEvents {
   DISCONNECT = "DISCONNECT"
 };
 
+const IS_DEV = import.meta.env.DEV;
+const socketUrl = IS_DEV ? "http://localhost:5000" : import.meta.env.VITE_PRODUCTION_URL;
+
 class SocketClient {
   private socketInstance: Socket;
 
   constructor() {
-    // this.socketInstance = io("http://localhost:5000");
-    this.socketInstance = io("http://192.168.0.114:5000");
+    this.socketInstance = io(socketUrl);
   };
 
   userReconnected(userId: string, location: UserLocation, peerId: string) {
