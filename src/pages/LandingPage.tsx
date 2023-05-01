@@ -55,7 +55,7 @@ const LandingPage = () => {
           <div className="flex flex-col justify-center items-center gap-1 w-[33%] text-center">
             <AiFillLock className="w-[50px] h-[50px] fill-gray-600" />
             <p className="text-sm">
-              Messages are not stored in any server. Only you can read them as they are stored only on your device.
+              Messages are not stored in any server. Only you can read them as they are stored only on your browser.
             </p>
           </div>
         </div>
