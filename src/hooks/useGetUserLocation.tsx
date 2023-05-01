@@ -6,10 +6,9 @@ import { getFakeLocation } from "../utils/dummyLocations";
 const useGetUserLocation = () => {
   const dispatch = useDispatch();
   const [locationError, setLocationError] = useState<string | null>(null);
+  const IS_DEV = import.meta.env.DEV;
 
   useEffect(() => {
-    const IS_DEV = import.meta.env.DEV;
-    
     // Usar la posición real sólo en producción
     if ("navigator" in window) {
       navigator.geolocation.getCurrentPosition(
@@ -34,7 +33,7 @@ const useGetUserLocation = () => {
     } else {
       setLocationError("This device is not compatible with the geolocation functionality")
     }
-  }, []);
+  }, [IS_DEV]);
 
   return {locationError, setLocationError}
 };
