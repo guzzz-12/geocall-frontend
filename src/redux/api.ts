@@ -3,6 +3,7 @@ import { LoginFormSchemaType } from "../pages/LoginPage";
 import { SignupFormSchemaType } from "../pages/SignupPage";
 import { UserLocation } from "./features/mapSlice";
 import { ChatMember } from "./features/chatsSlice";
+import { DeleteChatsFormSchemaType } from "../components/Account/Security";
 
 export interface User {
   _id: string;
@@ -146,6 +147,17 @@ export const api = createApi({
           const message = (response.data as {message: string}).message;
           throw Error(message);
         }
+      }),
+      checkPassword: build.mutation<void, DeleteChatsFormSchemaType>({
+        query: ({password}) => ({
+          url: "/users/check-password",
+          method: "POST",
+          body: {password}
+        }),
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
       })
     };
   }
@@ -162,5 +174,6 @@ export const {
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useGetVerificationCodeQuery,
-  useVerifyAccountMutation
+  useVerifyAccountMutation,
+  useCheckPasswordMutation
 } = api;
