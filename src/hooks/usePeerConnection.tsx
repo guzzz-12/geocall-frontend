@@ -61,9 +61,17 @@ const usePeerConnection = () => {
 
     // Escuchar el evento de llamada entrante
     peerClient.getInstance.on("call", (call) => {
+      // Si no tiene cámara conectada mostrar notificación
+      // para indicarle que otros usuarios están tratando de comunicarse.
       if (!localStream) {
-        console.log("You must connect your camera to receive videocalls");
-        return false;
+        toast.dismiss();
+        return toast(
+          <span className="text-sm">Some users are trying to call you but you don't have any video device available. Connect your camera to be able to receive calls.</span>,
+          {
+            type: "info",
+            autoClose: false
+          }
+        );
       };
 
       if (videoCallStatus === "busy") {
