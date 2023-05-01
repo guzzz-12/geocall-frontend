@@ -1,7 +1,8 @@
-import { Dispatch, SetStateAction } from "react";
+import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { ChatMember, createOrSelectChat, setReadMessages } from "../../redux/features/chatsSlice";
 import { ChatsRootState, MapRootState, UserRootState } from "../../redux/store";
+import { SocketEvents, socketClient } from "../../socket/socketClient";
 
 interface Props {
   chatMember: ChatMember;
@@ -14,11 +15,31 @@ const ChatItem = ({chatMember, setIsOpen}: Props) => {
   const {onlineUsers} = useSelector((state: MapRootState) => state.map);
   const {chats} = useSelector((state: ChatsRootState) => state.chats);
 
+  const [isTyping, setIsTyping] = useState(false);
+
+
+  /*--------------------------------*/
+  // Escuchar evento de escribiendo
+  /*--------------------------------*/
+  useEffect(() => {
+    socketClient.socket.on(SocketEvents.TYPING, (data: {senderId: string, typing: boolean}) => {
+      const {senderId, typing} = data;
+
+      if (senderId === chatMember._id) {
+        setIsTyping(typing)
+      }
+    });
+
+  }, [chatMember]);
+
+
+  // Buscar el chat en el state global de los chats
   const chat = chats.find(item => (
     item.localUser === currentUser?._id &&
     (item.senderId === chatMember._id || item.recipientId === chatMember._id)
   ));
 
+  // Retornar si no existe el chat
   if (!chat) {
     return null
   };
@@ -28,10 +49,6 @@ const ChatItem = ({chatMember, setIsOpen}: Props) => {
 
   // Buscar los mensajes sin leer del otro usuario
   const unreadMessages = chat.messages.filter((msg) => msg.senderId === chatMember._id && msg.unread);
-
-  if (!currentUser) {
-    return null
-  };
 
 
   /**
@@ -72,10 +89,19 @@ const ChatItem = ({chatMember, setIsOpen}: Props) => {
         />
       </div>
 
-      <p className="flex-grow max-w-[full] font-bold text-sm text-left text-gray-700 text-ellipsis overflow-hidden">
-        {chatMember.firstName} {chatMember.lastName}
-      </p>
+      {/* Nombre e indicador de escribiendo */}
+      <div className="flex flex-col justify-center items-start flex-grow w-full overflow-hidden">
+        <p className="max-w-[100%] font-bold text-sm text-left text-gray-700 text-ellipsis overflow-hidden">
+          {chatMember.firstName} {chatMember.lastName}
+        </p>
+        {isTyping &&
+          <span className="text-xs text-gray-600 italic">
+            User is typing...
+          </span>
+        }
+      </div>
 
+      {/* Número de mensajes sin leer */}
       {unreadMessages.length > 0 && (
         <p className="flex justify-center items-center w-5 h-5 ml-auto flex-shrink-0 text-sm text-white font-semibold rounded-full bg-orange-600">
           {unreadMessages.length}
