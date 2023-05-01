@@ -67,7 +67,7 @@ const Navbar = ({navbarType}: Props) => {
     dispatch(clearMapState());
     dispatch(clearSelectedChatState());
     socketClient.userLogout(currentUser!._id);
-    navigate("/login", {replace: true});
+    navigate("/", {replace: true});
   };
   
   /**
@@ -158,10 +158,14 @@ const Navbar = ({navbarType}: Props) => {
       <RenderTooltip id="status-button-tooltip" />
       <RenderTooltip id="logout-button-tooltip" />
 
-      <Link className="flex justify-between items-center gap-2" to="/">
-        <TfiWorld className="w-9 h-9 text-gray-400" />
-        <h1 className="text-lg font-bold uppercase text-gray-600">
-          GeoCall
+      <Link className="flex justify-between items-center gap-1" to="/">
+        <img
+          className="block w-11 h-11"
+          src="/world-map.png"
+          alt="World map icon"
+        />
+        <h1 className="text-lg font-bold text-gray-600">
+          Geo<span className="text-orange-600">Call</span>
         </h1>
       </Link>
 
@@ -172,7 +176,7 @@ const Navbar = ({navbarType}: Props) => {
           data-tooltip-id="user-button-tooltip"
           data-tooltip-content="Account"
         >
-          <span className="block w-8 h-8 flex-shrink-0 rounded-full border-2 border-blue-500 overflow-hidden">
+          <span className="block w-8 h-8 flex-shrink-0 rounded-full border-2 border-gray-400 overflow-hidden">
             <img
               src={currentUser!.avatar}
               className="block w-full h-full object-cover object-center "
