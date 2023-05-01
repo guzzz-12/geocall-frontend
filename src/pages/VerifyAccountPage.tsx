@@ -9,6 +9,7 @@ import { Tooltip } from "react-tooltip";
 import { AiOutlinePoweroff } from "react-icons/ai";
 import { HiOutlineKey } from "react-icons/hi";
 
+import Logo from "../components/Logo";
 import FormsWrapper from "../components/FormsWrapper";
 import Input from "../components/AuthFormInputs/Input";
 import Alert from "../components/Alert";
@@ -114,6 +115,10 @@ const VerifyAccountPage = () => {
   return (
     <FormsWrapper>
       <FormProvider {...methods}>
+        <div className="mb-5">
+          <Logo size="lg" />
+        </div>
+
         <form
           className="relative flex flex-col justify-between gap-5 w-[450px] p-5 rounded bg-white shadow-lg"
           noValidate

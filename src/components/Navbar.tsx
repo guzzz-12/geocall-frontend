@@ -1,11 +1,11 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { TfiWorld } from "react-icons/tfi";
 import { MdMailOutline, MdEmail, MdNotificationsNone, MdOutlineNotificationsOff } from "react-icons/md";
 import { AiOutlineLogout } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
+import Logo from "./Logo";
 import ChatsList from "./ChatsList";
 import { ChatsRootState, NotificationsRootState, UserRootState } from "../redux/store";
 import { api, useGetUsersMutation } from "../redux/api";
@@ -158,16 +158,7 @@ const Navbar = ({navbarType}: Props) => {
       <RenderTooltip id="status-button-tooltip" />
       <RenderTooltip id="logout-button-tooltip" />
 
-      <Link className="flex justify-between items-center gap-1" to="/">
-        <img
-          className="block w-11 h-11"
-          src="/world-map.png"
-          alt="World map icon"
-        />
-        <h1 className="text-lg font-bold text-gray-600">
-          Geo<span className="text-orange-600">Call</span>
-        </h1>
-      </Link>
+      <Logo size="sm" />
 
       <div className="relative flex justify-center items-stretch gap-3">
         <Link

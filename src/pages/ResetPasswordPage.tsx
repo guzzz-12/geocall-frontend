@@ -6,6 +6,7 @@ import { z } from "zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { HiOutlineKey } from "react-icons/hi";
 
+import Logo from "../components/Logo";
 import FormsWrapper from "../components/FormsWrapper";
 import Input from "../components/AuthFormInputs/Input";
 import Alert from "../components/Alert";
@@ -70,6 +71,10 @@ const ResetPasswordPage = () => {
   return (
     <FormsWrapper>
       <FormProvider {...methods}>
+        <div className="mb-5">
+          <Logo size="lg" />
+        </div>
+
         <form
           className="flex flex-col justify-between gap-3 w-[450px] p-5 rounded bg-white shadow-lg"
           noValidate

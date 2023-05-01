@@ -12,6 +12,7 @@ import { HiOutlineKey } from "react-icons/hi";
 import FormsWrapper from "../components/FormsWrapper";
 import Input from "../components/AuthFormInputs/Input";
 import Alert from "../components/Alert";
+import Logo from "../components/Logo";
 import withoutAuthentication from "../components/HOC/withoutAuthentication";
 import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
 import { useLoginUserMutation } from "../redux/api";
@@ -70,13 +71,17 @@ const LoginPage = () => {
   return (
     <FormsWrapper>
       <FormProvider {...methods}>
+        <div className="mb-5">
+          <Logo size="lg" />
+        </div>
+
         <form
           className="flex flex-col justify-between gap-5 w-[450px] p-5 rounded bg-white shadow-lg"
           noValidate
           onSubmit={methods.handleSubmit(onSubmitHandler)}
         >
-          <h1 className="text-center text-lg font-normal">
-            Log in to GeoCall App
+          <h1 className="text-center text-lg font-bold">
+            Log in to GeoCall
           </h1>
 
           <AnimatePresence>
