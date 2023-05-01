@@ -23,7 +23,7 @@ import { VideoCallData, setActiveVideoCallData, setVideoCall } from "../redux/fe
  */
 const ReconnectUser = () => {  
   const dispatch = useDispatch();
-  const {currentUser, videoCallStatus} = useSelector((state: UserRootState) => state.user);
+  const {currentUser, videoCallStatus, hasMediaDevice} = useSelector((state: UserRootState) => state.user);
   const {myLocation} = useSelector((state: MapRootState) => state.map);
   const {videoCall} = useSelector((state: VideoCallRootState) => state.videoCall);
 
@@ -48,14 +48,12 @@ const ReconnectUser = () => {
     // Escuchar el evento de nueva llamada entrante
     socketClient.socket.on(SocketEvents.INCOMING_CALL, (data: VideoCallData) => {
       if (videoCallStatus === "active") {
-        console.log("INCOMING_CALL", "status = active")
         const {remitent} = data;
         dispatch(setActiveVideoCallData(remitent));
         dispatch(setUserVideoCallStatus("busy"));
       };
 
-      if (videoCallStatus === "busy") {
-        console.log("INCOMING_CALL", "status = busy");
+      if (videoCallStatus === "busy" || !hasMediaDevice) {
         socketClient.userCallUnavailable(data.remitent.id);
         return false;
       };
@@ -66,7 +64,7 @@ const ReconnectUser = () => {
     return () => {
       socketClient.socket.removeListener(SocketEvents.INCOMING_CALL)
     };
-  }, [videoCallStatus]);
+  }, [videoCallStatus, hasMediaDevice]);
 
 
   useEffect(() => {
