@@ -8,18 +8,18 @@ const useGetUserLocation = () => {
   const [locationError, setLocationError] = useState<string | null>(null);
   const IS_DEV = import.meta.env.DEV;
 
+  // Usar la posición real sólo en producción
   useEffect(() => {
-    // Usar la posición real sólo en producción
-    if ("navigator" in window) {
+    if (IS_DEV) {
+      const fakeLocation = getFakeLocation();
+      dispatch(setMyLocation(fakeLocation));
+    };
+    
+    if ("navigator" in window && !IS_DEV) {
       navigator.geolocation.getCurrentPosition(
         (position: GeolocationPosition) => {
-          if (IS_DEV) {
-            const fakeLocation = getFakeLocation();
-            dispatch(setMyLocation(fakeLocation));
-          } else {
-            const {latitude, longitude} = position.coords;
-            dispatch(setMyLocation({lat: latitude, lon: longitude}));
-          };
+          const {latitude, longitude} = position.coords;
+          dispatch(setMyLocation({lat: latitude, lon: longitude}));
         },
         (err:GeolocationPositionError) => {
           setLocationError(err.message)
