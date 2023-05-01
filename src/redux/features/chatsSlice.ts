@@ -228,6 +228,7 @@ const chatsSlice = createSlice({
         return state;
       };
 
+      // Regenerar la lista de mensajes del chat
       const updatedMessages: Message[] = chat.messages.map((msg) => {
         // Eliminar el contenido del mensaje eliminado y pasar su status a deleted
         const content = msg.messageId === messageId ? "Message deleted..." : msg.content;
@@ -251,10 +252,31 @@ const chatsSlice = createSlice({
 
       chat.messages = updatedMessages;
 
-      const updatedChats = [...state.chats];
+      // Regenerar la lista de chats
+      const updatedChats: Chat[] = state.chats.map(chat => {
+        return {
+          chatId: chat.chatId,
+          senderId: chat.senderId,
+          recipientId: chat.recipientId,
+          senderData: chat.senderData,
+          recipientData: chat.recipientData,
+          createdAt: chat.createdAt,
+          localUser: chat.localUser,
+          messages: chat.messages
+        }
+      });
+
+      // Reemplazar el chat del mensaje eliminado
       updatedChats.splice(chatIndex, 1, chat);
+
+      // Actualizar el state de la lista de chats
       state.chats = updatedChats;
-      state.selectedChat = chat;
+
+      // Actualizar el state del chat seleccionado si el chat seleccionado
+      // es el mismo que el chat al que pertenece el mensaje eliminado
+      if (state.selectedChat?.chatId === chat.chatId) {
+        state.selectedChat = chat;
+      };
 
       // Actualizar los mensajes del chat en la DB local
       db.chats
