@@ -24,6 +24,8 @@ const animationProps: AnimationProps = {
 };
 
 const AccountPage = () => {
+  document.title = "GeoCall App | Account";
+
   const {currentUser} = useSelector((state: UserRootState) => state.user);
 
   const [activeTab, setActiveTab] = useState(1);

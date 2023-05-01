@@ -29,6 +29,8 @@ const MAP_THEMES = [
 
 
 const MapPage = () => {
+  document.title = "GeoCall App | Home";
+
   const dispatch = useDispatch();
   const {onlineUsers, myLocation, selectedUser, selectedUserPrefetch: {selectedUserId}} = useSelector((state: MapRootState) => state.map);
   const {currentUser} = useSelector((state: UserRootState) => state.user);

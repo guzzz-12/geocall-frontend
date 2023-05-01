@@ -21,6 +21,8 @@ const FormSchema = z.object({
 export type ForgotPasswordSchemaType = z.infer<typeof FormSchema>;
 
 const ForgotPassword = () => {
+  document.title = "GeoCall App | Forgot Password";
+
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

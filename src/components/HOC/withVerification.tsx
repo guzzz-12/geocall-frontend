@@ -14,7 +14,7 @@ const withVerification = (Component: ComponentType) => {
     
     // Si no está autenticado, redirigir a la página de login
     if(!isLoading && !currentUser && !token) {
-      return <Navigate to="/login" replace />
+      return <Navigate to="/" replace />
     };
 
     // Si está autenticado pero no está verificado,

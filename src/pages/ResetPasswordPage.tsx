@@ -32,6 +32,8 @@ export type ResetPasswordSchemaType = z.infer<typeof FormSchema>;
 
 
 const ResetPasswordPage = () => {
+  document.title = "GeoCall App | Reset Password";
+
   const [searchParams] = useSearchParams();
   
   const [success, setSuccess] = useState(false);

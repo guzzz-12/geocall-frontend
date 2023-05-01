@@ -30,6 +30,8 @@ const FormSchema = z.object({
 export type CodeFormSchemaType = z.infer<typeof FormSchema>;
 
 const VerifyAccountPage = () => {
+  document.title = "GeoCall App | Verify Account";
+
   const token = localStorage.getItem("token");
 
   const navigate = useNavigate();

@@ -53,6 +53,8 @@ const FormSchema = z.object({
 export type SignupFormSchemaType = z.infer<typeof FormSchema>;
 
 const SignupPage = () => {
+  document.title = "GeoCall App | Signup";
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {myLocation} = useSelector((state: MapRootState) => state.map);
