@@ -14,7 +14,7 @@ import "react-tooltip/dist/react-tooltip.css";
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
-const HomePage = lazy(() => import("./pages/HomePage"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const SignupPage = lazy(() => import("./pages/SignupPage"));
 const MapPage = lazy(() => import("./pages/MapPage"));
@@ -39,29 +39,31 @@ const App = () => {
       <RefetchCurrentUser />
       <ReconnectUser />
       <Suspense fallback={<Spinner size="large" />}>
-        <main className="relative min-h-screen bg-slate-100 overflow-x-hidden">
-          <ImageModal />
-          <VideoCallModal />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<HomePage />}  />
-              <Route path="/map" element={<MapPage />}  />
-              <Route path="/account" element={<AccountPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/verify-account" element={<VerifiAccountPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route path="*" element={<h1>Page not found...</h1>} />
-            </Routes>
-          </BrowserRouter>
-          <ChatWindow />
-          <ToastContainer
-            position="bottom-left"
-            autoClose={5000}
-            hideProgressBar={true}
-            theme="dark"
-          />
+        <main className="w-full min-h-screen bg-slate-100">
+          <section className="relative w-full max-w-[1440px] mx-auto overflow-x-hidden">
+            <ImageModal />
+            <VideoCallModal />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<LandingPage />}  />
+                <Route path="/map" element={<MapPage />}  />
+                <Route path="/account" element={<AccountPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/verify-account" element={<VerifiAccountPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="*" element={<h1>Page not found...</h1>} />
+              </Routes>
+            </BrowserRouter>
+            <ChatWindow />
+            <ToastContainer
+              position="bottom-left"
+              autoClose={5000}
+              hideProgressBar={true}
+              theme="dark"
+            />
+          </section>
         </main>
       </Suspense>
     </Provider>
