@@ -13,7 +13,7 @@ import { ChatsRootState, MapRootState, UserRootState } from "../redux/store";
 import { Message, closeChat, createMessage, deleteMessage } from "../redux/features/chatsSlice";
 import { Notification } from "../redux/features/notificationsSlice";
 import { imageResizer } from "../utils/imgResizer";
-import { socketClient } from "../socket/socketClient";
+import { SocketEvents, socketClient } from "../socket/socketClient";
 
 export interface DeleteMessageModalState {
   open: boolean;
@@ -33,6 +33,7 @@ const ChatWindow = () => {
   const [messageText, setMessageText] = useState("");
   const [imageData, setImageData] = useState<string | null>(null);
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   const [deleteMessageModal, setDeleteMessageModal] = useState<DeleteMessageModalState>({
     open: false,
@@ -48,6 +49,55 @@ const ChatWindow = () => {
 
   // Verificar si el usuario está online
   const isUserOnline = onlineUsers.find(user => user.userId === otherUserId);
+
+
+  /*--------------------------------*/
+  // Escuchar evento de escribiendo
+  /*--------------------------------*/
+  useEffect(() => {
+    if (otherUserId) {
+      socketClient.socket.on(SocketEvents.TYPING, (data: {senderId: string, typing: boolean}) => {
+        // En el caso de que hubieran múltiples ventanas abiertas
+        // evitar mostrar el tiping en las demás ventanas
+        if (data.senderId === otherUserId) {
+          setIsTyping(data.typing)
+        }
+      })
+    };
+
+    return () => {
+      socketClient.socket.off(SocketEvents.TYPING)
+    };
+  }, [otherUserId]);
+
+
+  /*--------------------------------------------------------------*/
+  // Emitir evento de escribiendo en true cada vez que tipea
+  // y emitirlo en false si deja de tipear durante 600ms
+  /*--------------------------------------------------------------*/
+  useEffect(() => {
+    let timeoutId: number | null = null;
+
+    socketClient.socket.emit(SocketEvents.TYPING, {
+      senderId: currentUser?._id,
+      recipientId: otherUserId,
+      typing: true
+    });
+
+    timeoutId = setTimeout(() => {
+      socketClient.socket.emit(SocketEvents.TYPING, {
+        senderId: currentUser?._id,
+        recipientId: otherUserId,
+        typing: false
+      })
+    }, 600);
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    };
+  }, [messageText, otherUserId, currentUser]);
 
 
   /*----------------------------------------------------------------*/
@@ -317,7 +367,14 @@ const ChatWindow = () => {
           </div>
 
           {/* Bandeja con la lista de mensajes */}
-          <div className="w-full flex-grow p-3 scrollbar-thin scrollbar-thumb-gray-400 overflow-y-auto">
+          <div className="relative w-full flex-grow p-3 scrollbar-thin scrollbar-thumb-gray-400 overflow-y-auto">
+            {/* Indicar si el otro usuario está escribiendo */}
+            {isTyping &&
+              <p className="absolute bottom-1 left-0 w-full text-center text-sm italic text-gray-600">
+                {otherUserData.firstName} is typing...
+              </p>
+            }
+            
             <div className="flex flex-col justify-start gap-4">
               {selectedChat.messages.map(msg => {
                 return (
