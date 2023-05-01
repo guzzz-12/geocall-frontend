@@ -39,7 +39,7 @@ const LandingPage = () => {
           </div>
         </div>
 
-        <div className="flex justify-between items-start gap-5 w-full">
+        <div className="flex justify-between items-start gap-5 w-full mb-4">
           <div className="flex flex-col justify-start items-center gap-1 w-[33%] text-center">
             <AiOutlineWechat className="w-[50px] h-[50px] fill-gray-600" />
             <p className="text-sm">

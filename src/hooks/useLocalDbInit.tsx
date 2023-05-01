@@ -21,6 +21,9 @@ const useLocalDbInit = () => {
         .where("localUser")
         .equals(currentUser._id)
         .toArray()
+        .catch((error: any) => {
+          throw new Error(`Error initializing database: ${error.message}`)
+        })
       )
     };
 
