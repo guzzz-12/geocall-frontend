@@ -1,11 +1,14 @@
 import { Peer } from "peerjs";
 
+const IS_DEV = import.meta.env.DEV;
+const peerHost = IS_DEV ? "localhost" : import.meta.env.VITE_PRODUCTION_HOST;
+
 class PeerClient {
   private peerInstance: Peer;
 
   constructor() {
     this.peerInstance = new Peer({
-      host: "localhost",
+      host: peerHost,
       port: 443,
       path: "/peer"
     });
