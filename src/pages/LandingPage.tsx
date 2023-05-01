@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { AiOutlineWechat, AiFillLock } from "react-icons/ai";
 import { BiVideoPlus } from "react-icons/bi";
+import Logo from "../components/Logo";
 import withoutAuthentication from "../components/HOC/withoutAuthentication";
 
 const LandingPage = () => {
@@ -8,21 +9,18 @@ const LandingPage = () => {
 
   return (
     <section className="flex w-screen h-screen bg-gray-100">
+      {/* Columna izquierda */}
       <header className="relative flex flex-col justify-between items-center w-[55%] px-6 py-4 z-10 max-[850px]:w-screen">
-        <Link to="/" className="flex justify-between items-center gap-1 self-start">
-          <img
-            className="block w-11 h-11"
-            src="/world-map.png"
-            alt="World map icon"
-          />
-          <h1 className="text-lg font-bold text-gray-600">
-            Geo<span className="text-orange-600">Call</span>
-          </h1>
-        </Link>
+        <div className="self-start">
+          <Logo size="sm" />
+        </div>
 
         <div className="flex flex-col justify-center items-start">
-          <p className="mb-8 text-4xl font-bold leading-[42px] text-gray-800">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Cupiditate nemo, accusantium dolore ducimus quod
+          <p className="mb-2 text-5xl text-left font-bold leading-none text-gray-800">
+            Connect with anyone, anytime, anywhere in the world!
+          </p>
+          <p className="mb-8 text-xl font-normal text-gray-800">
+            Connect with people from all over the world and experience new cultures, languages and ideas. Meet new people and stay in touch with friends and family, no matter where they are.
           </p>
 
           <div className="flex justify-center items-center gap-3">
@@ -42,27 +40,28 @@ const LandingPage = () => {
         </div>
 
         <div className="flex justify-between items-start gap-5 w-full">
-          <div className="flex flex-col justify-start items-center gap-1 text-center">
+          <div className="flex flex-col justify-start items-center gap-1 w-[33%] text-center">
             <AiOutlineWechat className="w-[50px] h-[50px] fill-gray-600" />
             <p className="text-sm">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quam nesciunt saepe adipisci rem officiis veniam.
+              Send text and images instantly with our realtime chat focused on your privacy.
             </p>
           </div>
-          <div className="flex flex-col justify-center items-center gap-1 text-center">
+          <div className="flex flex-col justify-center items-center gap-1 w-[33%] text-center">
             <BiVideoPlus className="w-[50px] h-[50px] fill-gray-600" />
             <p className="text-sm">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae illum sit ad. Maxime, maiores.
+              Take the conversation to the next level making videocalls with anyone anytime.
             </p>
           </div>
-          <div className="flex flex-col justify-center items-center gap-1 text-center">
+          <div className="flex flex-col justify-center items-center gap-1 w-[33%] text-center">
             <AiFillLock className="w-[50px] h-[50px] fill-gray-600" />
             <p className="text-sm">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut enim quo assumenda quasi tempore soluta!
+              Messages are not stored in any server. Only you can read them as they are stored only on your device.
             </p>
           </div>
         </div>
       </header>
 
+      {/* Columna derecha */}
       <div
         style={{backgroundImage: "url(/img/connected-world.png)"}}
         className="w-[45%] flex-shrink-[2] bg-left bg-cover bg-no-repeat max-[850px]:absolute max-[850px]:top-0 max-[850px]:left-0 max-[850px]:w-screen max-[850px]:h-screen max-[850px]:bg-cover max-[850px]:opacity-25 max-[850px]:z-0"
