@@ -4,7 +4,7 @@ import { Tooltip } from "react-tooltip";
 import { Twemoji } from "react-emoji-render";
 import dayjs from "dayjs";
 import { BiFullscreen } from "react-icons/bi";
-import { BsTrash } from "react-icons/bs";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import { Message } from "../redux/features/chatsSlice";
 import { User } from "../redux/api";
 import { openImageModal } from "../redux/features/imageModalSlice";
@@ -33,19 +33,21 @@ const MessageItem = ({message, currentUser, openDeleteModal}: Props) => {
       />
 
       {/* Botón para eliminar el mensaje */}
-      <BsTrash
+      <button
         style={{
-          display: !message.deleted ? "block" : "none",
-          right: isSender ? "unset" : -14,
-          left: isSender ? -14 : "unset"
+          display: !message.deleted ? "flex" : "none",
+          right: isSender ? "unset" : -22,
+          left: isSender ? -22 : "unset",
         }}
-        className="absolute w-[14px] h-[14px] text-red-700 cursor-pointer"
+        className="absolute w-[20px] h-[20px] justify-center items-center text-gray-700 rounded-full cursor-pointer transition-colors hover:bg-gray-200"
         onClick={() => {
           openDeleteModal({open: true, msgId: message.messageId, isSender})
         }}
-      />
+      >
+        <BsThreeDotsVertical className="w-[16px] h-[16px]"/>
+      </button>
 
-      {message.content.length > 0 &&
+      {(message.content.length > 0 || message.attachment) &&
         <div
           style={{
             fontStyle: message.deleted ? "italic" : "normal",
@@ -53,31 +55,34 @@ const MessageItem = ({message, currentUser, openDeleteModal}: Props) => {
           }}
           className="w-full px-4 py-2 text-left text-sm whitespace-pre-line leading-normal rounded-lg shadow-md"
         >
-          <Twemoji className="msg-body">
-            {message.content}
-          </Twemoji>
-        </div>
-      }
+          {message.content.length > 0 &&
+            <Twemoji className="msg-body">
+              {message.content}
+            </Twemoji>
+          }
 
-      {message.attachment &&
-        <div
-          className="relative"
-          data-tooltip-id="image-attachement-tooltip"
-          data-tooltip-content="View full screen"
-          data-tooltip-float={true}
-          onClick={() => dispatch(openImageModal(message.attachment!))}
-        >
-          <div
-            className="absolute top-0 left-0 flex flex-col justify-center items-center w-full h-full opacity-0 rounded-lg hover:bg-[rgba(0,0,0,0.55)] hover:opacity-100 transition-all cursor-pointer"
-          >
-            <BiFullscreen className="w-10 h-10 fill-white" />
-          </div>
-          <img
-            style={{backgroundColor: isSender ? "#bae6fd" : "#d1d5db"}}
-            className="w-full mt-2 px-4 py-2 text-left text-sm leading-normal rounded-lg shadow-md"
-            src={message.attachment}
-            alt="Attachement"
-          />
+          {message.attachment &&
+            <div
+              style={{marginTop: message.content.length > 0 ? 14 : "none"}}
+              className="relative mb-1 shadow-md"
+              data-tooltip-id="image-attachement-tooltip"
+              data-tooltip-content="View full screen"
+              data-tooltip-float={true}
+              onClick={() => dispatch(openImageModal(message.attachment!))}
+            >
+              <div
+                className="absolute top-0 left-0 flex flex-col justify-center items-center w-full h-full opacity-0 rounded-lg hover:bg-[rgba(0,0,0,0.55)] hover:opacity-100 transition-all cursor-pointer"
+              >
+                <BiFullscreen className="w-10 h-10 fill-white" />
+              </div>
+              <img
+                style={{backgroundColor: isSender ? "#bae6fd" : "#d1d5db"}}
+                className="w-full text-left text-sm leading-normal rounded-lg shadow-md"
+                src={message.attachment}
+                alt="Attachement"
+              />
+            </div>
+          }
         </div>
       }
 
