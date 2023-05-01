@@ -6,7 +6,7 @@ interface Props {
 
 const FormsWrapper = ({children}: Props) => {
   return (
-    <section className="flex flex-col justify-start items-center w-full h-screen py-10">
+    <section className="flex flex-col justify-start items-center w-full min-h-screen py-5">
       {children}
     </section>
   )
