@@ -30,6 +30,11 @@ const usePeerConnection = () => {
     peerClient.getInstance.on("error", (error) => {
       const {message} = error;
 
+      if (message.toLowerCase().includes("lost connection")) {
+        console.log("Reconnecting to peer server");
+        peerClient.getInstance.reconnect();
+      };
+
       // Mostrar notificación y restablecer el state
       // si el error se produjo al intentar iniciar una llamada
       if (message.toLowerCase().includes("could not connect to peer")) {
