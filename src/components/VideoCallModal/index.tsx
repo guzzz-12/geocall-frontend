@@ -194,7 +194,7 @@ const VideoCallModal = () => {
                   <IconButton
                     Icon={HiPhoneMissedCall}
                     disabled={false}
-                    tooltipText={`End videocall with ${selectedUser?.user.firstName}`}
+                    tooltipText={`End videocall with ${activeCallWith?.firstName}`}
                     onClickHandler={endVideoCallHandler.bind(null, "end")}
                   />
                 </div>
