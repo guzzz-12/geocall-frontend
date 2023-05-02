@@ -5,6 +5,8 @@ import { UserLocation } from "./features/mapSlice";
 import { ChatMember } from "./features/chatsSlice";
 import { DeleteChatsFormSchemaType } from "../components/Account/Security";
 
+const IS_DEV = import.meta.env.DEV;
+
 export interface User {
   _id: string;
   firstName: string;
@@ -25,7 +27,7 @@ export interface User {
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api",
+    baseUrl: `${IS_DEV ? "http://localhost:5000" : import.meta.env.VITE_PRODUCTION_URL}/api`,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
       headers.set("authorization", token || "");

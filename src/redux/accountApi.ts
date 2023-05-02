@@ -3,9 +3,11 @@ import { DeleteAccountFormSchemaType, EmailFormSchemaType, PasswordFormSchemaTyp
 import { ProfileFormSchemaType } from "../components/Account/ProfileForm";
 import { User } from "./api";
 
+const IS_DEV = import.meta.env.DEV;
+
 export const accountApi = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api/account",
+    baseUrl: `${IS_DEV ? "http://localhost:5000" : import.meta.env.VITE_PRODUCTION_URL}/api/account`,
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
       headers.set("authorization", token || "");

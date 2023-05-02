@@ -24,13 +24,13 @@ export enum SocketEvents {
 };
 
 const IS_DEV = import.meta.env.DEV;
-const socketUrl = !IS_DEV ? "http://localhost:5000" : import.meta.env.VITE_PRODUCTION_URL;
+const socketUrl = IS_DEV ? "http://localhost:5000" : import.meta.env.VITE_PRODUCTION_URL;
 
 class SocketClient {
   private socketInstance: Socket;
 
   constructor() {
-    this.socketInstance = io("https://geocall-server.onrender.com");
+    this.socketInstance = io(socketUrl);
   };
 
   userReconnected(userId: string, location: UserLocation, peerId: string) {
