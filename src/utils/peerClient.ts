@@ -8,7 +8,7 @@ class PeerClient {
 
   constructor() {
     this.peerInstance = new Peer({
-      host: peerHost,
+      host: "geocall-server.onrender.com",
       port: 443,
       path: "/peer"
     });
