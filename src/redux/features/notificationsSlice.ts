@@ -6,6 +6,13 @@ export interface Notification {
   senderId: string;
   receiverId: string;
   senderData: {
+    _id: string,
+    firstName: string;
+    lastName: string;
+    avatar: string;
+  };
+  recipientData: {
+    _id: string,
     firstName: string;
     lastName: string;
     avatar: string;

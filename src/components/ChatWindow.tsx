@@ -154,10 +154,12 @@ const ChatWindow = () => {
       receiverId: otherUserId,
       senderId: currentUser!._id,
       senderData: {
+        _id: currentUser!._id,
         firstName: currentUser!.firstName,
         lastName: currentUser!.lastName,
         avatar: currentUser!.avatar,
       },
+      recipientData: otherUserData,
       unread: true
     };
 
