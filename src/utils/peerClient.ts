@@ -9,6 +9,7 @@ class PeerClient {
   constructor() {
     this.peerInstance = new Peer({
       host: peerHost,
+      port: 10000,
       path: "/peer"
     });
   };
