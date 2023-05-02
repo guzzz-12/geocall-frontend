@@ -50,6 +50,11 @@ const usePeerConnection = () => {
 
       console.log(`Conection error with the peer server: ${message}}`)
     });
+
+    return () => {
+      socketClient.socket.off(SocketEvents.SERVER_RESTARTED);
+      socketClient.socket.off(SocketEvents.CALL_ENDED);
+    }
   }, [selectedUser]);
 
 
@@ -61,21 +66,10 @@ const usePeerConnection = () => {
 
     // Escuchar el evento de llamada entrante
     peerClient.getInstance.on("call", (call) => {
-      // Si no tiene cámara conectada mostrar notificación
-      // para indicarle que otros usuarios están tratando de comunicarse.
-      if (!localStream) {
-        toast.dismiss();
-        return toast(
-          <span className="text-sm">Some users are trying to call you but you don't have any video device available. Connect your camera to be able to receive calls.</span>,
-          {
-            type: "info",
-            autoClose: false
-          }
-        );
-      };
-
-      if (videoCallStatus === "busy") {
-        return false;
+      // Si no tiene cámara conectada o si ya tiene una llamada activa
+      // retornar sin hacer nada al recibir una videollamada
+      if (!localStream || videoCallStatus === "busy") {
+        return false
       };
 
       const videoCall: VideoCall = {

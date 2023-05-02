@@ -162,7 +162,7 @@ const Navbar = ({navbarType}: Props) => {
 
       <div className="relative flex justify-center items-stretch gap-3">
         <Link
-          className="flex justify-center items-center gap-1 max-w-[120px] rounded- cursor-pointer"
+          className="flex justify-center items-center gap-1 max-w-[120px] cursor-pointer"
           to="/account"
           data-tooltip-id="user-button-tooltip"
           data-tooltip-content="Account"
@@ -187,7 +187,7 @@ const Navbar = ({navbarType}: Props) => {
         />
 
         <button
-          className="relative flex justify-center items-center w-8 cursor-pointer"
+          className="relative flex justify-center items-center w-8 h-8 cursor-pointer"
           data-tooltip-id="msg-button-tooltip"
           data-tooltip-content="Messages"
           onClick={onClickNotificationsHandler}
@@ -210,22 +210,22 @@ const Navbar = ({navbarType}: Props) => {
 
         {/* Botón para alternar la disponibilidad del usuario para chatear y recibir llamadas */}
         <button
-          className="px-0 py-1 text-center text-base font-normal text-gray-600 uppercase rounded disabled:bg-slate-300 disabled:cursor-default transition-colors"
+          className="w-8 h-8 text-gray-600 rounded"
           data-tooltip-id="status-button-tooltip"
           data-tooltip-content={chatStatus === "available" ? "Set chat to unavailable" : "Set chat to available"}
           onClick={availabilityChangeHandler}
         >
-          {chatStatus === "available" && <MdNotificationsNone className="w-8 h-8" />}
-          {chatStatus === "unavailable" && <MdOutlineNotificationsOff className="w-8 h-8" />}
+          {chatStatus === "available" && <MdNotificationsNone className="w-full h-full" />}
+          {chatStatus === "unavailable" && <MdOutlineNotificationsOff className="w-full h-full" />}
         </button>
 
         <button
-          className="px-0 py-1 text-center text-base font-normal text-gray-600 uppercase rounded disabled:bg-slate-300 disabled:cursor-default transition-colors"
+          className="w-8 h-8 text-gray-600"
           data-tooltip-id="logout-button-tooltip"
           data-tooltip-content="Logout"
           onClick={logoutHandler}
         >
-          <AiOutlineLogout className="w-8 h-8" />
+          <AiOutlineLogout className="w-full h-full" />
         </button>
       </div>
     </Wrapper>

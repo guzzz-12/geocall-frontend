@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Map, { Marker, Popup, FullscreenControl, NavigationControl, GeolocateControl } from "react-map-gl";
+import Map, { Marker, Popup, NavigationControl } from "react-map-gl";
 import { useDispatch, useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import { Tooltip } from "react-tooltip";
@@ -10,7 +10,7 @@ import Navbar from "../components/Navbar";
 import SelectedUserCard from "../components/SelectedUserCard";
 import withVerification from "../components/HOC/withVerification";
 import { MapRootState, UserRootState } from "../redux/store";
-import { OnlineUser, setMyLocation, setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
+import { OnlineUser, setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { closeChat } from "../redux/features/chatsSlice";
 
 interface MapTheme {
@@ -147,15 +147,11 @@ const MapPage = () => {
         }}
         onLoad={() => setShotPopup(true)}
       >
-        <FullscreenControl />
-        <GeolocateControl
-          positionOptions={{enableHighAccuracy: true}}
-          onGeolocate={(geolocate) => {
-            const {latitude, longitude} = geolocate.coords;
-            dispatch(setMyLocation({lat: latitude, lon: longitude}));
-          }}
+        <NavigationControl
+          showCompass={true}
+          position="bottom-right"
+          visualizePitch
         />
-        <NavigationControl showCompass={true} />
 
         {showPopup && (
           <Popup

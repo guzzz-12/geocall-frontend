@@ -154,6 +154,7 @@ const ReconnectUser = () => {
       // para evitar disparar los eventos múltiples veces
       return () => {
         socketClient.socket.off(SocketEvents.NEW_MESSAGE);
+        socketClient.socket.off(SocketEvents.DELETED_MESSAGE);
         socketClient.socket.off(SocketEvents.NEW_NOTIFICATION);
       };
     }
@@ -194,6 +195,11 @@ const ReconnectUser = () => {
       socketClient.socket.on(SocketEvents.GET_ONLINE_USERS, (users: OnlineUser[]) => {
         dispatch(setOnlineUsers(users));
       });
+
+      return () => {
+        socketClient.socket.off(SocketEvents.SERVER_RESTARTED);
+        socketClient.socket.off(SocketEvents.GET_ONLINE_USERS);
+      }
     };
   }, [currentUser, myLocation, peerId]);
 
