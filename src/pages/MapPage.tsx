@@ -9,6 +9,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import Navbar from "../components/Navbar";
 import SelectedUserCard from "../components/SelectedUserCard";
 import withVerification from "../components/HOC/withVerification";
+import ErrorMessage from "../components/ErrorMessage";
+import Spinner from "../components/Spinner";
 import { MapRootState, UserRootState } from "../redux/store";
 import { OnlineUser, setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { closeChat } from "../redux/features/chatsSlice";
@@ -32,7 +34,7 @@ const MapPage = () => {
   document.title = "GeoCall App | Home";
 
   const dispatch = useDispatch();
-  const {onlineUsers, myLocation, selectedUser, selectedUserPrefetch: {selectedUserId}} = useSelector((state: MapRootState) => state.map);
+  const {waitingLocation, locationError, onlineUsers, myLocation, selectedUser, selectedUserPrefetch: {selectedUserId}} = useSelector((state: MapRootState) => state.map);
   const {currentUser} = useSelector((state: UserRootState) => state.user);
 
   // Verificar si el usuario está offline
@@ -57,7 +59,7 @@ const MapPage = () => {
   }, [isUserOffline, selectedUser]);
 
 
-  if (!myLocation || !currentUser) {
+  if (!currentUser) {
     return null;
   };
 
@@ -136,50 +138,64 @@ const MapPage = () => {
         )}
       </AnimatePresence>
 
-      <Map
-        style={{width: "100%", height: "100%"}}
-        mapStyle={mapTheme.uri}
-        mapboxAccessToken={mapboxToken}
-        initialViewState={{
-          latitude: myLocation.lat,
-          longitude: myLocation.lon,
-          zoom: 2
-        }}
-        onLoad={() => setShotPopup(true)}
-      >
-        <NavigationControl
-          showCompass={true}
-          position="bottom-right"
-          visualizePitch
+      {waitingLocation || (!locationError && !myLocation) &&
+        <Spinner size="large" spinnerInfo="Waiting for location..." />
+      }
+
+      {!waitingLocation && locationError &&
+        <ErrorMessage
+          mainMessage={locationError}
+          infoMessage="We are unable to get your current location. If you did not grant GeoCall to get your location refresh the page and allow GeoCall to get your location in the promp."
         />
+      }
 
-        {showPopup && (
-          <Popup
-            key="CurrentUserLocation"
-            latitude={myLocation.lat}
-            longitude={myLocation.lon}
-            anchor="bottom"
-            offset={16}
-            closeOnClick={false}
-          >
-            <p>You are here</p>
-          </Popup>
-        )}
+      {!waitingLocation && myLocation &&
+        <Map
+          style={{width: "100%", height: "100%"}}
+          mapStyle={mapTheme.uri}
+          mapboxAccessToken={mapboxToken}
+          initialViewState={{
+            latitude: myLocation.lat,
+            longitude: myLocation.lon,
+            zoom: 2
+          }}
+          onLoad={() => setShotPopup(true)}
+        >
+          <NavigationControl
+            showCompass={true}
+            position="bottom-right"
+            visualizePitch
+          />
 
-        {onlineUsers.map((user) => {
-          return (
-            <Marker
-              key={user.userId}
-              style={{cursor: currentUser._id !== user.userId ? "pointer" : "default"}}
-              latitude={user.location.lat}
-              longitude={user.location.lon}
-              anchor="top"
-              color={user.userId === currentUser._id ? "#ef4444" : "#bae6fd"}
-              onClick={onMarkerClickHandler.bind(null, user)}
-            />
-          )
-        })}
-      </Map>
+          {showPopup && (
+            <Popup
+              key="CurrentUserLocation"
+              latitude={myLocation.lat}
+              longitude={myLocation.lon}
+              anchor="bottom"
+              offset={16}
+              closeOnClick={false}
+            >
+              <p>You are here</p>
+            </Popup>
+          )}
+
+          {onlineUsers.map((user) => {
+            return (
+              <Marker
+                key={user.userId}
+                style={{cursor: currentUser._id !== user.userId ? "pointer" : "default"}}
+                latitude={user.location.lat}
+                longitude={user.location.lon}
+                anchor="top"
+                color={user.userId === currentUser._id ? "#ef4444" : "#bae6fd"}
+                onClick={onMarkerClickHandler.bind(null, user)}
+              />
+            )
+          })}
+        </Map>
+      }
+
     </div>
   )
 };
