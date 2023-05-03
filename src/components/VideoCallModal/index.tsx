@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Tooltip } from "react-tooltip";
+import { toast } from "react-toastify";
 import { BsCameraVideoOff } from "react-icons/bs";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import { HiPhoneMissedCall, HiOutlinePhoneMissedCall } from "react-icons/hi";
@@ -47,6 +48,24 @@ const VideoCallModal = () => {
   }, [localStream, isLocalStreamMuted]);
 
 
+  // Cerrar el modal, mostrar notificación y
+  // restablecer el state cuando la llamada termina
+  useEffect(() => {
+    const statuses = ["ended", "rejected"];
+
+    if (activeCallWith && statuses.includes(videoCall!.status!)) {
+      dispatch(setVideoCall(null));
+      dispatch(setActiveVideoCallData(null));
+      dispatch(setUserVideoCallStatus("active"));
+
+      toast.info(
+        `${activeCallWith?.firstName} ended the videocall`,
+        {position: "bottom-left"}
+      );
+    }
+  }, [videoCall, activeCallWith]);
+
+
   if (!videoCall) {
     return null;
   };
@@ -91,12 +110,21 @@ const VideoCallModal = () => {
       >
         {(videoCall.status === "calling"  || videoCall.status === "pending") && (
           <div className="flex flex-col justify-center items-center gap-16">
-            <p className="font-bold text-3xl text-center text-gray-600">
-              {videoCall.status === "calling" && "Calling "}
-              {activeCallWith?.firstName} (@{activeCallWith?.username})
-              {videoCall.status === "pending" && " is calling..."}
-            </p>
+            {/* Avatar y nombre de la persona que está llamando */}
+            <div className="flex flex-col justify-center items-center gap-2">
+              <img
+                className="block w-[120px] h-[120px] object-cover object-center rounded-full border-4 border-blue-600"
+                src={activeCallWith?.avatar}
+                alt={activeCallWith?.firstName}
+              />
+              <p className="font-bold text-3xl text-center text-gray-600">
+                {videoCall.status === "calling" && "Calling "}
+                {activeCallWith?.firstName}...
+                {videoCall.status === "pending" && " is calling..."}
+              </p>
+            </div>
 
+            {/* Botones de aceptar y terminar/rechazar llamada */}
             <div className="flex justify-center items-center gap-16 w-full">
               <Tooltip id="accept-button-tooltip" />
               <Tooltip id="reject-button-tooltip" />
@@ -139,25 +167,7 @@ const VideoCallModal = () => {
         {videoCall.status === "unavailable" && (
           <div className="flex flex-col justify-center items-center gap-6">
             <p className="font-bold text-3xl text-center text-gray-600">
-              {activeCallWith?.firstName} is not available in this moment.
-            </p>
-            <button
-              className="block min-w-[150px] px-3 py-2 uppercase rounded-sm bg-blue-50 hover:bg-blue-100 transition-colors"
-              onClick={() => {
-                dispatch(setVideoCall(null));
-                dispatch(setActiveVideoCallData(null));
-                dispatch(setUserVideoCallStatus("active"));
-              }}
-            >
-              Accept
-            </button>
-          </div>
-        )}
-
-        {(videoCall.status === "ended" || videoCall.status === "rejected") && (
-          <div className="flex flex-col justify-center items-center gap-6">
-            <p className="font-bold text-3xl text-center text-gray-600">
-              {activeCallWith?.firstName} {videoCall.status === "ended" ? "ended" : "rejected"} the videocall
+              {activeCallWith?.firstName} is not available at this moment.
             </p>
             <button
               className="block min-w-[150px] px-3 py-2 uppercase rounded-sm bg-blue-50 hover:bg-blue-100 transition-colors"
@@ -178,7 +188,7 @@ const VideoCallModal = () => {
             {localStream && (
               <div className="flex flex-col justify-start items-center gap-3 mb-1">
                 <p className="font-bold text-2xl text-center text-gray-600">
-                  Active video call with {activeCallWith?.firstName} (@{activeCallWith?.username})
+                  Active video call with {activeCallWith?.firstName}
                 </p>
                 <div className="flex justify-stretch items-center gap-1 min-w-[200px]">
                   <IconButton

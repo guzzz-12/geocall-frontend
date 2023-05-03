@@ -95,13 +95,11 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
       remitent: {
         id: currentUser!._id,
         firstName: currentUser!.firstName,
-        username: currentUser!.username,
         avatar: currentUser!.avatar
       },
       recipient: {
         id: selectedUser.user._id,
         firstName: selectedUser.user.firstName,
-        username: selectedUser.user.username,
         avatar: selectedUser.user.avatar
       }
     };

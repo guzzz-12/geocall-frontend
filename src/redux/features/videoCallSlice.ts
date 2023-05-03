@@ -18,13 +18,11 @@ export interface VideoCallData {
     id: string;
     firstName: string;
     avatar: string;
-    username: string;
   };
   recipient: {
     id: string;
     firstName: string;
     avatar: string;
-    username: string;
   }
 }
 
@@ -32,7 +30,6 @@ export interface ActiveCallWith {
   id: string;
   firstName: string;
   avatar: string;
-  username: string;
 };
 
 const initialState: VideoCallState = {
