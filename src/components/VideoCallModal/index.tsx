@@ -6,7 +6,7 @@ import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import { HiPhoneMissedCall, HiOutlinePhoneMissedCall } from "react-icons/hi";
 import { FiPhoneCall } from "react-icons/fi";
 import IconButton from "../IconButton";
-import { MapRootState, VideoCallRootState } from "../../redux/store";
+import { VideoCallRootState } from "../../redux/store";
 import { setActiveVideoCallData, setVideoCall } from "../../redux/features/videoCallSlice";
 import { setUserVideoCallStatus } from "../../redux/features/userSlice";
 import { SocketEvents, socketClient } from "../../socket/socketClient";
@@ -17,7 +17,6 @@ const VideoCallModal = () => {
 
   const dispatch = useDispatch();
   const {videoCall, activeCallWith} = useSelector((state: VideoCallRootState) => state.videoCall);
-  const {selectedUser} = useSelector((state: MapRootState) => state.map);
   const {localStream, remoteStream} = useSelector((state: VideoCallRootState) => state.videoCall);
 
   const [isLocalStreamMuted, setIsLocalStreamMuted] = useState(false);
@@ -51,11 +50,9 @@ const VideoCallModal = () => {
     };
 
     const audioTrack = localStream.getAudioTracks()[0];
+    audioTrack.enabled = !audioTrack.enabled;
 
-    setIsLocalStreamMuted((prev) => {
-      audioTrack.enabled = !prev;
-      return !prev;
-    });
+    setIsLocalStreamMuted(audioTrack.enabled);
   };
 
 
