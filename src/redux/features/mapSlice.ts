@@ -34,6 +34,8 @@ export interface SelectedUser {
 };
 
 export interface MapState {
+  waitingLocation: boolean;
+  locationError: string | null;
   myLocation: UserLocation | null;
   onlineUsers: OnlineUser[];
   selectedUser: SelectedUser | null;
@@ -43,6 +45,8 @@ export interface MapState {
 };
 
 const initialState: MapState = {
+  waitingLocation: false,
+  locationError: null,
   myLocation: null,
   onlineUsers: [],
   selectedUser: null,
@@ -55,6 +59,12 @@ const mapSlice = createSlice({
   name: "map",
   initialState,
   reducers: {
+    setWaitingLocation: (state, action: {type: string, payload: boolean}) => {
+      state.waitingLocation = action.payload;
+    },
+    setLocationError: (state, action: {type: string, payload: string | null}) => {
+      state.locationError = action.payload;
+    },
     setMyLocation: (state, action: LocationAction) => {
       state.myLocation = action.payload;
     },
@@ -77,6 +87,8 @@ const mapSlice = createSlice({
 
 export const mapReducer = mapSlice.reducer;
 export const {
+  setWaitingLocation,
+  setLocationError,
   setMyLocation,
   setOnlineUsers,
   setSelectedUserPrefetch,
