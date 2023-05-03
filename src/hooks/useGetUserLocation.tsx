@@ -22,7 +22,7 @@ const useGetUserLocation = () => {
       },
       {
         timeout: 30000,
-        maximumAge: 75000
+        maximumAge: 0
       }
     )
   }, []);
