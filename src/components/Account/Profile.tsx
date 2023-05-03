@@ -16,10 +16,10 @@ import dayjs from "dayjs";
 import ProfileForm from "./ProfileForm";
 import SocialLink from "./SocialLink";
 import { User } from "../../redux/api";
-import { imageResizer } from "../../utils/imgResizer";
 import { useUpdateAvatarMutation } from "../../redux/accountApi";
 import { setCurrentUser } from "../../redux/features/userSlice";
 import { openImageModal } from "../../redux/features/imageModalSlice";
+import { imageProcessor } from "../../utils/imageCompression";
 
 interface Props {
   currentUser: User;
@@ -82,7 +82,7 @@ const Profile = ({currentUser}: Props) => {
 
     if(files) {
       const file = files[0];
-      const image = await imageResizer(file, "file") as File;
+      const image = await imageProcessor(file, "file") as File;
       setImageData(image);
     };
 

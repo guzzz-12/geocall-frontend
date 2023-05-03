@@ -9,7 +9,7 @@ import useLocalDbInit from "../hooks/useLocalDbInit";
 import { socketClient, SocketEvents } from "../socket/socketClient";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
 import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
-import { setHasMediaDevice, setPeerId, setUserVideoCallStatus } from "../redux/features/userSlice";
+import { setHasMediaDevice, setUserVideoCallStatus } from "../redux/features/userSlice";
 import { Message, deleteMessage, incomingMessage } from "../redux/features/chatsSlice";
 import { Notification, setNotifications } from "../redux/features/notificationsSlice";
 import { VideoCallData, setActiveVideoCallData, setVideoCall } from "../redux/features/videoCallSlice";
@@ -23,7 +23,7 @@ import { VideoCallData, setActiveVideoCallData, setVideoCall } from "../redux/fe
  */
 const ReconnectUser = () => {  
   const dispatch = useDispatch();
-  const {currentUser, videoCallStatus, hasMediaDevice} = useSelector((state: UserRootState) => state.user);
+  const {currentUser, videoCallStatus, hasMediaDevice, peerId} = useSelector((state: UserRootState) => state.user);
   const {myLocation} = useSelector((state: MapRootState) => state.map);
   const {videoCall} = useSelector((state: VideoCallRootState) => state.videoCall);
 
@@ -34,11 +34,38 @@ const ReconnectUser = () => {
   useMediaDevices();
 
   // Reinicializar la conexión con el servidor de Peer
-  const {peerId} = usePeerConnection();
+  usePeerConnection();
 
   // Consultar los chats almacenados en la DB local
   // y restablecer el state global de los chats
   useLocalDbInit();
+
+
+  useEffect(() => {
+    if ("navigator" in window) {
+      navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      })
+      .then(() => {
+        dispatch(setHasMediaDevice(true));
+      })
+      .catch((err: any) => {
+        console.log(err);
+        dispatch(setHasMediaDevice(false));
+      });
+    };
+
+    // Escuchar evento de usuarios online
+    // para actualizar el state en tiempo real
+    socketClient.socket.on(SocketEvents.GET_ONLINE_USERS, (users: OnlineUser[]) => {
+      dispatch(setOnlineUsers(users));
+    });
+
+    return () => {
+      socketClient.socket.off(SocketEvents.GET_ONLINE_USERS);
+    };
+  }, []);
 
 
   /*--------------------------------------------------------*/
@@ -161,46 +188,25 @@ const ReconnectUser = () => {
   }, [currentUser]);
 
 
-  /*--------------------------------------------*/
-  // Escuchar el resto de los eventos de la app
-  /*--------------------------------------------*/
+  /*---------------------------------------------------------------*/
+  // Escuchar eventos relacionados con la conexión de los usuarios
+  /*---------------------------------------------------------------*/
   useEffect(() => {
-    if ("navigator" in window && currentUser && myLocation && peerId) {
-      dispatch(setPeerId(peerId));
-
-      navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true
-      })
-      .then(() => {
-        dispatch(setHasMediaDevice(true));
-      })
-      .catch((err: any) => {
-        console.log(err);
-        dispatch(setHasMediaDevice(false));
-      });
-
+    if (currentUser && myLocation && peerId) {
       // Agregar/actualizar el usuario en la lista de
       // los usuarios online del servidor de socket
       // al autenticarse o actualizar la página
       socketClient.userReconnected(currentUser._id, myLocation, peerId);
-
+  
       // Restablecer el usuario en la lista de usuarios online al reiniciarse el servidor
       socketClient.socket.on(SocketEvents.SERVER_RESTARTED, () => {
         socketClient.userReconnected(currentUser._id, myLocation, peerId); 
       });
-
-      // Escuchar evento de usuarios online
-      // para actualizar el state en tiempo real
-      socketClient.socket.on(SocketEvents.GET_ONLINE_USERS, (users: OnlineUser[]) => {
-        dispatch(setOnlineUsers(users));
-      });
-
-      return () => {
-        socketClient.socket.off(SocketEvents.SERVER_RESTARTED);
-        socketClient.socket.off(SocketEvents.GET_ONLINE_USERS);
-      }
     };
+
+    return () => {
+      socketClient.socket.off(SocketEvents.SERVER_RESTARTED);
+    }
   }, [currentUser, myLocation, peerId]);
 
   return null;

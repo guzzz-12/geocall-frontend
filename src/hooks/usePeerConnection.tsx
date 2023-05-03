@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { setVideoCall, setRemoteStream, VideoCall, setActiveVideoCallData } from "../redux/features/videoCallSlice";
 import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
 import peerClient from "../utils/peerClient";
 import { SocketEvents, socketClient } from "../socket/socketClient";
-import { setUserVideoCallStatus } from "../redux/features/userSlice";
+import { setPeerId, setUserVideoCallStatus } from "../redux/features/userSlice";
 
 /**
  * Inicializar conexión con el servidor de WebRTC vía Peer
@@ -16,8 +16,6 @@ const usePeerConnection = () => {
   const {currentUser, videoCallStatus} = useSelector((state: UserRootState) => state.user);
   const {localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
   const {selectedUser} = useSelector((state: MapRootState) => state.map);
-  
-  const [peerId, setPeerId] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -66,7 +64,7 @@ const usePeerConnection = () => {
   // Escuchar los eventos de las videollamdas entrantes
   useEffect(() => {
     peerClient.getInstance.on("open", (id) => {
-      setPeerId(id)
+      dispatch(setPeerId(id));
     });
 
     // Escuchar el evento de llamada entrante
@@ -97,7 +95,7 @@ const usePeerConnection = () => {
     });
   }, [currentUser, localStream, videoCallStatus]);
 
-  return {peerId};
+  return null;
 };
 
 export default usePeerConnection;

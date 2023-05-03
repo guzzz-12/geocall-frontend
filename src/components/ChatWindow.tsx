@@ -12,8 +12,8 @@ import EmojiPicker from "./EmojiPicker";
 import { ChatsRootState, MapRootState, UserRootState } from "../redux/store";
 import { Message, closeChat, createMessage, deleteMessage } from "../redux/features/chatsSlice";
 import { Notification } from "../redux/features/notificationsSlice";
-import { imageResizer } from "../utils/imgResizer";
 import { SocketEvents, socketClient } from "../socket/socketClient";
+import { imageProcessor } from "../utils/imageCompression";
 
 export interface DeleteMessageModalState {
   open: boolean;
@@ -190,7 +190,7 @@ const ChatWindow = () => {
 
     if(files) {
       const file = files[0];
-      const imageBase64 = await imageResizer(file, "base64") as string;
+      const imageBase64 = await imageProcessor(file, "base64") as string;
       setImageData(imageBase64);
     };
 
