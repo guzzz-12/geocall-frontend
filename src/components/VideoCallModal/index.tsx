@@ -203,11 +203,11 @@ const VideoCallModal = () => {
 
             <div className="relative w-full h-full">
               {/* Stream local */}
-              <div className="absolute top-2 left-2 w-[250px] px-1 aspect-[4/3] z-10">
+              <div className="absolute top-2 left-2 w-[250px] px-1 z-10">
                 {localStream && (
                   <video
                     ref={myVideoRef}
-                    className="w-full aspect-[4/3]"
+                    className="w-full"
                     playsInline
                     autoPlay
                     controls
@@ -228,7 +228,7 @@ const VideoCallModal = () => {
                 {remoteStream && (
                   <video
                     ref={myPeerVideoRef}
-                    className="w-full h-full"
+                    className="h-full mx-auto"
                     playsInline
                     autoPlay
                     controls
