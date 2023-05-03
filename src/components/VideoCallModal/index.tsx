@@ -38,21 +38,17 @@ const VideoCallModal = () => {
   }, [localStream, remoteStream]);
 
 
+  // Mutear/desmutear el audio de la transmisión de salida
+  useEffect(() => {
+    if (localStream) {
+      const audioTrack = localStream.getAudioTracks()[0];
+      audioTrack.enabled = !isLocalStreamMuted;
+    };
+  }, [localStream, isLocalStreamMuted]);
+
+
   if (!videoCall) {
     return null;
-  };
-
-
-  // Mutear/desmutear el audio de la transmisión de salida
-  const toggleMuteStreamHandler = () => {
-    if (!localStream) {
-      return false;
-    };
-
-    const audioTrack = localStream.getAudioTracks()[0];
-    audioTrack.enabled = !audioTrack.enabled;
-
-    setIsLocalStreamMuted(audioTrack.enabled);
   };
 
 
@@ -186,7 +182,7 @@ const VideoCallModal = () => {
                     Icon={!isLocalStreamMuted ? FaMicrophone : FaMicrophoneSlash}
                     disabled={false}
                     tooltipText={isLocalStreamMuted ? "Enable audio" : "Disable audio"}
-                    onClickHandler={toggleMuteStreamHandler}
+                    onClickHandler={() => setIsLocalStreamMuted((prev) => !prev)}
                   />
                   <IconButton
                     Icon={HiPhoneMissedCall}
