@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { setVideoCall, setRemoteStream, VideoCall, setActiveVideoCallData } from "../redux/features/videoCallSlice";
-import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
+import { MapRootState, UserRootState } from "../redux/store";
 import peerClient from "../utils/peerClient";
 import { SocketEvents, socketClient } from "../socket/socketClient";
 import { setPeerId, setUserVideoCallStatus } from "../redux/features/userSlice";
@@ -13,8 +13,7 @@ import { setPeerId, setUserVideoCallStatus } from "../redux/features/userSlice";
  */
 const usePeerConnection = () => {
   const dispatch = useDispatch();
-  const {currentUser, videoCallStatus} = useSelector((state: UserRootState) => state.user);
-  const {localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
+  const {currentUser, hasMediaDevice, videoCallStatus} = useSelector((state: UserRootState) => state.user);
   const {selectedUser} = useSelector((state: MapRootState) => state.map);
 
 
@@ -71,7 +70,7 @@ const usePeerConnection = () => {
     peerClient.getInstance.on("call", (call) => {
       // Si no tiene cámara conectada o si ya tiene una llamada activa
       // retornar sin hacer nada al recibir una videollamada
-      if (!localStream || videoCallStatus === "busy") {
+      if (!hasMediaDevice || videoCallStatus === "busy") {
         return false
       };
 
@@ -93,7 +92,7 @@ const usePeerConnection = () => {
         console.log("Call ended by the other user")
       });
     });
-  }, [currentUser, localStream, videoCallStatus]);
+  }, [currentUser, hasMediaDevice, videoCallStatus]);
 
   return null;
 };

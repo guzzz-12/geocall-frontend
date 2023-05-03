@@ -19,14 +19,15 @@ import Spinner from "./Spinner";
 import SocialLink from "./Account/SocialLink";
 import { setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { closeChat } from "../redux/features/chatsSlice";
-import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
+import { MapRootState, UserRootState } from "../redux/store";
 import { createOrSelectChat, Chat } from "../redux/features/chatsSlice";
-import { VideoCallData, setActiveVideoCallData, setRemoteStream, setVideoCall } from "../redux/features/videoCallSlice";
+import { VideoCallData, setActiveVideoCallData, setLocalStream, setRemoteStream, setVideoCall } from "../redux/features/videoCallSlice";
 import peerClient from "../utils/peerClient";
 import { socketClient } from "../socket/socketClient";
 import useSelectedUser from "../hooks/useSelectedUser";
 import { setUserVideoCallStatus } from "../redux/features/userSlice";
 import { openImageModal } from "../redux/features/imageModalSlice";
+import { getLocalStream } from "../utils/getLocalStream";
 
 interface Props {
   selectedUserId: string;
@@ -34,16 +35,14 @@ interface Props {
 
 const SelectedUserCard = ({selectedUserId}: Props) => {
   const dispatch = useDispatch();
-  const {currentUser} = useSelector((state: UserRootState) => state.user);
+  const {currentUser, hasMediaDevice} = useSelector((state: UserRootState) => state.user);
   const {selectedUser, onlineUsers} = useSelector((state: MapRootState) => state.map);
-  const {localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
 
   // Consultar la data del usuario seleccionado y actualizar el state global
   const {isLoading, isFetching} = useSelectedUser({selectedUserId});
 
   // Verificar si el usuario está offline
   const isUserOffline = !onlineUsers.find(user => user.userId === selectedUser?.user._id);
-
 
   /**
    * Crear el chat si no existe o abrirlo si ya existe
@@ -85,8 +84,8 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
   /**
    * Iniciar una videollamada con el usuario seleccionado
    */
-  const onVideoCallClickHandler = () => {
-    if (!localStream || !selectedUser || isUserOffline) {
+  const onVideoCallClickHandler = async () => {
+    if (!hasMediaDevice || !selectedUser || isUserOffline) {
       return false;
     };
 
@@ -108,18 +107,25 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
     };
 
     let call: MediaConnection | null = null;
+    let myStream: MediaStream | null = null;
     
     try {
       // Intentar iniciar la videollamada
-      call = peerClient.getInstance.call(recipientPeerId, localStream);
+      // y almacenar el stream en el state global
+      myStream = await getLocalStream();
+      call = peerClient.getInstance.call(recipientPeerId, myStream);
+      dispatch(setLocalStream(myStream));
 
     } catch (err: any) {
       console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`);
+
+      myStream?.getTracks().forEach(track => track.stop());
 
       // Restaurar el state de la videollamada en caso de error
       dispatch(setUserVideoCallStatus("active"));
       dispatch(setActiveVideoCallData(null));
       dispatch(setVideoCall(null));
+      setLocalStream(null);
 
       // Cerrar la videollamada en caso de error
       if (call) {
@@ -238,13 +244,13 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
                 <IconButton
                   Icon={BiVideoPlus}
                   tooltipText={
-                    !localStream ? `Connect your camera to start a videocall with ${selectedUser.user.firstName}`
+                    !hasMediaDevice ? `Connect your camera to start a videocall with ${selectedUser.user.firstName}`
                     :
                     isUserOffline ? "The user is offline"
                     :
                     "Start videocall"
                   }
-                  disabled={!localStream || isUserOffline}
+                  disabled={!hasMediaDevice || isUserOffline}
                   onClickHandler={onVideoCallClickHandler}
                 />
               </div>

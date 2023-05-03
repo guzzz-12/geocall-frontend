@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 
 import useGetUserLocation from "../hooks/useGetUserLocation";
 import usePeerConnection from "../hooks/usePeerConnection";
-import useMediaDevices from "../hooks/useMediaDevices";
 import useLocalDbInit from "../hooks/useLocalDbInit";
 import { socketClient, SocketEvents } from "../socket/socketClient";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
@@ -12,7 +11,8 @@ import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store"
 import { setHasMediaDevice, setUserVideoCallStatus } from "../redux/features/userSlice";
 import { Message, deleteMessage, incomingMessage } from "../redux/features/chatsSlice";
 import { Notification, setNotifications } from "../redux/features/notificationsSlice";
-import { VideoCallData, setActiveVideoCallData, setVideoCall } from "../redux/features/videoCallSlice";
+import { VideoCallData, setActiveVideoCallData, setLocalStream, setRemoteStream, setVideoCall } from "../redux/features/videoCallSlice";
+import { getLocalStream } from "../utils/getLocalStream";
 
 /**
  * Reconectar el usuario al servidor de socket io,
@@ -25,13 +25,10 @@ const ReconnectUser = () => {
   const dispatch = useDispatch();
   const {currentUser, videoCallStatus, hasMediaDevice, peerId} = useSelector((state: UserRootState) => state.user);
   const {myLocation} = useSelector((state: MapRootState) => state.map);
-  const {videoCall} = useSelector((state: VideoCallRootState) => state.videoCall);
+  const {videoCall, localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
 
   // Obtener la ubicación del usuario
   useGetUserLocation();
-
-  // Solicitar permisos de acceso a la cámara
-  useMediaDevices();
 
   // Reinicializar la conexión con el servidor de Peer
   usePeerConnection();
@@ -41,6 +38,8 @@ const ReconnectUser = () => {
   useLocalDbInit();
 
 
+  // Verificar si el usuario tiene dispositivo de video
+  // cuando inicialice o refresque la app
   useEffect(() => {
     if ("navigator" in window) {
       navigator.mediaDevices.getUserMedia({
@@ -68,21 +67,30 @@ const ReconnectUser = () => {
   }, []);
 
 
-  /*--------------------------------------------------------*/
-  // Escuchar los eventos relacionados con las videollamadas
-  /*--------------------------------------------------------*/
+  /*----------------------------------------------*/
+  // Escuchar el evento de nueva llamada entrante
+  /*----------------------------------------------*/
   useEffect(() => {
-    // Escuchar el evento de nueva llamada entrante
-    socketClient.socket.on(SocketEvents.INCOMING_CALL, (data: VideoCallData) => {
-      if (videoCallStatus === "active") {
-        const {remitent} = data;
-        dispatch(setActiveVideoCallData(remitent));
-        dispatch(setUserVideoCallStatus("busy"));
-      };
+    socketClient.socket.on(SocketEvents.INCOMING_CALL, async (data: VideoCallData) => {
+      try {
+        // Si está disponible, tomar el stream de su cámara y aceptar la llamada
+        if (videoCallStatus === "active") {
+          const {remitent} = data;
+          
+          const myStream = await getLocalStream();
 
-      if (videoCallStatus === "busy" || !hasMediaDevice) {
-        socketClient.userCallUnavailable(data.remitent.id);
-        return false;
+          dispatch(setLocalStream(myStream));
+          dispatch(setActiveVideoCallData(remitent));
+          dispatch(setUserVideoCallStatus("busy"));
+        };
+  
+        // Si no está disponible,  rechazar la llamada y notificarle al usuario remoto
+        if (videoCallStatus === "busy" || !hasMediaDevice) {
+          socketClient.userCallUnavailable(data.remitent.id);
+          return false;
+        };
+      } catch (error) {
+        console.log("Error getting local stream")
       };
     });
 
@@ -104,7 +112,10 @@ const ReconnectUser = () => {
     // Escuchar evento de videollamada finalizada para cambiar el status a ended
     socketClient.socket.on(SocketEvents.CALL_ENDED, () => {
       console.log("CALL_ENDED");
+      localStream?.getTracks().forEach(track => track.stop());
       dispatch(setVideoCall({...videoCall!, status: "ended"}));
+      dispatch(setLocalStream(null));
+      dispatch(setRemoteStream(null));
     });
     
     // Escuchar evento de videollamada rechazada para cambiar el status a rejected
@@ -126,7 +137,7 @@ const ReconnectUser = () => {
       socketClient.socket.off(SocketEvents.CALL_REJECTED);
       socketClient.socket.off(SocketEvents.CALL_USER_UNAVAILABLE);
     };
-  }, [videoCall]);
+  }, [videoCall, localStream]);
 
 
   /*------------------------------------------------*/

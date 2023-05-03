@@ -7,7 +7,7 @@ import { HiPhoneMissedCall, HiOutlinePhoneMissedCall } from "react-icons/hi";
 import { FiPhoneCall } from "react-icons/fi";
 import IconButton from "../IconButton";
 import { VideoCallRootState } from "../../redux/store";
-import { setActiveVideoCallData, setVideoCall } from "../../redux/features/videoCallSlice";
+import { setActiveVideoCallData, setLocalStream, setRemoteStream, setVideoCall } from "../../redux/features/videoCallSlice";
 import { setUserVideoCallStatus } from "../../redux/features/userSlice";
 import { SocketEvents, socketClient } from "../../socket/socketClient";
 
@@ -72,10 +72,13 @@ const VideoCallModal = () => {
       socketClient.socket.emit(SocketEvents.CALL_ENDED, activeCallWith!.id)
     };
     
+    localStream!.getTracks().forEach(track => track.stop());
     videoCall.callObj!.close();
     dispatch(setVideoCall(null));
     dispatch(setActiveVideoCallData(null));
     dispatch(setUserVideoCallStatus("active"));
+    dispatch(setLocalStream(null));
+    dispatch(setRemoteStream(null));
   };
 
 
@@ -196,7 +199,7 @@ const VideoCallModal = () => {
 
             <div className="relative w-full h-full">
               {/* Stream local */}
-              <div className="absolute top-2 left-2 w-[250px] px-1 z-10">
+              <div className="absolute w-[250px] z-10">
                 {localStream && (
                   <video
                     ref={myVideoRef}
@@ -217,7 +220,7 @@ const VideoCallModal = () => {
               </div>
 
               {/* Stream remoto */}
-              <div className="w-full h-full p-1 rounded shadow border border-gray-100">
+              <div className="w-full h-full">
                 {remoteStream && (
                   <video
                     ref={myPeerVideoRef}
