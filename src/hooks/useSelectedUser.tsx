@@ -6,7 +6,10 @@ import { SelectedUser, UserLocation, setSelectedUser } from "../redux/features/m
 import { useGetUserWithLocationQuery } from "../redux/api";
 
 interface Props {
+  /** ID del usuario a consultar */
   selectedUserId: string;
+  /** Agregar la data al state global si es requerido o sólo retornar la data */
+  updateGlobalState: boolean;
 };
 
 /**
@@ -14,7 +17,7 @@ interface Props {
  * calcular su distancia al usuario actual
  * y actualizar el state global.
  */
-const useSelectedUser = ({selectedUserId}: Props) => {
+const useSelectedUser = ({selectedUserId, updateGlobalState}: Props) => {
   const dispatch = useDispatch();
   const {onlineUsers, myLocation} = useSelector((state: MapRootState) => state.map);
 
@@ -43,7 +46,7 @@ const useSelectedUser = ({selectedUserId}: Props) => {
   // Calcular la distancia del usuario seleccionado
   // y actualizar el state global del usuario seleccionado
   useEffect(() => {
-    if (selectedUserLocation && data && myLocation) {
+    if (selectedUserLocation && data && myLocation && updateGlobalState) {
       const from = [myLocation.lat, myLocation.lon];
       const to = [selectedUserLocation.lat, selectedUserLocation.lon];
       const userDistance = distance(from, to, {units: "kilometers"});
@@ -58,7 +61,7 @@ const useSelectedUser = ({selectedUserId}: Props) => {
 
       dispatch(setSelectedUser(selectedUser));
     }
-  }, [selectedUserLocation, data, myLocation]);
+  }, [selectedUserLocation, data, myLocation, updateGlobalState]);
 
   return {
     data,

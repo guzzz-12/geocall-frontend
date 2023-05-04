@@ -1,9 +1,8 @@
+import { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { MediaConnection } from "peerjs";
 import dayjs from "dayjs";
 import { v4 } from "uuid";
 import { Tooltip } from "react-tooltip";
-import { toast } from "react-toastify";
 import { GrClose } from "react-icons/gr";
 import { AiOutlineWechat } from "react-icons/ai";
 import { BiVideoPlus } from "react-icons/bi";
@@ -18,28 +17,25 @@ import IconButton from "./IconButton";
 import Spinner from "./Spinner";
 import SocialLink from "./Account/SocialLink";
 import { setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
-import { closeChat } from "../redux/features/chatsSlice";
 import { MapRootState, UserRootState } from "../redux/store";
 import { createOrSelectChat, Chat } from "../redux/features/chatsSlice";
-import { VideoCallData, setActiveVideoCallData, setLocalStream, setRemoteStream, setVideoCall } from "../redux/features/videoCallSlice";
-import peerClient from "../utils/peerClient";
-import { socketClient } from "../socket/socketClient";
 import useSelectedUser from "../hooks/useSelectedUser";
-import { setUserVideoCallStatus } from "../redux/features/userSlice";
 import { openImageModal } from "../redux/features/imageModalSlice";
-import { getLocalStream } from "../utils/getLocalStream";
+import { VideocallContext } from "../hooks/VideoCallContext";
 
 interface Props {
   selectedUserId: string;
 };
 
 const SelectedUserCard = ({selectedUserId}: Props) => {
+  const {videoCallHandler} = useContext(VideocallContext);
+
   const dispatch = useDispatch();
   const {currentUser, hasMediaDevice} = useSelector((state: UserRootState) => state.user);
   const {selectedUser, onlineUsers} = useSelector((state: MapRootState) => state.map);
 
   // Consultar la data del usuario seleccionado y actualizar el state global
-  const {isLoading, isFetching} = useSelectedUser({selectedUserId});
+  const {isLoading, isFetching} = useSelectedUser({selectedUserId, updateGlobalState: true});
 
   // Verificar si el usuario está offline
   const isUserOffline = !onlineUsers.find(user => user.userId === selectedUser?.user._id);
@@ -81,96 +77,6 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
   };
 
 
-  /**
-   * Iniciar una videollamada con el usuario seleccionado
-   */
-  const onVideoCallClickHandler = async () => {
-    if (!hasMediaDevice || !selectedUser || isUserOffline) {
-      return false;
-    };
-
-    const recipientPeerId = selectedUser.peerId;
-
-    const videoCallData: VideoCallData = {
-      remitent: {
-        id: currentUser!._id,
-        firstName: currentUser!.firstName,
-        avatar: currentUser!.avatar
-      },
-      recipient: {
-        id: selectedUser.user._id,
-        firstName: selectedUser.user.firstName,
-        avatar: selectedUser.user.avatar
-      }
-    };
-
-    let call: MediaConnection | null = null;
-    let myStream: MediaStream | null = null;
-    
-    try {
-      // Intentar iniciar la videollamada
-      // y almacenar el stream en el state global
-      myStream = await getLocalStream();
-      call = peerClient.getInstance.call(recipientPeerId, myStream);
-      dispatch(setLocalStream(myStream));
-
-    } catch (err: any) {
-      console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`);
-
-      myStream?.getTracks().forEach(track => track.stop());
-
-      // Restaurar el state de la videollamada en caso de error
-      dispatch(setUserVideoCallStatus("active"));
-      dispatch(setActiveVideoCallData(null));
-      dispatch(setVideoCall(null));
-      setLocalStream(null);
-
-      // Cerrar la videollamada en caso de error
-      if (call) {
-        call.close()
-      };
-
-      return false;
-    };
-
-    if (!call) {
-      return false;
-    };
-
-    // Almacenar el objeto call en el state global
-    // para acceder a éste desde el resto de la app
-    dispatch(setVideoCall({callObj: call, status: "calling"}));
-
-    // Almacenar la data del usuario recipiente en el state global
-    dispatch(setActiveVideoCallData(videoCallData.recipient));
-
-    // Pasar el status del usuario a busy
-    dispatch(setUserVideoCallStatus("busy"));
-
-    // Emitir el evento de videollamada al usuario recipiente
-    socketClient.videoCall(videoCallData);
-
-    call.on("error", (err) => {
-      console.log(`Error initializing videocall with ${selectedUser.user.firstName}: ${err.message}`);
-
-      // Mostrar notificación de error de llamada
-      toast.error(
-        "Error establishing connection with the user. Refresh the page and try again...",
-        {
-          position: "bottom-right"
-        }
-      );
-    });
-
-    // Almacenar el stream remoto en el state global
-    // cuando el usuario recipiente acepta la llamada
-    call.on("stream", (remoteStream) => {
-      console.log(`Videocall with ${selectedUser.user.firstName} initialized`);
-      dispatch(setRemoteStream(remoteStream));
-    });
-  };
-
-
   const UserMetadata = ({Icon, text}: {Icon: IconType, text: string}) => {
     return (
       <p className="flex justify-start items-center gap-3">
@@ -188,7 +94,6 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
         onClick={() => {
           dispatch(setSelectedUserPrefetch({selectedUserId: null}))
           dispatch(setSelectedUser(null));
-          dispatch(closeChat())
         }}
       >
         <GrClose className="w-5 h-5 opacity-60" />
@@ -249,7 +154,7 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
                     "Start videocall"
                   }
                   disabled={!hasMediaDevice || isUserOffline}
-                  onClickHandler={onVideoCallClickHandler}
+                  onClickHandler={videoCallHandler}
                 />
               </div>
 

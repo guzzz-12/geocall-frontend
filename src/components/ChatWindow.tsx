@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { useState, useEffect, useRef, useContext, ChangeEvent } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import { v4 } from "uuid";
@@ -7,13 +7,18 @@ import { FiSend } from "react-icons/fi";
 import { FaTimesCircle } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import { BsImage, BsEmojiSmile } from "react-icons/bs";
+import { BiVideoPlus } from "react-icons/bi";
+
 import MessageItem from "./MessageItem";
 import EmojiPicker from "./EmojiPicker";
+import IconButton from "./IconButton";
+import { VideocallContext } from "../hooks/VideoCallContext";
 import { ChatsRootState, MapRootState, UserRootState } from "../redux/store";
 import { Message, closeChat, createMessage, deleteMessage } from "../redux/features/chatsSlice";
 import { Notification } from "../redux/features/notificationsSlice";
 import { SocketEvents, socketClient } from "../socket/socketClient";
 import { imageProcessor } from "../utils/imageCompression";
+import { setSelectedUserPrefetch } from "../redux/features/mapSlice";
 
 export interface DeleteMessageModalState {
   open: boolean;
@@ -24,6 +29,8 @@ export interface DeleteMessageModalState {
 const ChatWindow = () => {
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const {videoCallHandler, selectedUser} = useContext(VideocallContext);
 
   const dispatch = useDispatch();
   const {currentUser} = useSelector((state: UserRootState) => state.user);
@@ -51,9 +58,10 @@ const ChatWindow = () => {
   const isUserOnline = onlineUsers.find(user => user.userId === otherUserId);
 
 
-  /*--------------------------------*/
+  /*---------------------------------------------*/
   // Escuchar evento de escribiendo
-  /*--------------------------------*/
+  // Iniciar la consulta de la data del usuario
+  /*---------------------------------------------*/
   useEffect(() => {
     if (otherUserId) {
       socketClient.socket.on(SocketEvents.TYPING, (data: {senderId: string, typing: boolean}) => {
@@ -237,6 +245,21 @@ const ChatWindow = () => {
 
 
   /**
+   * Pasar la ID del usuario del chat al state global
+   * para abrir el card y consultar su perfil
+   */
+  const onUserNameClickHandler = () => {
+    if (!isUserOnline || currentUser._id === isUserOnline.userId) {
+      return false;
+    };
+
+    dispatch(setSelectedUserPrefetch({
+      selectedUserId: isUserOnline.userId
+    }));
+  };
+
+
+  /**
    * Eliminar un mensaje para el usuario o para todos los usuarios.
    */
   const deleteMessageHandler = async (mode: "me" | "all") => {
@@ -339,7 +362,8 @@ const ChatWindow = () => {
         <div className="flex flex-col w-[330px] h-[450px] bg-slate-100 shadow-lg rounded-t-lg">
           {/* Header de la bandeja */}
           <div className="flex justify-between items-center w-full px-3 py-2 flex-shrink-0 border-b border-gray-400 bg-gray-300 rounded-t-lg">
-            <div className="flex justify-between items-stretch gap-2">
+            <div className="flex justify-start items-stretch gap-2 w-full">
+              {/* Avatar del usuario remoto */}
               <div className="relative w-8 h-8">
                 <img
                   className="block w-full h-full object-cover object-center rounded-full border-2 border-gray-500"
@@ -357,7 +381,10 @@ const ChatWindow = () => {
               </div>
 
               {/* Nombre del usuario remoto */}
-              <div className="flex flex-col justify-start items-start">
+              <div
+                className="flex flex-col justify-start items-start cursor-pointer"
+                onClick={onUserNameClickHandler}
+              >
                 <p className="-mb-1 font-semibold text-lg">
                   {otherUserData.firstName} {otherUserData.lastName}
                 </p>
@@ -368,9 +395,19 @@ const ChatWindow = () => {
                   </p>
                 }
               </div>
+
+              {/* Botón para iniciar una videollamada */}
+              <div className="w-min ml-auto self-center mr-2">
+                <IconButton
+                  Icon={BiVideoPlus}
+                  disabled={false}
+                  tooltipText={`Start a videocall with ${selectedUser?.firstName}`}
+                  onClickHandler={videoCallHandler}
+                />
+              </div>
             </div>
 
-            <div className="flex justify-center items-center ml-auto cursor-pointer">
+            <div className="flex justify-center items-center cursor-pointer">
               <GrClose
                 className="w-5 h-5"
                 onClick={onCloseHandler}

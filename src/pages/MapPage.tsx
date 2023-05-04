@@ -65,7 +65,8 @@ const MapPage = () => {
 
   
   /**
-   * Seleccionar la ID del usuario
+   * Seleccionar la ID del usuario para comenzar
+   * la carga de su perfil en el card
    */
   const onMarkerClickHandler = (user: OnlineUser) => {
     if (currentUser._id === user.userId) {
