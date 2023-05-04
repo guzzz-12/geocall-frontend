@@ -10,6 +10,7 @@ import Spinner from "./components/Spinner";
 import ChatWindow from "./components/ChatWindow";
 import VideoCallModal from "./components/VideoCallModal";
 import ImageModal from "./components/ImageModal";
+import GlobalAlert from "./components/GlobalAlert";
 import VideocallContextProvider from "./hooks/VideoCallContext";
 import store from "./redux/store";
 import "react-tooltip/dist/react-tooltip.css";
@@ -81,6 +82,7 @@ const App = () => {
                 hideProgressBar={true}
                 theme="dark"
               />
+              <GlobalAlert />
             </section>
           </main>
         </Suspense>
