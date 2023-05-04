@@ -11,6 +11,7 @@ import SelectedUserCard from "../components/SelectedUserCard";
 import withVerification from "../components/HOC/withVerification";
 import ErrorMessage from "../components/ErrorMessage";
 import Spinner from "../components/Spinner";
+import InfoBanner from "../components/InfoBanner";
 import { MapRootState, UserRootState } from "../redux/store";
 import { OnlineUser, setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { closeChat } from "../redux/features/chatsSlice";
@@ -45,6 +46,10 @@ const MapPage = () => {
 
   // State del theme del mapa
   const [mapTheme, setMapTheme] = useState<MapTheme>(MAP_THEMES[2]);
+
+  // State del modal informativo (mostrar sólo en produccción)
+  const isProduction = import.meta.env.PROD;
+  const [isInfoOpen, setIsInfoOpen] = useState(() => localStorage.getItem("showInfoModal") === "true");
 
 
   // Si el usuario seleccionado se desconecta, cerrar el card
@@ -122,6 +127,20 @@ const MapPage = () => {
       <div className="absolute bottom-2 left-2 flex gap-2 rounded z-[100]">
         {MapThemeBtn()}
       </div>
+
+      {/* Modal informativo */}
+      <AnimatePresence>
+        {isInfoOpen && isProduction &&
+          <motion.div
+            className="z-[1000]"
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+          >
+            <InfoBanner setIsOpen={setIsInfoOpen} />
+          </motion.div>
+        }
+      </AnimatePresence>
 
       <AnimatePresence>
         {selectedUserId && !isUserOffline && (

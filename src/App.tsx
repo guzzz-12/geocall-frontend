@@ -34,6 +34,12 @@ const App = () => {
       const {quota, usage} = result;
       console.log({storage: {quota, usage}})
     });
+
+    // Inicializar el state del modal informativo mostrado en production
+    const showInfoModal = localStorage.getItem("showInfoModal");
+    if (!showInfoModal) {
+      localStorage.setItem("showInfoModal", "true");
+    }
   }, []);
 
   return (
