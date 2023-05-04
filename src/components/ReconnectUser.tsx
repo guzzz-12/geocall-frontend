@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -27,6 +27,8 @@ const ReconnectUser = () => {
   const {myLocation} = useSelector((state: MapRootState) => state.map);
   const {videoCall, localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
 
+  const [disconnected, setDisconnected] = useState(false);
+
   // Obtener la ubicación del usuario
   useGetUserLocation();
 
@@ -45,9 +47,9 @@ const ReconnectUser = () => {
   };
 
 
-  // Verificar si el usuario tiene dispositivo de video
-  // cuando inicialice o refresque la app
   useEffect(() => {
+    // Verificar si el usuario tiene dispositivo de video
+    // cuando inicialice o refresque la app
     if ("navigator" in window) {
       navigator.mediaDevices.getUserMedia({
         video: true,
@@ -71,8 +73,15 @@ const ReconnectUser = () => {
       dispatch(setOnlineUsers(users));
     });
 
+    // Escuchar evento de desconexión con el servidor de socket
+    socketClient.socket.on("disconnect", () => {
+      console.log("User disconnected");
+      toast.info("Connection lost. Refresh the page to go back online.")
+    });
+
     return () => {
       socketClient.socket.off(SocketEvents.GET_ONLINE_USERS);
+      socketClient.socket.off("disconnect");
     };
   }, []);
 
