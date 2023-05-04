@@ -106,7 +106,6 @@ const VideoCallModal = () => {
     };
     
     videoCall.callObj!.close();
-    localStream!.getTracks().forEach(track => track.stop());
     dispatch(setVideoCall(null));
     dispatch(setActiveVideoCallData(null));
     dispatch(setUserVideoCallStatus("active"));
@@ -167,6 +166,7 @@ const VideoCallModal = () => {
                 data-tooltip-id="reject-button-tooltip"
                 data-tooltip-content="Reject Videocall"
                 onClick={() => {
+                  localStream!.getTracks().forEach(track => track.stop());
                   const mode = videoCall.status === "calling" ? "end" : "reject";
                   endVideoCallHandler(mode);
                 }}
