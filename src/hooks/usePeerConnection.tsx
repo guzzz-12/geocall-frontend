@@ -37,14 +37,6 @@ const usePeerConnection = () => {
       // Mostrar notificación y restablecer el state
       // si el error se produjo al intentar iniciar una llamada
       if (message.toLowerCase().includes("could not connect to peer")) {
-        toast.dismiss()
-        toast.error(
-          "Error establishing connection with the user. Refresh the page and try again...",
-          {
-            position: "bottom-right"
-          }
-        );
-
         dispatch(setVideoCall(null));
         dispatch(setActiveVideoCallData(null));
         dispatch(setUserVideoCallStatus("active"));

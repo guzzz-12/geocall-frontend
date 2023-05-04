@@ -35,10 +35,10 @@ const InfoBanner = ({setIsOpen}: Props) => {
 
         <div className="flex flex-col gap-2 mb-8">
           <p className="text-base">
-            The application is currently running in test mode and even when it's fully functional, due to limitations imposed by the free hosting service the realtime connection is restarted approximately every 5 minutes, which affects the chat and videocalls functionality. Active videocalls should not be affected tho.
+            The application is currently running in test mode. Although it's fully functional, due to limitations imposed by the free hosting service the realtime connection is restarted approximately every 5 minutes, which affects the chat and videocalls functionalities. Active videocalls should not be affected tho.
           </p>
           <p className="font-bold">
-            When this event arises we will notify you so that you refresh the page and go back inline again.
+            When this event arises we will notify you so that you refresh the page and go back online again.
           </p>
         </div>
 

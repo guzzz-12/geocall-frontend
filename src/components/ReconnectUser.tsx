@@ -8,11 +8,12 @@ import useLocalDbInit from "../hooks/useLocalDbInit";
 import { socketClient, SocketEvents } from "../socket/socketClient";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
 import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
-import { setHasMediaDevice, setUserVideoCallStatus } from "../redux/features/userSlice";
+import { setHasMediaDevice, setIsDisconnected, setUserVideoCallStatus } from "../redux/features/userSlice";
 import { Message, deleteMessage, incomingMessage } from "../redux/features/chatsSlice";
 import { Notification, setNotifications } from "../redux/features/notificationsSlice";
 import { VideoCallData, setActiveVideoCallData, setLocalStream, setRemoteStream, setVideoCall } from "../redux/features/videoCallSlice";
 import { getLocalStream } from "../utils/getLocalStream";
+import { openAlert } from "../redux/features/globalAlertSlice";
 
 /**
  * Reconectar el usuario al servidor de socket io,
@@ -76,7 +77,10 @@ const ReconnectUser = () => {
     // Escuchar evento de desconexión con el servidor de socket
     socketClient.socket.on("disconnect", () => {
       console.log("User disconnected");
-      toast.info("Connection lost. Refresh the page to go back online.")
+      dispatch(setIsDisconnected(true));
+      dispatch(openAlert({
+        message: "Your realtime connection is currently offline. <br /> Refresh the page to go back online."
+      }))
     });
 
     return () => {
