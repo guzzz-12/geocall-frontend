@@ -191,6 +191,7 @@ const ReconnectUser = () => {
 
       // Escuchar evento de mensaje eliminado
       socketClient.socket.on(SocketEvents.DELETED_MESSAGE, (data: {chatId: string, messageId: string}) => {
+        console.log("DELETED MESSGE");
         dispatch(deleteMessage(data));
       });
 

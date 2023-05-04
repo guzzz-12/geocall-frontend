@@ -338,8 +338,8 @@ const ChatWindow = () => {
         {/* Contenido */}
         <div className="flex flex-col w-[330px] h-[450px] bg-slate-100 shadow-lg rounded-t-lg">
           {/* Header de la bandeja */}
-          <div className="flex justify-between items-stretch w-full px-3 py-2 flex-shrink-0 border-b border-gray-400 bg-gray-300 rounded-t-lg">
-            <div className="flex justify-start items-center gap-2">
+          <div className="flex justify-between items-center w-full px-3 py-2 flex-shrink-0 border-b border-gray-400 bg-gray-300 rounded-t-lg">
+            <div className="flex justify-between items-stretch gap-2">
               <div className="relative w-8 h-8">
                 <img
                   className="block w-full h-full object-cover object-center rounded-full border-2 border-gray-500"
@@ -355,9 +355,19 @@ const ChatWindow = () => {
                   className="absolute -bottom-[2px] right-[1px] w-[11px] h-[11px] rounded-full outline outline-2 outline-gray-100"
                 />
               </div>
-              <p className="font-semibold text-lg">
-                {otherUserData.firstName} {otherUserData.lastName}
-              </p>
+
+              {/* Nombre del usuario remoto */}
+              <div className="flex flex-col justify-start items-start">
+                <p className="-mb-1 font-semibold text-lg">
+                  {otherUserData.firstName} {otherUserData.lastName}
+                </p>
+                {/* Indicador de escribiendo */}
+                {isTyping &&
+                  <p className="w-full text-left text-xs italic text-gray-700">
+                    {otherUserData.firstName} is typing...
+                  </p>
+                }
+              </div>
             </div>
 
             <div className="flex justify-center items-center ml-auto cursor-pointer">
@@ -369,14 +379,7 @@ const ChatWindow = () => {
           </div>
 
           {/* Bandeja con la lista de mensajes */}
-          <div className="relative w-full flex-grow p-3 scrollbar-thin scrollbar-thumb-gray-400 overflow-y-auto">
-            {/* Indicar si el otro usuario está escribiendo */}
-            {isTyping &&
-              <p className="absolute bottom-1 left-0 w-full text-center text-sm italic text-gray-600">
-                {otherUserData.firstName} is typing...
-              </p>
-            }
-            
+          <div className="w-full flex-grow p-3 scrollbar-thin scrollbar-thumb-gray-400 overflow-y-auto">
             <div className="flex flex-col justify-start gap-4">
               {selectedChat.messages.map(msg => {
                 return (
@@ -391,7 +394,7 @@ const ChatWindow = () => {
             </div>
 
             {/* Elemento vacío para referencia del scroll to bottom */}
-            <div ref={chatBottomRef}/>
+            <div className="mb-2" ref={chatBottomRef}/>
           </div>
           
           {/* Input y botonera */}
