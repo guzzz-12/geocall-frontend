@@ -10,6 +10,7 @@ export interface UserState {
   hasMediaDevice: boolean;
   videoCallStatus: "active" | "busy";
   chatStatus: UserAvailability;
+  isDisconnected: boolean;
 };
 
 const initialState: UserState = {
@@ -19,7 +20,8 @@ const initialState: UserState = {
   peerId: null,
   hasMediaDevice: false,
   videoCallStatus: "active",
-  chatStatus: "available"
+  chatStatus: "available",
+  isDisconnected: false
 };
 
 const userSlice = createSlice({
@@ -52,6 +54,9 @@ const userSlice = createSlice({
     setIsLoadingUser: (state, action: {type: string, payload: boolean}) => {
       state.isLoading = action.payload;
     },
+    setIsDisconnected: (state, action: {type: string, payload: boolean}) => {
+      state.isDisconnected = action.payload
+    }
   }
 });
 
@@ -64,5 +69,6 @@ export const {
   setHasMediaDevice,
   setUserVideoCallStatus,
   setChatStatus,
-  setIsLoadingUser
+  setIsLoadingUser,
+  setIsDisconnected
 } = userSlice.actions;

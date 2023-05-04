@@ -5,6 +5,7 @@ import { ChatsState, chatsReducer } from "./features/chatsSlice";
 import { NotificationsState, notificationsReducer } from "./features/notificationsSlice";
 import { VideoCallState, videoCallReducer } from "./features/videoCallSlice";
 import { ImageModalState, imageModalReducer } from "./features/imageModalSlice";
+import { GlobalAlertState, globalAlertReducer } from "./features/globalAlertSlice";
 import { api } from "./api";
 import { accountApi } from "./accountApi";
 
@@ -32,6 +33,10 @@ export interface ImageModalRootState {
   imageModal: ImageModalState
 };
 
+export interface GlobalAlertRootState {
+  globalAlert: GlobalAlertState
+};
+
 const store = configureStore({
   reducer: {
     map: mapReducer,
@@ -40,6 +45,7 @@ const store = configureStore({
     notifications: notificationsReducer,
     videoCall: videoCallReducer,
     imageModal: imageModalReducer,
+    globalAlert: globalAlertReducer,
     [api.reducerPath]: api.reducer,
     [accountApi.reducerPath]: accountApi.reducer
   },
