@@ -37,6 +37,13 @@ const ReconnectUser = () => {
   // y restablecer el state global de los chats
   useLocalDbInit();
 
+  /**
+   * Apagar la cámara
+   */
+  const shutDownCameraHandler = (stream: MediaStream) => {
+    stream.getTracks().forEach(track => track.stop())
+  };
+
 
   // Verificar si el usuario tiene dispositivo de video
   // cuando inicialice o refresque la app
@@ -46,8 +53,11 @@ const ReconnectUser = () => {
         video: true,
         audio: true
       })
-      .then(() => {
+      .then((stream) => {
+        // Especificar que el usuario sí posee cámara
         dispatch(setHasMediaDevice(true));
+        // Apagar la cámara de inmediato
+        shutDownCameraHandler(stream);
       })
       .catch((err: any) => {
         console.log(err);
@@ -90,7 +100,8 @@ const ReconnectUser = () => {
           return false;
         };
       } catch (error) {
-        console.log("Error getting local stream")
+        console.log("Error getting local stream");
+        socketClient.userCallUnavailable(data.remitent.id);
       };
     });
 
@@ -109,21 +120,28 @@ const ReconnectUser = () => {
       dispatch(setVideoCall({...videoCall!, status: "accepted"}));
     });
 
-    // Escuchar evento de videollamada finalizada para cambiar el status a ended
+    // Escuchar evento de videollamada finalizada
+    // para cambiar el status a ended y apagar la cámara
     socketClient.socket.on(SocketEvents.CALL_ENDED, () => {
-      console.log("CALL_ENDED");
-      localStream?.getTracks().forEach(track => track.stop());
-      dispatch(setVideoCall({...videoCall!, status: "ended"}));
-      dispatch(setLocalStream(null));
-      dispatch(setRemoteStream(null));
+      if (videoCall && localStream) {
+        console.log("CALL_ENDED");
+        shutDownCameraHandler(localStream);
+        dispatch(setVideoCall({...videoCall, status: "ended"}));
+        dispatch(setLocalStream(null));
+        dispatch(setRemoteStream(null));
+      }
     });
     
     // Escuchar evento de videollamada rechazada para cambiar el status a rejected
     socketClient.socket.on(SocketEvents.CALL_REJECTED, () => {
-      console.log("CALL_REJECTED");
-      dispatch(setVideoCall({...videoCall!, status: "rejected"}));
+      if (videoCall && localStream) {
+        console.log("CALL_REJECTED");
+        shutDownCameraHandler(localStream);
+        dispatch(setVideoCall({...videoCall, status: "rejected"}));
+      }
     });
 
+    // Escuchar evento de usuario no disponible
     socketClient.socket.on(SocketEvents.CALL_USER_UNAVAILABLE, () => {
       console.log("CALL_USER_UNAVAILABLE");
       dispatch(setVideoCall({...videoCall!, status: "unavailable"}));

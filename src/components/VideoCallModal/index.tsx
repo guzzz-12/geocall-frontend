@@ -7,8 +7,8 @@ import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import { HiPhoneMissedCall, HiOutlinePhoneMissedCall } from "react-icons/hi";
 import { FiPhoneCall } from "react-icons/fi";
 import IconButton from "../IconButton";
-import { VideoCallRootState } from "../../redux/store";
-import { setActiveVideoCallData, setLocalStream, setRemoteStream, setVideoCall } from "../../redux/features/videoCallSlice";
+import { MapRootState, VideoCallRootState } from "../../redux/store";
+import { setActiveVideoCallData, setRemoteStream, setVideoCall } from "../../redux/features/videoCallSlice";
 import { setUserVideoCallStatus } from "../../redux/features/userSlice";
 import { SocketEvents, socketClient } from "../../socket/socketClient";
 
@@ -17,10 +17,12 @@ const VideoCallModal = () => {
   const myPeerVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const dispatch = useDispatch();
-  const {videoCall, activeCallWith} = useSelector((state: VideoCallRootState) => state.videoCall);
-  const {localStream, remoteStream} = useSelector((state: VideoCallRootState) => state.videoCall);
+  const {videoCall, activeCallWith, localStream, remoteStream} = useSelector((state: VideoCallRootState) => state.videoCall);
+  const {onlineUsers} = useSelector((state: MapRootState) => state.map);
 
   const [isLocalStreamMuted, setIsLocalStreamMuted] = useState(false);
+
+  const isOnline = onlineUsers.find(user => user.userId === activeCallWith?.id);
   
   // Inicializar los videos de los participantes de la videollamada
   useEffect(() => {
@@ -50,10 +52,22 @@ const VideoCallModal = () => {
 
   // Cerrar el modal, mostrar notificación y
   // restablecer el state cuando la llamada termina
+  // o cuando el usuario pierde la conexión
   useEffect(() => {
     const statuses = ["ended", "rejected"];
 
-    if (activeCallWith && statuses.includes(videoCall!.status!)) {
+    if (activeCallWith && !isOnline) {
+      dispatch(setVideoCall(null));
+      dispatch(setActiveVideoCallData(null));
+      dispatch(setUserVideoCallStatus("active"));
+
+      toast.info(
+        `Videocall ended as ${activeCallWith?.firstName} has disconnected`,
+        {position: "bottom-left"}
+      );
+    };
+
+    if (activeCallWith && statuses.includes(videoCall?.status!)) {
       dispatch(setVideoCall(null));
       dispatch(setActiveVideoCallData(null));
       dispatch(setUserVideoCallStatus("active"));
@@ -63,7 +77,7 @@ const VideoCallModal = () => {
         {position: "bottom-left"}
       );
     }
-  }, [videoCall, activeCallWith]);
+  }, [videoCall, activeCallWith, isOnline]);
 
 
   if (!videoCall) {
@@ -91,12 +105,11 @@ const VideoCallModal = () => {
       socketClient.socket.emit(SocketEvents.CALL_ENDED, activeCallWith!.id)
     };
     
-    localStream!.getTracks().forEach(track => track.stop());
     videoCall.callObj!.close();
+    localStream!.getTracks().forEach(track => track.stop());
     dispatch(setVideoCall(null));
     dispatch(setActiveVideoCallData(null));
     dispatch(setUserVideoCallStatus("active"));
-    dispatch(setLocalStream(null));
     dispatch(setRemoteStream(null));
   };
 
@@ -119,7 +132,7 @@ const VideoCallModal = () => {
               />
               <p className="font-bold text-3xl text-center text-gray-600">
                 {videoCall.status === "calling" && "Calling "}
-                {activeCallWith?.firstName}...
+                {activeCallWith?.firstName}
                 {videoCall.status === "pending" && " is calling..."}
               </p>
             </div>
@@ -164,6 +177,7 @@ const VideoCallModal = () => {
           </div>
         )}
 
+        {/* Indicar que el usuario no está disponible para llamadas y apagar la cámara */}
         {videoCall.status === "unavailable" && (
           <div className="flex flex-col justify-center items-center gap-6">
             <p className="font-bold text-3xl text-center text-gray-600">
@@ -175,6 +189,7 @@ const VideoCallModal = () => {
                 dispatch(setVideoCall(null));
                 dispatch(setActiveVideoCallData(null));
                 dispatch(setUserVideoCallStatus("active"));
+                localStream?.getTracks().forEach(track => track.stop());
               }}
             >
               Accept
