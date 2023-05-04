@@ -74,7 +74,7 @@ const SignupPage = () => {
     setSignupError(null);
 
     if (!myLocation) {
-      return setSignupError("You need to grant us to get your location");
+      return setSignupError("Unable to get your location. Refresh the page and try again.");
     }
     
     try {

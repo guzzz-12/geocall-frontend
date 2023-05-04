@@ -52,7 +52,7 @@ const LoginPage = () => {
     setLoginError(null);
 
     if (!myLocation) {
-      return setLoginError("You need to grant us to get your location");
+      return setLoginError("Unable to get your location. Refresh the page and try again.");
     };
 
     try {

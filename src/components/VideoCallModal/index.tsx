@@ -62,7 +62,7 @@ const VideoCallModal = () => {
       dispatch(setUserVideoCallStatus("active"));
 
       toast.info(
-        `Videocall ended as ${activeCallWith?.firstName} has disconnected`,
+        `Videocall ended as ${activeCallWith.firstName} has disconnected`,
         {position: "bottom-left"}
       );
     };
@@ -73,14 +73,14 @@ const VideoCallModal = () => {
       dispatch(setUserVideoCallStatus("active"));
 
       toast.info(
-        `${activeCallWith?.firstName} ended the videocall`,
+        `${activeCallWith.firstName} ended the videocall`,
         {position: "bottom-left"}
       );
     }
   }, [videoCall, activeCallWith, isOnline]);
 
 
-  if (!videoCall) {
+  if (!videoCall || !activeCallWith) {
     return null;
   };
 
@@ -91,7 +91,7 @@ const VideoCallModal = () => {
       return false;
     };
 
-    socketClient.socket.emit(SocketEvents.CALL_ACCEPTED, activeCallWith!.id);    
+    socketClient.socket.emit(SocketEvents.CALL_ACCEPTED, activeCallWith.id);    
     dispatch(setVideoCall({...videoCall, status: "accepted"}));
     videoCall.callObj!.answer(localStream);
   };
@@ -100,9 +100,9 @@ const VideoCallModal = () => {
   // Finalizar/rechazar la video llamada
   const endVideoCallHandler = (mode: "end" | "reject") => {
     if (mode === "reject") {
-      socketClient.socket.emit(SocketEvents.CALL_REJECTED, activeCallWith!.id)
+      socketClient.socket.emit(SocketEvents.CALL_REJECTED, activeCallWith.id)
     } else {
-      socketClient.socket.emit(SocketEvents.CALL_ENDED, activeCallWith!.id)
+      socketClient.socket.emit(SocketEvents.CALL_ENDED, activeCallWith.id)
     };
     
     videoCall.callObj!.close();
@@ -126,12 +126,12 @@ const VideoCallModal = () => {
             <div className="flex flex-col justify-center items-center gap-2">
               <img
                 className="block w-[120px] h-[120px] object-cover object-center rounded-full border-4 border-blue-600"
-                src={activeCallWith?.avatar}
-                alt={activeCallWith?.firstName}
+                src={activeCallWith.avatar}
+                alt={activeCallWith.firstName}
               />
               <p className="font-bold text-3xl text-center text-gray-600">
                 {videoCall.status === "calling" && "Calling "}
-                {activeCallWith?.firstName}
+                {activeCallWith.firstName}
                 {videoCall.status === "pending" && " is calling..."}
               </p>
             </div>
@@ -181,7 +181,7 @@ const VideoCallModal = () => {
         {videoCall.status === "unavailable" && (
           <div className="flex flex-col justify-center items-center gap-6">
             <p className="font-bold text-3xl text-center text-gray-600">
-              {activeCallWith?.firstName} is not available at this moment.
+              {activeCallWith.firstName} is not available at this moment.
             </p>
             <button
               className="block min-w-[150px] px-3 py-2 uppercase rounded-sm bg-blue-50 hover:bg-blue-100 transition-colors"
@@ -203,7 +203,7 @@ const VideoCallModal = () => {
             {localStream && (
               <div className="flex flex-col justify-start items-center gap-3 mb-1">
                 <p className="font-bold text-2xl text-center text-gray-600">
-                  Active video call with {activeCallWith?.firstName}
+                  Active video call with {activeCallWith.firstName}
                 </p>
                 <div className="flex justify-stretch items-center gap-1 min-w-[200px]">
                   <IconButton
@@ -215,7 +215,7 @@ const VideoCallModal = () => {
                   <IconButton
                     Icon={HiPhoneMissedCall}
                     disabled={false}
-                    tooltipText={`End videocall with ${activeCallWith?.firstName}`}
+                    tooltipText={`End videocall with ${activeCallWith.firstName}`}
                     onClickHandler={endVideoCallHandler.bind(null, "end")}
                   />
                 </div>

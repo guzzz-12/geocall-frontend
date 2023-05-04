@@ -30,7 +30,7 @@ const ChatWindow = () => {
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const {videoCallHandler, selectedUser} = useContext(VideocallContext);
+  const {videoCallHandler} = useContext(VideocallContext);
 
   const dispatch = useDispatch();
   const {currentUser} = useSelector((state: UserRootState) => state.user);
@@ -401,7 +401,7 @@ const ChatWindow = () => {
                 <IconButton
                   Icon={BiVideoPlus}
                   disabled={false}
-                  tooltipText={`Start a videocall with ${selectedUser?.firstName}`}
+                  tooltipText="Start videocall"
                   onClickHandler={videoCallHandler}
                 />
               </div>
