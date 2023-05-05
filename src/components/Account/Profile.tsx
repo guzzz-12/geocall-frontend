@@ -282,7 +282,7 @@ const Profile = ({currentUser}: Props) => {
             </p>
           </div>
 
-          <div className="flex justify-center items-center gap-10 w-full">
+          <div className="flex justify-center items-center gap-10 w-full max-[500px]:flex-col max-[500px]:gap-2">
             {socialLinks.map((item) => {
               const {_id, name, link} = item;
 

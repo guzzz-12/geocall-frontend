@@ -3,6 +3,7 @@ import { FormProvider, UseFormReturn } from "react-hook-form";
 import { AnimatePresence, AnimationProps, motion } from "framer-motion";
 import { HiOutlineKey } from "react-icons/hi";
 import { MdOutlineWarning } from "react-icons/md";
+import FormWrapper from "./FormWrapper";
 import Alert from "../Alert";
 import Input from "../AuthFormInputs/Input";
 import { DeleteChatsFormSchemaType } from "./Security";
@@ -20,11 +21,7 @@ interface Props {
 const DeleteChatsForm = ({error, loading, animationProps, methods, onSubmitHandler, setError}: Props) => {
   return (
     <FormProvider {...methods}>
-      <form
-        className="flex flex-col gap-3 w-[450px] mx-auto px-4 py-3 rounded-md bg-white shadow-md"
-        noValidate
-        onSubmit={methods.handleSubmit(onSubmitHandler)}
-      >
+      <FormWrapper onSubmitHandler={methods.handleSubmit(onSubmitHandler)}>
         <div>
           <div className="flex justify-center items-center gap-3 w-full">
             <MdOutlineWarning className="w-6 h-6 fill-red-700" />
@@ -36,7 +33,6 @@ const DeleteChatsForm = ({error, loading, animationProps, methods, onSubmitHandl
             This action will remove all your chats from your browser only. <br /> This action cannot be undone.
           </p>
         </div>
-
         <AnimatePresence>
           {error && (
             <motion.div
@@ -53,9 +49,7 @@ const DeleteChatsForm = ({error, loading, animationProps, methods, onSubmitHandl
             </motion.div>
           )}
         </AnimatePresence>
-
         <div className="w-full h-[1px] mb-3 bg-gray-200" />
-
         <Input
           id="password-4"
           type="password"
@@ -64,7 +58,6 @@ const DeleteChatsForm = ({error, loading, animationProps, methods, onSubmitHandl
           disabled={loading}
           Icon={HiOutlineKey}
         />
-
         <button
           className="auth-btn text-sm text-red-700 bg-red-50"
           type="submit"
@@ -74,7 +67,7 @@ const DeleteChatsForm = ({error, loading, animationProps, methods, onSubmitHandl
             Delete all conversations
           </span>
         </button>
-      </form>
+      </FormWrapper>
     </FormProvider>
   )
 };

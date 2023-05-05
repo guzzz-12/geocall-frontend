@@ -40,11 +40,11 @@ const AccountPage = () => {
         <Navbar navbarType="static" />
       </div>
 
-      <div className="flex flex-grow overflow-x-hidden container-md">
+      <div className="flex flex-grow overflow-x-hidden container-md px-0">
         {/* Columna izquierda (Tabs) */}
-        <div className="flex-shrink-0 min-w-[22%] border-r border-l border-gray-300">
+        <div className="flex-shrink-0 border-r border-l border-gray-300">
           {/* Header de la columna */}
-          <div className="flex justify-center items-center gap-3 px-3 py-5 border-b border-gray-300">
+          <div className="hidden md:flex justify-center items-center gap-3 px-3 py-5 border-b border-gray-300">
             <FaCog className="w-[30px] h-[30px] opacity-30" />
             <h2 className="text-center font-bold text-gray-600 uppercase">
               Account settings

@@ -19,7 +19,7 @@ const TabItem = ({Icon, text, tabIndex, activeTab, setActiveTab}: Props) => {
       onClick={() => setActiveTab(tabIndex)}
     >
       <Icon className="w-[30px] h-[30px] opacity-30" />
-      <p className="text-left text-ellipsis">
+      <p className="hidden md:block text-left text-ellipsis">
         {text}
       </p>
     </div>

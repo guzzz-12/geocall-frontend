@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { FormProvider, UseFormReturn } from "react-hook-form";
 import { AnimatePresence, AnimationProps, motion } from "framer-motion";
 import { HiOutlineKey } from "react-icons/hi";
+import FormWrapper from "./FormWrapper";
 import Alert from "../Alert";
 import Input from "../AuthFormInputs/Input";
 import { PasswordFormSchemaType } from "./Security";
@@ -20,11 +21,7 @@ interface Props {
 const PasswordChangeForm = ({success, error, setSuccess, setError, loading, animationProps, methods, onSubmitHandler}: Props) => {
   return (
     <FormProvider {...methods}>
-      <form
-        className="flex flex-col gap-3 w-[450px] mx-auto px-4 py-3 rounded-md bg-white shadow-md"
-        noValidate
-        onSubmit={methods.handleSubmit(onSubmitHandler)}
-      >
+      <FormWrapper onSubmitHandler={methods.handleSubmit(onSubmitHandler)}>
         <div className="flex justify-center items-center gap-3 w-full">
           <HiOutlineKey className="w-6 h-6 opacity-50" />
           <p className="text-left font-bold text-gray-500">
@@ -50,9 +47,7 @@ const PasswordChangeForm = ({success, error, setSuccess, setError, loading, anim
             </motion.div>
           )}
         </AnimatePresence>
-
         <div className="w-full h-[1px] mb-3 bg-gray-200" />
-
         <Input
           id="password"
           type="password"
@@ -77,7 +72,6 @@ const PasswordChangeForm = ({success, error, setSuccess, setError, loading, anim
           disabled={loading}
           Icon={HiOutlineKey}
         />
-
         <button
           className="auth-btn text-sm"
           type="submit"
@@ -87,7 +81,7 @@ const PasswordChangeForm = ({success, error, setSuccess, setError, loading, anim
             Save changes
           </span>
         </button>
-      </form>
+      </FormWrapper>
     </FormProvider>
   )
 };

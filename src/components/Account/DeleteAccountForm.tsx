@@ -3,6 +3,7 @@ import { FormProvider, UseFormReturn } from "react-hook-form";
 import { AnimatePresence, AnimationProps, motion } from "framer-motion";
 import { HiOutlineKey } from "react-icons/hi";
 import { MdOutlineWarning } from "react-icons/md";
+import FormWrapper from "./FormWrapper";
 import Alert from "../Alert";
 import Input from "../AuthFormInputs/Input";
 import { DeleteAccountFormSchemaType } from "./Security";
@@ -19,16 +20,12 @@ interface Props {
 const DeleteAccountForm = ({error, loading, animationProps, methods, setError, onSubmitHandler}: Props) => {
   return (
     <FormProvider {...methods}>
-      <form
-        className="flex flex-col gap-3 w-[450px] mx-auto px-4 py-3 rounded-md bg-white shadow-md"
-        noValidate
-        onSubmit={methods.handleSubmit(onSubmitHandler)}
-      >
+      <FormWrapper onSubmitHandler={methods.handleSubmit(onSubmitHandler)}>
         <div>
           <div className="flex justify-center items-center gap-3 w-full">
             <MdOutlineWarning className="w-6 h-6 fill-red-700" />
             <p className="text-left font-bold text-gray-500">
-              Delete your account permanently
+              Delete your account
             </p>
           </div>
           <p className="text-xs text-center text-red-700">
@@ -73,7 +70,7 @@ const DeleteAccountForm = ({error, loading, animationProps, methods, setError, o
             Delete account permanently
           </span>
         </button>
-      </form>
+      </FormWrapper>
     </FormProvider>
   )
 };

@@ -3,6 +3,7 @@ import { FormProvider, UseFormReturn } from "react-hook-form";
 import { AnimatePresence, AnimationProps, motion } from "framer-motion";
 import { HiOutlineKey } from "react-icons/hi";
 import { AiOutlineMail } from "react-icons/ai";
+import FormWrapper from "./FormWrapper";
 import Alert from "../Alert";
 import Input from "../AuthFormInputs/Input";
 import { EmailFormSchemaType } from "./Security";
@@ -21,11 +22,7 @@ interface Props {
 const EmailChangeForm = ({success, error, setSuccess, setError, loading, animationProps, methods, onSubmitHandler}: Props) => {
   return (
     <FormProvider {...methods}>
-      <form
-        className="flex flex-col gap-3 w-[450px] mx-auto px-4 py-3 rounded-md bg-white shadow-md"
-        noValidate
-        onSubmit={methods.handleSubmit(onSubmitHandler)}
-      >
+      <FormWrapper onSubmitHandler={methods.handleSubmit(onSubmitHandler)}>
         <div>
           <div className="flex justify-center items-center gap-3 w-full">
             <AiOutlineMail className="w-6 h-6 opacity-50" />
@@ -39,7 +36,6 @@ const EmailChangeForm = ({success, error, setSuccess, setError, loading, animati
             or you will lose access to your account!
           </p>
         </div>
-
         <AnimatePresence>
           {(success || error) && (
             <motion.div
@@ -59,9 +55,7 @@ const EmailChangeForm = ({success, error, setSuccess, setError, loading, animati
             </motion.div>
           )}
         </AnimatePresence>
-
         <div className="w-full h-[1px] mb-3 bg-gray-200" />
-
         <Input
           id="newEmail"
           type="email"
@@ -70,7 +64,6 @@ const EmailChangeForm = ({success, error, setSuccess, setError, loading, animati
           disabled={loading}
           Icon={AiOutlineMail}
         />
-
         <Input
           id="password-2"
           type="password"
@@ -79,7 +72,6 @@ const EmailChangeForm = ({success, error, setSuccess, setError, loading, animati
           disabled={loading}
           Icon={HiOutlineKey}
         />
-
         <button
           className="auth-btn text-sm"
           type="submit"
@@ -89,7 +81,7 @@ const EmailChangeForm = ({success, error, setSuccess, setError, loading, animati
             Save changes
           </span>
         </button>
-      </form>
+      </FormWrapper>
     </FormProvider>
   )
 };
