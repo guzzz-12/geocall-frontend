@@ -70,8 +70,8 @@ const ChatItem = ({chatMember, setIsOpen}: Props) => {
 
 
   return (
-    <div
-      className="flex justify-start items-center gap-2 w-full flex-shrink-0 px-2 py-2 border-b border-gray-200 cursor-pointer overflow-hidden hover:bg-gray-100 transition-colors"
+    <li
+      className="flex justify-start items-center gap-2 w-full min-h-[60px] flex-shrink-0 px-2 py-2 border-b border-gray-200 cursor-pointer overflow-hidden hover:bg-gray-100 transition-colors"
       onClick={onClickChatHandler}
     >
       <div className="relative w-10 h-10 flex-shrink-0">
@@ -107,7 +107,7 @@ const ChatItem = ({chatMember, setIsOpen}: Props) => {
           {unreadMessages.length}
         </p>
       )}
-    </div>
+    </li>
   )
 };
 

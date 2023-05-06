@@ -27,7 +27,7 @@ const Logo = ({size="sm"}: Props) => {
   }
 
   return (
-    <Link to="/" className="flex justify-between items-center gap-1">
+    <Link to="/" className="flex justify-start items-center gap-1">
       <img
         style={{width: dimensions.img, height: dimensions.img}}
         className="block"

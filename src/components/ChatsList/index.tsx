@@ -21,13 +21,9 @@ const ChatsList = ({isOpen, chatUsersData, isLoading, isError, setIsOpen}: Props
   };
 
   return (
-    <>
-      <div
-        className="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-transparent z-1000"
-        onClick={() => setIsOpen(false)}
-      />
-      <div
-        className="absolute flex flex-col -bottom-2 -right-3 justify-stretch items-start w-[250px] min-h-min max-h-[300px] translate-y-[100%] bg-white rounded-b-md scrollbar-thin scrollbar-thumb-slate-500 overflow-y-auto z-20"
+    <div className="absolute -bottom-4 xs:bottom-0 right-0 w-full max-w-[250px] max-h-[300px] bg-gray-50 border-t border-gray-300 translate-y-[100%] rounded-b-md shadow-md scrollbar-thin scrollbar-thumb-slate-500 overflow-x-hidden overflow-y-auto z-50">
+      <ul
+        className="flex flex-col justify-stretch items-start w-full min-h-[60px]"
         onClick={(e) => e.stopPropagation()}
       >
         {isLoading &&
@@ -63,8 +59,8 @@ const ChatsList = ({isOpen, chatUsersData, isLoading, isError, setIsOpen}: Props
             />
           )
         })}
-      </div>
-    </>
+      </ul>
+    </div>
   )
 };
 
