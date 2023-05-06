@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import { Link } from "react-router-dom";
 import { MdEmail, MdMailOutline, MdNotificationsNone, MdOutlineNotificationsOff } from "react-icons/md";
 import { AiOutlineLogout } from "react-icons/ai";
@@ -20,16 +19,16 @@ const NavItems = (props: Props) => {
 
   return (
     <div
-      className="relative flex flex-row justify-center items-center gap-3 max-[449px]:flex-col max-[449px]:items-start max-[449px]:gap-5"
+      className="relative flex flex-col justify-center items-start gap-5 xs:flex-row xs:items-center xs:gap-3"
       onClick={(e) => e.stopPropagation()}
     >
       <Link
-        className="flex justify-center items-center gap-2 max-w-[120px] max-[449px]:mx-auto cursor-pointer"
+        className="flex justify-center items-center gap-2 max-w-[120px] mx-auto cursor-pointer"
         to="/account"
         data-tooltip-id="user-button-tooltip"
         data-tooltip-content="Account"
       >
-        <span className="block w-8 h-8 max-[449px]:w-12 max-[449px]:h-12 flex-shrink-0 rounded-full border-2 border-gray-400 overflow-hidden">
+        <span className="block w-11 h-11 xs:w-8 xs:h-8 flex-shrink-0 rounded-full border-2 border-gray-400 overflow-hidden">
           <img
             src={currentUser!.avatar}
             className="block w-full h-full object-cover object-center "
@@ -41,19 +40,19 @@ const NavItems = (props: Props) => {
       </Link>
 
       <button
-        className="flex justify-center items-center max-[449px]:w-full max-[449px]:justify-start  text-gray-600 cursor-pointer"
+        className="flex justify-start xs:justify-center items-center text-gray-600 cursor-pointer"
         data-tooltip-id="msg-button-tooltip"
         data-tooltip-content="Messages"
         onClick={onClickNotificationsHandler}
       >
         {unread.length === 0 && (
-          <MdMailOutline className="w-8 h-8 text-gray-600 max-[449px]:w-auto" />
+          <MdMailOutline className="w-8 h-8 text-gray-600" />
         )}
 
         {unread.length > 0 && (
-          <div className="relative w-8 h-8 max-[449px]:w-auto">
-            <MdEmail className="text-gray-600 w-full h-full" />
-            <span className="absolute -top-1 -right-1 max-[449px]:-top-2 max-[449px]:-right-1 flex justify-center items-center w-5 h-5 rounded-full bg-orange-600">
+          <div className="relative">
+            <MdEmail className="text-gray-600 w-8 h-8" />
+            <span className="absolute -top-2 -right-1 xs:-top-1 xs:-right-1 flex justify-center items-center w-5 h-5 rounded-full bg-orange-600">
               <span className="font-bold text-white text-sm">
                 {unread.length}
               </span>
@@ -61,33 +60,33 @@ const NavItems = (props: Props) => {
           </div>
         )}
 
-        <p className="min-[450px]:hidden ml-2">
+        <p className="xs:hidden ml-2">
           Messages
         </p>
       </button>
 
       {/* Botón para alternar la disponibilidad del usuario para chatear y recibir llamadas */}
       <button
-        className="flex items-center w-8 h-8 max-[449px]:w-full text-gray-600"
+        className="flex justify-start xs:justify-center items-center text-gray-600 cursor-pointer"
         data-tooltip-id="status-button-tooltip"
         data-tooltip-content={chatStatus === "available" ? "Set chat to unavailable" : "Set chat to available"}
         onClick={availabilityChangeHandler}
       >
-        {chatStatus === "available" && <MdNotificationsNone className="w-full h-full max-[449px]:w-auto" />}
-        {chatStatus === "unavailable" && <MdOutlineNotificationsOff className="w-full h-full max-[449px]:w-auto" />}
-        <p className="min-[450px]:hidden ml-2">
+        {chatStatus === "available" && <MdNotificationsNone className="w-8 h-8" />}
+        {chatStatus === "unavailable" && <MdOutlineNotificationsOff className="w-8 h-8" />}
+        <p className="xs:hidden ml-2">
           Notifications
         </p>
       </button>
 
       <button
-        className="flex items-center w-8 h-8 max-[449px]:w-full text-gray-600"
+        className="flex justify-start xs:justify-center items-center text-gray-600 cursor-pointer"
         data-tooltip-id="logout-button-tooltip"
         data-tooltip-content="Logout"
         onClick={logoutHandler}
       >
-        <AiOutlineLogout className="w-full h-full max-[449px]:w-auto" />
-        <p className="min-[450px]:hidden ml-2">
+        <AiOutlineLogout className="w-8 h-8" />
+        <p className="xs:hidden ml-2">
           Logout
         </p>
       </button>

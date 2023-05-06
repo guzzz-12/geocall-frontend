@@ -228,7 +228,7 @@ const Navbar = ({navbarType}: Props) => {
           />
         }
 
-        <div className="xs:block hidden">
+        <div className="hidden xs:block">
           <Logo size="sm" />
         </div>
 
@@ -239,7 +239,7 @@ const Navbar = ({navbarType}: Props) => {
           <AiOutlineMenu className="block w-7 h-7" />
         </div>
 
-        <div className="max-[449px]:hidden">
+        <div className="hidden xs:block">
           <NavItems
             currentUser={currentUser}
             unread={unread}

@@ -10,13 +10,13 @@ const LandingPage = () => {
   return (
     <section className="flex w-screen h-screen bg-gray-100">
       {/* Columna izquierda */}
-      <header className="relative flex flex-col justify-between items-center w-[55%] px-6 py-4 z-10 max-[850px]:w-screen">
+      <header className="relative flex flex-col justify-between items-center gap-5 w-screen tablet:w-[55%] px-6 py-4 z-10">
         <div className="self-start">
           <Logo size="sm" />
         </div>
 
         <div className="flex flex-col justify-center items-start">
-          <p className="mb-2 text-5xl text-left font-bold leading-none text-gray-800">
+          <p className="mb-2 text-4xl md:text-5xl text-left font-bold leading-none text-gray-800">
             Connect with anyone, anytime, anywhere in the world!
           </p>
           <p className="mb-8 text-xl font-normal text-gray-800">
@@ -64,7 +64,7 @@ const LandingPage = () => {
       {/* Columna derecha */}
       <div
         style={{backgroundImage: "url(/img/connected-world.png)"}}
-        className="w-[45%] flex-shrink-[2] bg-left bg-cover bg-no-repeat max-[850px]:absolute max-[850px]:top-0 max-[850px]:left-0 max-[850px]:w-screen max-[850px]:h-screen max-[850px]:bg-cover max-[850px]:opacity-25 max-[850px]:z-0"
+        className="absolute tablet:static w-screen tablet:w-[45%] flex-shrink-[2] bg-left bg-cover bg-no-repeat top-0 left-0 h-screen opacity-25 tablet:opacity-100 z-0"
       />
     </section>
   )
