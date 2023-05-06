@@ -11,9 +11,10 @@ interface Props {
   isError: boolean;
   chatUsersData: ChatMember[];
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  setOpenDrawer?: Dispatch<SetStateAction<boolean>>
 };
 
-const ChatsList = ({isOpen, chatUsersData, isLoading, isError, setIsOpen}: Props) => {
+const ChatsList = ({isOpen, chatUsersData, isLoading, isError, setIsOpen, setOpenDrawer}: Props) => {
   const {chats} = useSelector((state: ChatsRootState) => state.chats);
 
   if (!isOpen) {
@@ -56,6 +57,7 @@ const ChatsList = ({isOpen, chatUsersData, isLoading, isError, setIsOpen}: Props
               key={member._id}
               chatMember={member}
               setIsOpen={setIsOpen}
+              setOpenDrawer={setOpenDrawer}
             />
           )
         })}

@@ -7,9 +7,10 @@ import { SocketEvents, socketClient } from "../../socket/socketClient";
 interface Props {
   chatMember: ChatMember;
   setIsOpen: Dispatch<SetStateAction<boolean>>
+  setOpenDrawer?: Dispatch<SetStateAction<boolean>>
 };
 
-const ChatItem = ({chatMember, setIsOpen}: Props) => {
+const ChatItem = ({chatMember, setIsOpen, setOpenDrawer}: Props) => {
   const dispatch = useDispatch();
   const {currentUser} = useSelector((state: UserRootState) => state.user);
   const {onlineUsers} = useSelector((state: MapRootState) => state.map);
@@ -63,6 +64,9 @@ const ChatItem = ({chatMember, setIsOpen}: Props) => {
 
     dispatch(setReadMessages({chatId: chat.chatId}));
     
+    // Cerrar el drawer si está en navegación mobile
+    setOpenDrawer?.(false);
+
     setTimeout(() => {
       setIsOpen(false);
     }, 500);

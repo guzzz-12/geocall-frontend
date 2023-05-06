@@ -50,6 +50,7 @@ const Drawer = (props: Props) => {
           isError={props.isError}
           chatUsersData={props.chatUsersData}
           setIsOpen={props.setIsNotificationsOpen}
+          setOpenDrawer={props.setOpenDrawer}
         />
         <NavItems {...props} />
       </div>
