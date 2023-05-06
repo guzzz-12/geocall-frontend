@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useContext, ChangeEvent } from "react";
+import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
 import { v4 } from "uuid";
@@ -12,13 +12,13 @@ import { BiVideoPlus } from "react-icons/bi";
 import MessageItem from "./MessageItem";
 import EmojiPicker from "./EmojiPicker";
 import IconButton from "./IconButton";
-import { VideocallContext } from "../hooks/VideoCallContext";
+import useVideoCall from "../hooks/useVideoCall";
 import { ChatsRootState, MapRootState, UserRootState } from "../redux/store";
 import { Message, closeChat, createMessage, deleteMessage } from "../redux/features/chatsSlice";
+import { setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { Notification } from "../redux/features/notificationsSlice";
 import { SocketEvents, socketClient } from "../socket/socketClient";
 import { imageProcessor } from "../utils/imageCompression";
-import { setSelectedUserPrefetch } from "../redux/features/mapSlice";
 
 export interface DeleteMessageModalState {
   open: boolean;
@@ -29,8 +29,6 @@ export interface DeleteMessageModalState {
 const ChatWindow = () => {
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const {videoCallHandler} = useContext(VideocallContext);
 
   const dispatch = useDispatch();
   const {currentUser} = useSelector((state: UserRootState) => state.user);
@@ -47,6 +45,9 @@ const ChatWindow = () => {
     msgId: null,
     isSender: false
   });
+
+  // Funcionalidad para iniciar una videollamada
+  const {videoCallHandler} = useVideoCall();
 
   // Extraer la ID del otro usuario de la conversación
   const otherUserId = selectedChat?.senderId === currentUser?._id ? selectedChat?.recipientId : selectedChat?.senderId;

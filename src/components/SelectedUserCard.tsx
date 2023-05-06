@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from "dayjs";
 import { v4 } from "uuid";
@@ -16,20 +15,18 @@ import { IconType } from "react-icons/lib";
 import IconButton from "./IconButton";
 import Spinner from "./Spinner";
 import SocialLink from "./Account/SocialLink";
-import { setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
-import { MapRootState, UserRootState } from "../redux/store";
-import { createOrSelectChat, Chat } from "../redux/features/chatsSlice";
+import useVideoCall from "../hooks/useVideoCall";
 import useSelectedUser from "../hooks/useSelectedUser";
+import { MapRootState, UserRootState } from "../redux/store";
+import { setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
+import { createOrSelectChat, Chat } from "../redux/features/chatsSlice";
 import { openImageModal } from "../redux/features/imageModalSlice";
-import { VideocallContext } from "../hooks/VideoCallContext";
 
 interface Props {
   selectedUserId: string;
 };
 
 const SelectedUserCard = ({selectedUserId}: Props) => {
-  const {videoCallHandler} = useContext(VideocallContext);
-
   const dispatch = useDispatch();
   const {currentUser, hasMediaDevice} = useSelector((state: UserRootState) => state.user);
   const {selectedUser, onlineUsers} = useSelector((state: MapRootState) => state.map);
@@ -39,6 +36,9 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
 
   // Verificar si el usuario está offline
   const isUserOffline = !onlineUsers.find(user => user.userId === selectedUser?.user._id);
+
+  // Funcionalidad para iniciar una videollamada
+  const {videoCallHandler} = useVideoCall();
 
   /**
    * Crear el chat si no existe o abrirlo si ya existe

@@ -1,4 +1,3 @@
-import { createContext, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MediaConnection } from "peerjs";
 import { toast } from "react-toastify";
@@ -9,26 +8,12 @@ import { setUserVideoCallStatus } from "../redux/features/userSlice";
 import { socketClient } from "../socket/socketClient";
 import peerClient from "../utils/peerClient";
 import { getLocalStream } from "../utils/getLocalStream";
-import { User } from "../redux/api";
-
-interface InitialState {
-  selectedUser: User | undefined;
-  selectedUserAddress: string | undefined;
-  isLoading: boolean;
-  isFetching: boolean;
-  videoCallHandler: () => void;
-};
-
-export const VideocallContext = createContext<InitialState>({
-  selectedUser: undefined,
-  selectedUserAddress: undefined,
-  isLoading: false,
-  isFetching: false,
-  videoCallHandler: () => {}
-});
 
 
-const VideocallContextProvider = ({children}: {children: ReactNode}) => {
+/**
+ * Custom hook para iniciar videollamadas con el usuario seleccionado
+ */
+const useVideoCall = () => {
   const dispatch = useDispatch();
   const {currentUser, hasMediaDevice} = useSelector((state: UserRootState) => state.user);
   const {selectedUser, onlineUsers} = useSelector((state: MapRootState) => state.map);
@@ -152,19 +137,7 @@ const VideocallContextProvider = ({children}: {children: ReactNode}) => {
     });
   };
 
-  return (
-    <VideocallContext.Provider
-      value={{
-        selectedUser: selectedUser?.user,
-        selectedUserAddress: selectedUser?.address,
-        isLoading,
-        isFetching,
-        videoCallHandler
-      }}
-    >
-      {children}
-    </VideocallContext.Provider>
-  )
+  return {videoCallHandler, isLoading, isFetching}
 };
 
-export default VideocallContextProvider;
+export default useVideoCall;

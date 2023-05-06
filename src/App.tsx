@@ -11,7 +11,6 @@ import ChatWindow from "./components/ChatWindow";
 import VideoCallModal from "./components/VideoCallModal";
 import ImageModal from "./components/ImageModal";
 import GlobalAlert from "./components/GlobalAlert";
-import VideocallContextProvider from "./hooks/VideoCallContext";
 import store from "./redux/store";
 import "react-tooltip/dist/react-tooltip.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -55,15 +54,8 @@ const App = () => {
               <VideoCallModal />
               <BrowserRouter>
                 <Routes>
-                  <Route path="/" element={<LandingPage />}  />
-                  <Route
-                    path="/map"
-                    element={
-                      <VideocallContextProvider>
-                        <MapPage />
-                      </VideocallContextProvider>
-                    }
-                  />
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/map" element={<MapPage />} />
                   <Route path="/account" element={<AccountPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignupPage />} />
@@ -73,9 +65,7 @@ const App = () => {
                   <Route path="*" element={<h1>Page not found...</h1>} />
                 </Routes>
               </BrowserRouter>
-              <VideocallContextProvider>
-                <ChatWindow />
-              </VideocallContextProvider>
+              <ChatWindow />
               <ToastContainer
                 position="bottom-left"
                 autoClose={5000}
