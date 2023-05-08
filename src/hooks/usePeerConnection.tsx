@@ -1,12 +1,10 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
 import { setVideoCall, setRemoteStream, VideoCall, setActiveVideoCallData } from "../redux/features/videoCallSlice";
 import { MapRootState, UserRootState } from "../redux/store";
 import peerClient from "../utils/peerClient";
 import { SocketEvents, socketClient } from "../socket/socketClient";
 import { setPeerId, setUserVideoCallStatus } from "../redux/features/userSlice";
-import { getLocalStream } from "../utils/getLocalStream";
 
 /**
  * Inicializar conexión con el servidor de WebRTC vía Peer
@@ -63,12 +61,9 @@ const usePeerConnection = () => {
     // Escuchar el evento de llamada entrante
     peerClient.getInstance.on("call", async (call) => {
       try {
-        // Intentar tomar el stream local y continuar si lo tiene
-        await getLocalStream();  
-
         // Si ya tiene una llamada activa retornar
         // sin hacer nada al recibir una videollamada
-        if (videoCallStatus === "busy") {
+        if (videoCallStatus === "busy" || !hasMediaDevice) {
           return false
         };
   

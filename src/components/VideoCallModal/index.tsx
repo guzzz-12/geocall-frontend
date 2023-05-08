@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Tooltip } from "react-tooltip";
 import { toast } from "react-toastify";
-import { BsCameraVideoOff } from "react-icons/bs";
+import { BsCameraVideoOff, BsFillRecordFill, BsFillStopFill } from "react-icons/bs";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
-import { HiPhoneMissedCall, HiOutlinePhoneMissedCall } from "react-icons/hi";
+import { HiPhoneMissedCall, HiOutlinePhoneMissedCall, HiDownload } from "react-icons/hi";
 import { FiPhoneCall } from "react-icons/fi";
 import IconButton from "../IconButton";
 import { MapRootState, VideoCallRootState } from "../../redux/store";
@@ -12,17 +12,40 @@ import { setActiveVideoCallData, setRemoteStream, setVideoCall } from "../../red
 import { setUserVideoCallStatus } from "../../redux/features/userSlice";
 import { SocketEvents, socketClient } from "../../socket/socketClient";
 
+let mediaRecorder: MediaRecorder | null = null;
+let recordedChunks: Blob[] = [];
+
 const VideoCallModal = () => {
   const myVideoRef = useRef<HTMLVideoElement | null>(null);
   const myPeerVideoRef = useRef<HTMLVideoElement | null>(null);
+  const downloadLinkRef = useRef<HTMLAnchorElement>(null);
 
   const dispatch = useDispatch();
   const {videoCall, activeCallWith, localStream, remoteStream} = useSelector((state: VideoCallRootState) => state.videoCall);
   const {onlineUsers} = useSelector((state: MapRootState) => state.map);
 
   const [isLocalStreamMuted, setIsLocalStreamMuted] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isRecordingReady, setIsRecordingReady] = useState(false);
+  
+  // State para indicar si el usuario terminó la llamada
+  // mientras la está grabando para darle la opción de guardarla
+  // El state se mantiene en true mientras espera el guardado
+  // y en este state las llamadas entrantes son rechazadas automáticamente
+  const [endedWhileRecording, setEndedWhileRecording] = useState(false);
 
+  /** Indicar si el usuario llamado está online */
   const isOnline = onlineUsers.find(user => user.userId === activeCallWith?.id);
+
+  // Restablecer el state local y las variables locales al desmontar el modal
+  const clearLocalStateHandler = () => {
+    setEndedWhileRecording(false);
+    setIsRecording(false);
+    setIsRecordingReady(false);
+    setIsLocalStreamMuted(false);
+    mediaRecorder = null;
+    recordedChunks = [];
+  };
   
   // Inicializar los videos de los participantes de la videollamada
   useEffect(() => {
@@ -40,8 +63,37 @@ const VideoCallModal = () => {
     };
   }, [localStream, remoteStream]);
 
+  
+  /*-----------------------------------------------------------------*/
+  // Manejar el caso cuando el otro usuario finaliza la videollamada
+  /*-----------------------------------------------------------------*/
+  useEffect(() => {
+    // Detener la grabación si hay grabación activa al terminar la videollamada
+    if (videoCall?.status === "ended" && isRecording && mediaRecorder) {
+      mediaRecorder.stop();
+      setIsRecordingReady(true);
+      setEndedWhileRecording(true);
+    };
 
+    // Restablecer el state local y global si no hay llamada activa
+    // cuando el usuario remoto finaliza la llamada
+    if (videoCall?.status === "ended" && !isRecording) {
+      toast.info(
+        `${activeCallWith?.firstName} ended the video call`,
+        {position: "bottom-left"}
+      );
+
+      clearLocalStateHandler();
+      dispatch(setVideoCall(null));
+      dispatch(setActiveVideoCallData(null));
+      dispatch(setUserVideoCallStatus("active"));
+    }
+  }, [videoCall, isRecording, mediaRecorder, activeCallWith]);
+
+
+  /*-------------------------------------------------------*/
   // Mutear/desmutear el audio de la transmisión de salida
+  /*-------------------------------------------------------*/
   useEffect(() => {
     if (localStream) {
       const audioTrack = localStream.getAudioTracks()[0];
@@ -50,12 +102,9 @@ const VideoCallModal = () => {
   }, [localStream, isLocalStreamMuted]);
 
 
-  // Cerrar el modal, mostrar notificación y
-  // restablecer el state cuando la llamada termina
-  // o cuando el usuario pierde la conexión
+  // Cerrar el modal y mostrar notificación toast
+  // cuando el usuario remoto se desconecta
   useEffect(() => {
-    const statuses = ["ended", "rejected"];
-
     if (activeCallWith && !isOnline) {
       dispatch(setVideoCall(null));
       dispatch(setActiveVideoCallData(null));
@@ -66,17 +115,6 @@ const VideoCallModal = () => {
         {position: "bottom-left"}
       );
     };
-
-    if (activeCallWith && statuses.includes(videoCall?.status!)) {
-      dispatch(setVideoCall(null));
-      dispatch(setActiveVideoCallData(null));
-      dispatch(setUserVideoCallStatus("active"));
-
-      toast.info(
-        `${activeCallWith.firstName} ended the videocall`,
-        {position: "bottom-left"}
-      );
-    }
   }, [videoCall, activeCallWith, isOnline]);
 
 
@@ -85,27 +123,73 @@ const VideoCallModal = () => {
   };
 
 
-  // Aceptar la videollamada
+  /**
+   * Aceptar la videollamada
+   */
   const acceptVideoCallHandler = () => {
     if (!localStream) {
       return false;
     };
 
+    videoCall.callObj!.answer(localStream);
     socketClient.socket.emit(SocketEvents.CALL_ACCEPTED, activeCallWith.id);    
     dispatch(setVideoCall({...videoCall, status: "accepted"}));
-    videoCall.callObj!.answer(localStream);
   };
 
 
-  // Finalizar/rechazar la video llamada
+  /**
+   * Iniciar/terminar la grabación de la videollamada
+   */
+  const recordVideocallHandler = (mode: "start" | "stop") => {
+    if (mode === "start" && remoteStream) {
+      mediaRecorder = new MediaRecorder(remoteStream);
+      mediaRecorder.start();
+      setIsRecording(true);
+    };
+    
+    if (mode === "stop" && mediaRecorder) {
+      mediaRecorder.stop();
+      recordedChunks = [];
+      mediaRecorder = null;
+      setIsRecording(false);
+      setIsRecordingReady(true);
+    };
+
+    // Almacenar los chunks de la grabación a medida que van generándose
+    mediaRecorder?.addEventListener("dataavailable", (e) => {
+      recordedChunks.push(e.data);
+    });
+
+    // Escuchar el evento de grabación terminada
+    // y generar la url de descarga de la misma
+    mediaRecorder?.addEventListener("stop", () => {
+      const blob = new Blob(recordedChunks, {type: "video/mp4"});
+      const videoUrl = URL.createObjectURL(blob);
+      downloadLinkRef.current?.setAttribute("href", videoUrl);
+    });
+  };
+
+
+  /**
+   * Finalizar la videollamada
+   */
   const endVideoCallHandler = (mode: "end" | "reject") => {
     if (mode === "reject") {
       socketClient.socket.emit(SocketEvents.CALL_REJECTED, activeCallWith.id)
     } else {
       socketClient.socket.emit(SocketEvents.CALL_ENDED, activeCallWith.id)
     };
-    
+
     videoCall.callObj!.close();
+    localStream?.getTracks().forEach(track => track.stop());
+    
+    // Si está grabando la videollamada darle la opción
+    // de guardar la grabación antes de cerrar el modal
+    if (isRecording && mediaRecorder) {
+      mediaRecorder.stop();
+      return setEndedWhileRecording(true);
+    };
+
     dispatch(setVideoCall(null));
     dispatch(setActiveVideoCallData(null));
     dispatch(setUserVideoCallStatus("active"));
@@ -120,7 +204,15 @@ const VideoCallModal = () => {
         className="relative flex justify-center items-center h-[95dvh] max-w-[98%] aspect-[4/3] p-6 rounded-xl bg-white"
         onClick={(e) => e.stopPropagation()}
       >
-        {(videoCall.status === "calling"  || videoCall.status === "pending") && (
+        {/* Link de descarga de la videollamada grabada */}
+        <a
+          ref={downloadLinkRef}
+          className="hidden"
+          href=""
+          download={`geocall_recorded_call_with_${activeCallWith.firstName}_${Date.now()}`}
+        />
+
+        {!endedWhileRecording && (videoCall.status === "calling" || videoCall.status === "pending") && (
           <div className="flex flex-col justify-center items-center gap-16">
             {/* Avatar y nombre de la persona que está llamando */}
             <div className="flex flex-col justify-center items-center gap-2">
@@ -186,10 +278,10 @@ const VideoCallModal = () => {
             <button
               className="block min-w-[150px] px-3 py-2 uppercase rounded-sm bg-blue-50 hover:bg-blue-100 transition-colors"
               onClick={() => {
+                localStream?.getTracks().forEach(track => track.stop());
                 dispatch(setVideoCall(null));
                 dispatch(setActiveVideoCallData(null));
                 dispatch(setUserVideoCallStatus("active"));
-                localStream?.getTracks().forEach(track => track.stop());
               }}
             >
               Accept
@@ -197,15 +289,48 @@ const VideoCallModal = () => {
           </div>
         )}
 
+        {/* Dar la opción de guardar la videollamada si la terminó mientras la grababa*/}
+        {endedWhileRecording && (
+          <div className="flex flex-col justify-center items-center gap-6">
+            <p className="font-bold text-3xl text-center text-gray-600">
+              Save the recorded call?
+            </p>
+            <button
+              className="block min-w-[150px] px-3 py-2 uppercase rounded-sm bg-blue-50 hover:bg-blue-100 transition-colors"
+              onClick={() => {
+                downloadLinkRef.current?.click();
+                clearLocalStateHandler();
+                dispatch(setVideoCall(null));
+                dispatch(setActiveVideoCallData(null));
+                dispatch(setUserVideoCallStatus("active"));
+              }}
+            >
+              Save and exit
+            </button>
+
+            <button
+              className="block min-w-[150px] px-3 py-2 uppercase rounded-sm bg-blue-50 hover:bg-blue-100 transition-colors"
+              onClick={() => {
+                clearLocalStateHandler();
+                dispatch(setVideoCall(null));
+                dispatch(setActiveVideoCallData(null));
+                dispatch(setUserVideoCallStatus("active"));
+              }}
+            >
+              Exit without saving
+            </button>
+          </div>
+        )}
+
         {/* Mostrar los streams si la video llamada es aceptada */}
-        {videoCall.status === "accepted" && (
+        {videoCall.status === "accepted" && !endedWhileRecording && (
           <div className="flex flex-col justify-start items-center gap-6 h-full">
             {localStream && (
               <div className="flex flex-col justify-start items-center gap-3 mb-1">
                 <p className="font-bold text-2xl text-center text-gray-600">
                   Active video call with {activeCallWith.firstName}
                 </p>
-                <div className="flex justify-stretch items-center gap-1 min-w-[200px]">
+                <div className="flex justify-stretch items-center gap-1 flex-shrink-0 min-w-[200px]">
                   <IconButton
                     Icon={!isLocalStreamMuted ? FaMicrophone : FaMicrophoneSlash}
                     disabled={false}
@@ -218,6 +343,29 @@ const VideoCallModal = () => {
                     tooltipText={`End videocall with ${activeCallWith.firstName}`}
                     onClickHandler={endVideoCallHandler.bind(null, "end")}
                   />
+                  <IconButton
+                    Icon={!isRecording ? BsFillRecordFill : BsFillStopFill}
+                    disabled={false}
+                    tooltipText={!isRecording ? "Start recording" : "Stop recording"}
+                    onClickHandler={() => {
+                      if (!isRecording) {
+                        recordVideocallHandler("start");
+                      } else {
+                        recordVideocallHandler("stop");
+                      }
+                    }}
+                  />
+                  {isRecordingReady && !isRecording &&
+                    <IconButton
+                      Icon={HiDownload}
+                      disabled={false}
+                      tooltipText="Save videocall"
+                      onClickHandler={() => {
+                        downloadLinkRef.current?.click();
+                        setIsRecordingReady(false);
+                      }}
+                    />
+                  }
                 </div>
               </div>
             )}

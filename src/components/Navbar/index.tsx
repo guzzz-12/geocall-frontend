@@ -83,11 +83,11 @@ const Navbar = ({navbarType}: Props) => {
    * redirigir a la pantalla de login.
    */
   const logoutHandler = () => {
-    dispatch(api.util.resetApiState());
-    dispatch(removeCurrentUser());
-    dispatch(clearMapState());
-    dispatch(clearSelectedChatState());
+    // dispatch(api.util.resetApiState());
     socketClient.userLogout(currentUser!._id);
+    dispatch(clearMapState());
+    dispatch(removeCurrentUser());
+    dispatch(clearSelectedChatState());
     navigate("/", {replace: true});
   };
   
