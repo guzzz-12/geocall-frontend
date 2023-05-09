@@ -37,16 +37,25 @@ const VideoCallModal = () => {
   /** Indicar si el usuario llamado está online */
   const isOnline = onlineUsers.find(user => user.userId === activeCallWith?.id);
 
-  // Restablecer el state local y las variables locales al desmontar el modal
-  const clearLocalStateHandler = () => {
+  /**
+   * Restablecer el state local, las variables locales
+   * y el state global al desmontar el modal
+   */
+  const clearStateHandler = () => {
     setEndedWhileRecording(false);
     setIsRecording(false);
     setIsRecordingReady(false);
     setIsLocalStreamMuted(false);
+
     mediaRecorder = null;
     recordedChunks = [];
+
+    dispatch(setVideoCall(null));
+    dispatch(setActiveVideoCallData(null));
+    dispatch(setUserVideoCallStatus("active"));
   };
   
+
   // Inicializar los videos de los participantes de la videollamada
   useEffect(() => {
     const localVideoElement = myVideoRef.current;
@@ -83,10 +92,7 @@ const VideoCallModal = () => {
         {position: "bottom-left"}
       );
 
-      clearLocalStateHandler();
-      dispatch(setVideoCall(null));
-      dispatch(setActiveVideoCallData(null));
-      dispatch(setUserVideoCallStatus("active"));
+      clearStateHandler();
     }
   }, [videoCall, isRecording, mediaRecorder, activeCallWith]);
 
@@ -212,7 +218,7 @@ const VideoCallModal = () => {
           download={`geocall_recorded_call_with_${activeCallWith.firstName}_${Date.now()}`}
         />
 
-        {!endedWhileRecording && (videoCall.status === "calling" || videoCall.status === "pending") && (
+        {!endedWhileRecording && (videoCall.status === "calling" || videoCall.status === "pending") &&
           <div className="flex flex-col justify-center items-center gap-16">
             {/* Avatar y nombre de la persona que está llamando */}
             <div className="flex flex-col justify-center items-center gap-2">
@@ -267,7 +273,7 @@ const VideoCallModal = () => {
               </button>
             </div>
           </div>
-        )}
+        }
 
         {/* Indicar que el usuario no está disponible para llamadas y apagar la cámara */}
         {videoCall.status === "unavailable" && (
@@ -299,10 +305,7 @@ const VideoCallModal = () => {
               className="block min-w-[150px] px-3 py-2 uppercase rounded-sm bg-blue-50 hover:bg-blue-100 transition-colors"
               onClick={() => {
                 downloadLinkRef.current?.click();
-                clearLocalStateHandler();
-                dispatch(setVideoCall(null));
-                dispatch(setActiveVideoCallData(null));
-                dispatch(setUserVideoCallStatus("active"));
+                clearStateHandler();
               }}
             >
               Save and exit
@@ -310,12 +313,7 @@ const VideoCallModal = () => {
 
             <button
               className="block min-w-[150px] px-3 py-2 uppercase rounded-sm bg-blue-50 hover:bg-blue-100 transition-colors"
-              onClick={() => {
-                clearLocalStateHandler();
-                dispatch(setVideoCall(null));
-                dispatch(setActiveVideoCallData(null));
-                dispatch(setUserVideoCallStatus("active"));
-              }}
+              onClick={clearStateHandler}
             >
               Exit without saving
             </button>
