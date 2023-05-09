@@ -1,7 +1,7 @@
 import { ComponentType } from "react";
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { UserRootState } from "../../redux/store";
+import { RootState } from "../../redux/store";
 
 /**
  * HOC para no permitir acceder las rutas que NO requieran autenticación
@@ -9,7 +9,7 @@ import { UserRootState } from "../../redux/store";
  */
 const withoutAuthentication = (Component: ComponentType) => {
   return () => {
-    const {isLoading, currentUser} = useSelector((state: UserRootState) => state.user);
+    const {isLoading, currentUser} = useSelector((state: RootState) => state.user);
 
     if (!isLoading && currentUser && currentUser.emailVerified) {
       return <Navigate to="/map" replace />

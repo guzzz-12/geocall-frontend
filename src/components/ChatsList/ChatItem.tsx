@@ -1,7 +1,7 @@
 import { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { ChatMember, createOrSelectChat, setReadMessages } from "../../redux/features/chatsSlice";
-import { ChatsRootState, MapRootState, UserRootState } from "../../redux/store";
+import { RootState } from "../../redux/store";
 import { SocketEvents, socketClient } from "../../socket/socketClient";
 
 interface Props {
@@ -12,9 +12,9 @@ interface Props {
 
 const ChatItem = ({chatMember, setIsOpen, setOpenDrawer}: Props) => {
   const dispatch = useDispatch();
-  const {currentUser} = useSelector((state: UserRootState) => state.user);
-  const {onlineUsers} = useSelector((state: MapRootState) => state.map);
-  const {chats} = useSelector((state: ChatsRootState) => state.chats);
+  const {currentUser} = useSelector((state: RootState) => state.user);
+  const {onlineUsers} = useSelector((state:RootState) => state.map);
+  const {chats} = useSelector((state: RootState) => state.chats);
 
   const [isTyping, setIsTyping] = useState(false);
 

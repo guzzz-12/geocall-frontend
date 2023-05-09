@@ -1,7 +1,7 @@
 import { ComponentType } from "react";
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { UserRootState } from "../../redux/store";
+import { RootState } from "../../redux/store";
 
 /**
  * HOC para proteger las rutas que requieran
@@ -9,7 +9,7 @@ import { UserRootState } from "../../redux/store";
  */
 const withVerification = (Component: ComponentType) => {
   return () => {
-    const {isLoading, currentUser}= useSelector((state: UserRootState) => state.user);
+    const {isLoading, currentUser}= useSelector((state: RootState) => state.user);
     const token = localStorage.getItem("token");
     
     // Si no está autenticado, redirigir a la página de login

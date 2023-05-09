@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { useSelector } from "react-redux";
 import NotificationItem from "./NotificationItem";
 import { Notification } from "../../redux/features/notificationsSlice";
-import { MapRootState } from "../../redux/store";
+import { RootState } from "../../redux/store";
 
 interface Props {
   isOpen: boolean;
@@ -11,7 +11,7 @@ interface Props {
 };
 
 const NotificationsList = ({isOpen, notifications, setIsOpen}: Props) => {
-  const {onlineUsers} = useSelector((state: MapRootState) => state.map);
+  const {onlineUsers} = useSelector((state: RootState) => state.map);
 
   /**
    * Filtrar los usuarios offline de la lista de notificaciones

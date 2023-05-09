@@ -7,7 +7,7 @@ import usePeerConnection from "../hooks/usePeerConnection";
 import useLocalDbInit from "../hooks/useLocalDbInit";
 import { socketClient, SocketEvents } from "../socket/socketClient";
 import { OnlineUser, setOnlineUsers } from "../redux/features/mapSlice";
-import { MapRootState, UserRootState, VideoCallRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import { setHasMediaDevice, setIsDisconnected, setUserVideoCallStatus } from "../redux/features/userSlice";
 import { Message, deleteMessage, incomingMessage } from "../redux/features/chatsSlice";
 import { Notification, setNotifications } from "../redux/features/notificationsSlice";
@@ -24,9 +24,9 @@ import { openAlert } from "../redux/features/globalAlertSlice";
  */
 const ReconnectUser = () => {  
   const dispatch = useDispatch();
-  const {currentUser, videoCallStatus, hasMediaDevice, peerId} = useSelector((state: UserRootState) => state.user);
-  const {myLocation} = useSelector((state: MapRootState) => state.map);
-  const {videoCall, localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
+  const {currentUser, videoCallStatus, hasMediaDevice, peerId} = useSelector((state: RootState) => state.user);
+  const {myLocation} = useSelector((state: RootState) => state.map);
+  const {videoCall, localStream} = useSelector((state: RootState) => state.videoCall);
 
   // Obtener la ubicación del usuario
   useGetUserLocation();

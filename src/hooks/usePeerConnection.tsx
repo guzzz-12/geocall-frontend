@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setVideoCall, setRemoteStream, VideoCall, setActiveVideoCallData } from "../redux/features/videoCallSlice";
-import { MapRootState, UserRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import peerClient from "../utils/peerClient";
 import { SocketEvents, socketClient } from "../socket/socketClient";
 import { setPeerId, setUserVideoCallStatus } from "../redux/features/userSlice";
@@ -12,8 +12,8 @@ import { setPeerId, setUserVideoCallStatus } from "../redux/features/userSlice";
  */
 const usePeerConnection = () => {
   const dispatch = useDispatch();
-  const {currentUser, hasMediaDevice, videoCallStatus} = useSelector((state: UserRootState) => state.user);
-  const {selectedUser} = useSelector((state: MapRootState) => state.map);
+  const {currentUser, hasMediaDevice, videoCallStatus} = useSelector((state: RootState) => state.user);
+  const {selectedUser} = useSelector((state:RootState) => state.map);
 
 
   useEffect(() => {

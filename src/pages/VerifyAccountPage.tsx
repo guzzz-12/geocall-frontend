@@ -13,7 +13,7 @@ import Logo from "../components/Logo";
 import FormsWrapper from "../components/FormsWrapper";
 import Input from "../components/AuthFormInputs/Input";
 import Alert from "../components/Alert";
-import { UserRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import { socketClient } from "../socket/socketClient";
 import { api, useVerifyAccountMutation } from "../redux/api";
 import { removeCurrentUser, setCurrentUser } from "../redux/features/userSlice";
@@ -37,7 +37,7 @@ const VerifyAccountPage = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {isLoading, currentUser} = useSelector((state: UserRootState) => state.user);
+  const {isLoading, currentUser} = useSelector((state: RootState) => state.user);
 
   const [success, setSuccess] = useState<string | null>(null);
   const [verificationError, setVerificationError] = useState<string | null>(null);

@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface GlobalAlertState {
   isOpen: boolean;
@@ -14,7 +14,7 @@ const globalAlertSlice = createSlice({
   name: "globalAlert",
   initialState,
   reducers: {
-    openAlert: (state, action: {type: string, payload: {message: string}}) => {
+    openAlert: (state, action: PayloadAction<{message: string}>) => {
       state.isOpen = true;
       state.message = action.payload.message;
     },

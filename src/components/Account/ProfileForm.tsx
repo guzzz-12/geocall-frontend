@@ -11,7 +11,7 @@ import { FaInfoCircle, FaInstagram, FaFacebookSquare, FaTwitter } from "react-ic
 
 import Alert from "../Alert";
 import Input from "../AuthFormInputs/Input";
-import { UserRootState } from "../../redux/store";
+import { RootState } from "../../redux/store";
 import { FB_REGEX, IG_REGEX, NAME_REGEX, TW_REGEX, USERNAME_REGEX } from "../../utils/consts";
 import { useUpdateProfileMutation } from "../../redux/accountApi";
 import { setCurrentUser } from "../../redux/features/userSlice";
@@ -58,7 +58,7 @@ const ProfileForm = ({enabled, getProfileFormBtnsRef, setEnabled}: Props) => {
   const formButtonsRef = useRef<HTMLDivElement | null>(null);
 
   const dispatch = useDispatch();
-  const {currentUser} = useSelector((state: UserRootState) => state.user);
+  const {currentUser} = useSelector((state: RootState) => state.user);
 
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [profileUpdateSuccess, setProfileUpdateSuccess] = useState<string | null>(null);

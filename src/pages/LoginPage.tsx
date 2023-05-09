@@ -16,7 +16,7 @@ import Logo from "../components/Logo";
 import withoutAuthentication from "../components/HOC/withoutAuthentication";
 import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
 import { useLoginUserMutation } from "../redux/api";
-import { MapRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import { setCurrentUser } from "../redux/features/userSlice";
 
 const FormSchema = z.object({
@@ -38,7 +38,7 @@ const LoginPage = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {myLocation} = useSelector((state: MapRootState) => state.map);
+  const {myLocation} = useSelector((state: RootState) => state.map);
 
   const [loginError, setLoginError] = useState<string | null>(null);
 

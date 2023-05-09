@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLiveQuery } from "dexie-react-hooks";
 import { initStoredChats } from "../redux/features/chatsSlice";
 import db from "../db/GeoCallDB";
-import { UserRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 
 /**
  * Custom hook para inicializar el state global
@@ -12,7 +12,7 @@ import { UserRootState } from "../redux/store";
  */
 const useLocalDbInit = () => {
   const dispatch = useDispatch();
-  const {currentUser} = useSelector((state: UserRootState) => state.user);
+  const {currentUser} = useSelector((state: RootState) => state.user);
 
   const chats = useLiveQuery(() => {
     if (currentUser) {

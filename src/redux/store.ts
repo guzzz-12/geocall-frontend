@@ -1,41 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { MapState, mapReducer } from "./features/mapSlice";
-import { UserState, userReducer } from "./features/userSlice";
-import { ChatsState, chatsReducer } from "./features/chatsSlice";
-import { NotificationsState, notificationsReducer } from "./features/notificationsSlice";
-import { VideoCallState, videoCallReducer } from "./features/videoCallSlice";
-import { ImageModalState, imageModalReducer } from "./features/imageModalSlice";
-import { GlobalAlertState, globalAlertReducer } from "./features/globalAlertSlice";
+import { mapReducer } from "./features/mapSlice";
+import { userReducer } from "./features/userSlice";
+import { chatsReducer } from "./features/chatsSlice";
+import { notificationsReducer } from "./features/notificationsSlice";
+import { videoCallReducer } from "./features/videoCallSlice";
+import { imageModalReducer } from "./features/imageModalSlice";
+import { globalAlertReducer } from "./features/globalAlertSlice";
 import { api } from "./api";
 import { accountApi } from "./accountApi";
-
-export interface MapRootState {
-  map: MapState;
-};
-
-export interface UserRootState {
-  user: UserState;
-};
-
-export interface ChatsRootState {
-  chats: ChatsState;
-};
-
-export interface NotificationsRootState {
-  notifications: NotificationsState
-};
-
-export interface VideoCallRootState {
-  videoCall: VideoCallState
-};
-
-export interface ImageModalRootState {
-  imageModal: ImageModalState
-};
-
-export interface GlobalAlertRootState {
-  globalAlert: GlobalAlertState
-};
 
 const store = configureStore({
   reducer: {
@@ -56,5 +28,7 @@ const store = configureStore({
     }
   }).concat([api.middleware, accountApi.middleware])
 });
+
+export type RootState = ReturnType<typeof store.getState>;
 
 export default store;

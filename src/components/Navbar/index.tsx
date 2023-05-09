@@ -9,8 +9,8 @@ import Logo from "../Logo";
 import NavItems from "./NavItems";
 import Drawer from "./Drawer";
 import ChatsList from "../ChatsList";
-import { ChatsRootState, NotificationsRootState, UserRootState } from "../../redux/store";
-import { api, useGetUsersMutation } from "../../redux/api";
+import { RootState } from "../../redux/store";
+import { useGetUsersMutation } from "../../redux/api";
 import { removeCurrentUser, setChatStatus } from "../../redux/features/userSlice";
 import { clearMapState } from "../../redux/features/mapSlice";
 import { setReadNotifications } from "../../redux/features/notificationsSlice";
@@ -24,10 +24,10 @@ interface Props {
 const Navbar = ({navbarType}: Props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {chats} = useSelector((state: ChatsRootState) => state.chats);
-  const {chatStatus} = useSelector((state: UserRootState) => state.user);
-  const {currentUser} = useSelector((state: UserRootState) => state.user);
-  const {unread} = useSelector((state: NotificationsRootState) => state.notifications);
+  const {chats} = useSelector((state: RootState) => state.chats);
+  const {chatStatus} = useSelector((state: RootState) => state.user);
+  const {currentUser} = useSelector((state: RootState) => state.user);
+  const {unread} = useSelector((state: RootState) => state.notifications);
 
   const [chatsMembersIds, setChatsMembersIds] = useState<string[]>([]);
   const [chatUsersData, setChatUsersData] = useState<ChatMember[]>([]);

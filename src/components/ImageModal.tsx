@@ -2,7 +2,7 @@ import { MouseEvent, useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { TfiClose, TfiZoomIn, TfiZoomOut } from "react-icons/tfi";
 import { BsArrowsAngleContract } from "react-icons/bs";
-import { ImageModalRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import { closeImageModal } from "../redux/features/imageModalSlice";
 
 const ImageModal = () => {
@@ -10,7 +10,7 @@ const ImageModal = () => {
   const imageRef = useRef<HTMLImageElement | null>(null);
 
   const dispatch = useDispatch();
-  const {image, isOpen} = useSelector((state: ImageModalRootState) => state.imageModal);
+  const {image, isOpen} = useSelector((state: RootState) => state.imageModal);
 
   const [zoomLevel, setZoomLevel] = useState<number>(0);
   

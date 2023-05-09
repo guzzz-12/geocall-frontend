@@ -1,7 +1,7 @@
 import {useState, useEffect} from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { distance } from "@turf/turf";
-import { MapRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import { SelectedUser, UserLocation, setSelectedUser } from "../redux/features/mapSlice";
 import { useGetUserWithLocationQuery } from "../redux/api";
 
@@ -19,7 +19,7 @@ interface Props {
  */
 const useSelectedUser = ({selectedUserId, updateGlobalState}: Props) => {
   const dispatch = useDispatch();
-  const {onlineUsers, myLocation} = useSelector((state: MapRootState) => state.map);
+  const {onlineUsers, myLocation} = useSelector((state: RootState) => state.map);
 
   const [selectedUserLocation, setSelectedUserLocation] = useState<UserLocation | null>(null);
   const [selectedUserPeerId, setSelectedUserPeerId] = useState("");

@@ -9,7 +9,7 @@ import Navbar from "../components/Navbar";
 import withVerification from "../components/HOC/withVerification";
 import Profile from "../components/Account/Profile";
 import Security from "../components/Account/Security";
-import { UserRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 
 const animationProps: AnimationProps = {
   initial: "hidden",
@@ -26,7 +26,7 @@ const animationProps: AnimationProps = {
 const AccountPage = () => {
   document.title = "GeoCall App | Account";
 
-  const {currentUser} = useSelector((state: UserRootState) => state.user);
+  const {currentUser} = useSelector((state: RootState) => state.user);
 
   const [activeTab, setActiveTab] = useState(1);
 

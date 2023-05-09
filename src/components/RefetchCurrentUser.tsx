@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import Spinner from "./Spinner";
 import { api, useGetCurrentUserQuery } from "../redux/api";
 import { removeCurrentUser, setCurrentUser, setIsLoadingUser } from "../redux/features/userSlice";
-import { UserRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import { clearMapState } from "../redux/features/mapSlice";
 import { clearSelectedChatState } from "../redux/features/chatsSlice";
 import { socketClient } from "../socket/socketClient";
 
 const RefetchCurrentUser = () => {
   const dispatch = useDispatch();
-  const {isLoading: isLoadingUser, currentUser} = useSelector((state: UserRootState) => state.user);
+  const {isLoading: isLoadingUser, currentUser} = useSelector((state: RootState) => state.user);
   const currentToken = localStorage.getItem("token");
 
   // No realizar la consulta si no hay token

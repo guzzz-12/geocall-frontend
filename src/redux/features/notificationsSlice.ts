@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface Notification {
   notificationId: string;
@@ -34,7 +34,7 @@ const notificationsSlice = createSlice({
   name: "notifications",
   initialState,
   reducers: {
-    setNotifications: (state, action: {type: string, payload: Notification}) => {
+    setNotifications: (state, action: PayloadAction<Notification>) => {
       state.all = [action.payload, ...state.all];
       state.unread = [action.payload, ...state.unread];
     },

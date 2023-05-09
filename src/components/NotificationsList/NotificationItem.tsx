@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Chat, createOrSelectChat } from "../../redux/features/chatsSlice";
 import { Notification } from "../../redux/features/notificationsSlice"
 import { setSelectedUserPrefetch } from "../../redux/features/mapSlice";
-import { UserRootState } from "../../redux/store";
+import { RootState } from "../../redux/store";
 
 interface Props {
   notification: Notification;
@@ -13,7 +13,7 @@ const NotificationItem = ({notification}: Props) => {
   const {senderData, recipientData, notificationType, unread} = notification;
 
   const dispatch = useDispatch();
-  const {currentUser} = useSelector((state: UserRootState) => state.user);
+  const {currentUser} = useSelector((state: RootState) => state.user);
 
   /**
    * Si la notificación es de tipo mensaje, seleccionar

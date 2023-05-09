@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import db from "../../db/GeoCallDB";
 
 export interface ChatMember {
@@ -70,10 +70,10 @@ const chatsSlice = createSlice({
   name: "chats",
   initialState,
   reducers: {
-    initStoredChats: (state, action: {type: string, payload: Chat[]}) => {
+    initStoredChats: (state, action: PayloadAction<Chat[]>) => {
       state.chats = action.payload;
     },
-    createOrSelectChat: (state, action: {type: string, payload: {chat: Chat, otherMember: ChatMember}}) => {
+    createOrSelectChat: (state, action: PayloadAction<{chat: Chat, otherMember: ChatMember}>) => {
       const {chat: {chatId, senderId, recipientId}, otherMember} = action.payload;
 
       // Verificar si existe un chat entre ambos usuarios
@@ -125,11 +125,11 @@ const chatsSlice = createSlice({
     closeChat: (state) => {
       state.selectedChat = null;
     },
-    deleteChat: (state, action: {type: string, payload: string}) => {
+    deleteChat: (state, action: PayloadAction<string>) => {
       state.chats = state.chats.filter(chat => chat.chatId !== action.payload);
       db.chats.where("chatId").equals(action.payload).delete();
     },
-    createMessage: (state, action: {type: string, payload: {chatId: string, message: Message}}) => {
+    createMessage: (state, action: PayloadAction<{chatId: string, message: Message}>) => {
       // Buscar el chat en el state global
       const chatIndex = state.chats.findIndex(chat => chat.chatId === action.payload.chatId);
       const chat = state.chats[chatIndex];
@@ -157,7 +157,7 @@ const chatsSlice = createSlice({
       .modify((item: Chat) => item.messages.push(action.payload.message))
       .catch((err) => console.log({error_updating_chat: err.message}))
     },
-    incomingMessage: (state, action: {type: string, payload: {message: Message, localUser: string}}) => {
+    incomingMessage: (state, action: PayloadAction<{message: Message, localUser: string}>) => {
       const {
         message: {
           chatId,
@@ -219,7 +219,7 @@ const chatsSlice = createSlice({
         db.chats.add(chat);
       };
     },
-    deleteMessage: (state, action: {type: string, payload: {chatId: string, messageId: string}}) => {
+    deleteMessage: (state, action: PayloadAction<{chatId: string, messageId: string}>) => {
       const {chatId, messageId} = action.payload;
       const chatIndex = state.chats.findIndex(chat => chat.chatId === chatId);
       const chat = state.chats[chatIndex];
@@ -285,7 +285,7 @@ const chatsSlice = createSlice({
       .modify((item: Chat) => item.messages = updatedMessages)
       .catch((err) => console.log({error_deleting_message: err.message}))
     },
-    setReadMessages: (state, action: {type: string, payload: {chatId: string}}) => {
+    setReadMessages: (state, action: PayloadAction<{chatId: string}>) => {
       const chat = state.chats.find(chat => chat.chatId === action.payload.chatId);
       const chatIndex = state.chats.findIndex(chat => chat.chatId === action.payload.chatId);
 

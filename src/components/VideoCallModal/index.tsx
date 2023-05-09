@@ -7,7 +7,7 @@ import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import { HiPhoneMissedCall, HiOutlinePhoneMissedCall, HiDownload } from "react-icons/hi";
 import { FiPhoneCall } from "react-icons/fi";
 import IconButton from "../IconButton";
-import { MapRootState, VideoCallRootState } from "../../redux/store";
+import { RootState } from "../../redux/store";
 import { setActiveVideoCallData, setRemoteStream, setVideoCall } from "../../redux/features/videoCallSlice";
 import { setUserVideoCallStatus } from "../../redux/features/userSlice";
 import { SocketEvents, socketClient } from "../../socket/socketClient";
@@ -21,8 +21,8 @@ const VideoCallModal = () => {
   const downloadLinkRef = useRef<HTMLAnchorElement>(null);
 
   const dispatch = useDispatch();
-  const {videoCall, activeCallWith, localStream, remoteStream} = useSelector((state: VideoCallRootState) => state.videoCall);
-  const {onlineUsers} = useSelector((state: MapRootState) => state.map);
+  const {videoCall, activeCallWith, localStream, remoteStream} = useSelector((state: RootState) => state.videoCall);
+  const {onlineUsers} = useSelector((state: RootState) => state.map);
 
   const [isLocalStreamMuted, setIsLocalStreamMuted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);

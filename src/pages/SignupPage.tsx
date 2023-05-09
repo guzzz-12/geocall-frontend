@@ -16,7 +16,7 @@ import Logo from "../components/Logo";
 import withoutAuthentication from "../components/HOC/withoutAuthentication";
 import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from "../utils/consts";
 import { useSignupUserMutation } from "../redux/api";
-import { MapRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import { setCurrentUser } from "../redux/features/userSlice";
 
 const FormSchema = z.object({
@@ -58,7 +58,7 @@ const SignupPage = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {myLocation} = useSelector((state: MapRootState) => state.map);
+  const {myLocation} = useSelector((state: RootState) => state.map);
 
   const [signupError, setSignupError] = useState<string | null>(null);
 

@@ -17,7 +17,7 @@ import Spinner from "./Spinner";
 import SocialLink from "./Account/SocialLink";
 import useVideoCall from "../hooks/useVideoCall";
 import useSelectedUser from "../hooks/useSelectedUser";
-import { MapRootState, UserRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import { setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { createOrSelectChat, Chat } from "../redux/features/chatsSlice";
 import { openImageModal } from "../redux/features/imageModalSlice";
@@ -28,8 +28,8 @@ interface Props {
 
 const SelectedUserCard = ({selectedUserId}: Props) => {
   const dispatch = useDispatch();
-  const {currentUser, hasMediaDevice} = useSelector((state: UserRootState) => state.user);
-  const {selectedUser, onlineUsers} = useSelector((state: MapRootState) => state.map);
+  const {currentUser, hasMediaDevice} = useSelector((state: RootState) => state.user);
+  const {selectedUser, onlineUsers} = useSelector((state: RootState) => state.map);
 
   // Consultar la data del usuario seleccionado y actualizar el state global
   const {isLoading, isFetching} = useSelectedUser({selectedUserId, updateGlobalState: true});

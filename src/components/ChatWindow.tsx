@@ -13,7 +13,7 @@ import MessageItem from "./MessageItem";
 import EmojiPicker from "./EmojiPicker";
 import IconButton from "./IconButton";
 import useVideoCall from "../hooks/useVideoCall";
-import { ChatsRootState, MapRootState, UserRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import { Message, closeChat, createMessage, deleteMessage } from "../redux/features/chatsSlice";
 import { setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { Notification } from "../redux/features/notificationsSlice";
@@ -31,9 +31,9 @@ const ChatWindow = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const dispatch = useDispatch();
-  const {currentUser} = useSelector((state: UserRootState) => state.user);
-  const {selectedChat} = useSelector((state: ChatsRootState) => state.chats);
-  const {onlineUsers} = useSelector((state: MapRootState) => state.map);
+  const {currentUser} = useSelector((state: RootState) => state.user);
+  const {selectedChat} = useSelector((state: RootState) => state.chats);
+  const {onlineUsers} = useSelector((state: RootState) => state.map);
 
   const [messageText, setMessageText] = useState("");
   const [imageData, setImageData] = useState<string | null>(null);

@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { useSelector } from "react-redux";
 import ChatItem from "./ChatItem";
 import ChatItemSkeleton from "./ChatItemSkeleton";
-import { ChatsRootState } from "../../redux/store";
+import { RootState } from "../../redux/store";
 import { ChatMember } from "../../redux/features/chatsSlice";
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
 };
 
 const ChatsList = ({isOpen, chatUsersData, isLoading, isError, setIsOpen, setOpenDrawer}: Props) => {
-  const {chats} = useSelector((state: ChatsRootState) => state.chats);
+  const {chats} = useSelector((state: RootState) => state.chats);
 
   if (!isOpen) {
     return null;

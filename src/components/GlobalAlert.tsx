@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
 import { AnimatePresence, motion} from "framer-motion";
-import { GlobalAlertRootState, UserRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 
 const GlobalAlert = () => {
-  const {isAuth} = useSelector((state: UserRootState) => state.user);
-  const {isOpen, message} = useSelector((state: GlobalAlertRootState) => state.globalAlert);
+  const {isAuth} = useSelector((state: RootState) => state.user);
+  const {isOpen, message} = useSelector((state: RootState) => state.globalAlert);
 
   if (!isAuth) {
     return null

@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "../api";
 
 export interface UserLocation {
@@ -13,16 +13,6 @@ export interface OnlineUser {
   peerId: string;
   status: UserAvailability;
   location: UserLocation
-};
-
-interface LocationAction {
-  type: string;
-  payload: UserLocation;
-};
-
-interface OnlineUsersAction {
-  type: string;
-  payload: OnlineUser[];
 };
 
 export interface SelectedUser {
@@ -59,22 +49,22 @@ const mapSlice = createSlice({
   name: "map",
   initialState,
   reducers: {
-    setWaitingLocation: (state, action: {type: string, payload: boolean}) => {
+    setWaitingLocation: (state, action: PayloadAction<boolean>) => {
       state.waitingLocation = action.payload;
     },
-    setLocationError: (state, action: {type: string, payload: string | null}) => {
+    setLocationError: (state, action: PayloadAction<string | null>) => {
       state.locationError = action.payload;
     },
-    setMyLocation: (state, action: LocationAction) => {
+    setMyLocation: (state, action: PayloadAction<UserLocation>) => {
       state.myLocation = action.payload;
     },
-    setOnlineUsers: (state, action: OnlineUsersAction) => {
+    setOnlineUsers: (state, action: PayloadAction<OnlineUser[]>) => {
       state.onlineUsers = action.payload;
     },
-    setSelectedUserPrefetch: (state, action: {type: string, payload: {selectedUserId: string | null}}) => {
+    setSelectedUserPrefetch: (state, action: PayloadAction<{selectedUserId: string | null}>) => {
       state.selectedUserPrefetch = action.payload;
     },
-    setSelectedUser: (state, action: {type: string, payload: SelectedUser | null}) => {
+    setSelectedUser: (state, action: PayloadAction<SelectedUser | null>) => {
       state.selectedUser = action.payload;
     },
     clearMapState: (state) => {

@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface ImageModalState {
   isOpen: boolean;
@@ -14,7 +14,7 @@ const imageModalSlice = createSlice({
   name: "imageModal",
   initialState,
   reducers: {
-    openImageModal: (state, action: {type: string, payload: string}) => {
+    openImageModal: (state, action: PayloadAction<string>) => {
       state.isOpen = true;
       state.image = action.payload;
     },

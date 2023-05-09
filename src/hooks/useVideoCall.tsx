@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { MediaConnection } from "peerjs";
 import { toast } from "react-toastify";
 import useSelectedUser from "./useSelectedUser";
-import { ChatsRootState, MapRootState, UserRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import { VideoCallData, setActiveVideoCallData, setLocalStream, setRemoteStream, setVideoCall } from "../redux/features/videoCallSlice";
 import { setUserVideoCallStatus } from "../redux/features/userSlice";
 import { socketClient } from "../socket/socketClient";
@@ -15,9 +15,9 @@ import { getLocalStream } from "../utils/getLocalStream";
  */
 const useVideoCall = () => {
   const dispatch = useDispatch();
-  const {currentUser, hasMediaDevice} = useSelector((state: UserRootState) => state.user);
-  const {selectedUser, onlineUsers} = useSelector((state: MapRootState) => state.map);
-  const {selectedChat} = useSelector((state: ChatsRootState) => state.chats);
+  const {currentUser, hasMediaDevice} = useSelector((state: RootState) => state.user);
+  const {selectedUser, onlineUsers} = useSelector((state: RootState) => state.map);
+  const {selectedChat} = useSelector((state: RootState) => state.chats);
 
   // Extraer la id y la data del otro usuario de la conversación
   let selectedUserId: string | null = null;

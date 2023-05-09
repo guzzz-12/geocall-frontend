@@ -12,7 +12,7 @@ import withVerification from "../components/HOC/withVerification";
 import ErrorMessage from "../components/ErrorMessage";
 import Spinner from "../components/Spinner";
 import InfoBanner from "../components/InfoBanner";
-import { MapRootState, UserRootState } from "../redux/store";
+import { RootState } from "../redux/store";
 import { OnlineUser, setSelectedUser, setSelectedUserPrefetch } from "../redux/features/mapSlice";
 import { closeChat } from "../redux/features/chatsSlice";
 
@@ -35,8 +35,8 @@ const MapPage = () => {
   document.title = "GeoCall App | Home";
 
   const dispatch = useDispatch();
-  const {waitingLocation, locationError, onlineUsers, myLocation, selectedUser, selectedUserPrefetch: {selectedUserId}} = useSelector((state: MapRootState) => state.map);
-  const {currentUser} = useSelector((state: UserRootState) => state.user);
+  const {waitingLocation, locationError, onlineUsers, myLocation, selectedUser, selectedUserPrefetch: {selectedUserId}} = useSelector((state: RootState) => state.map);
+  const {currentUser} = useSelector((state: RootState) => state.user);
 
   // Verificar si el usuario está offline
   const isUserOffline = !onlineUsers.find(user => user.userId === selectedUserId);

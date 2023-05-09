@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "../api";
 import { UserAvailability } from "./mapSlice";
 
@@ -28,7 +28,7 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setCurrentUser: (state, action: {type: string, payload: User}) => {
+    setCurrentUser: (state, action: PayloadAction<User>) => {
       state.isAuth = true;
       state.currentUser = action.payload;
       state.isLoading = false;
@@ -39,22 +39,22 @@ const userSlice = createSlice({
       state.currentUser = null;
       localStorage.clear();
     },
-    setPeerId: (state, action: {type: string, payload: string | null}) => {
+    setPeerId: (state, action: PayloadAction<string | null>) => {
       state.peerId = action.payload;
     },
-    setHasMediaDevice: (state, action: {type: string, payload: boolean}) => {
+    setHasMediaDevice: (state, action: PayloadAction<boolean>) => {
       state.hasMediaDevice = action.payload;
     },
-    setUserVideoCallStatus: (state, action: {type: string, payload: "active" | "busy"}) => {
+    setUserVideoCallStatus: (state, action: PayloadAction<"active" | "busy">) => {
       state.videoCallStatus = action.payload;
     },
-    setChatStatus: (state, action: {type: string, payload: UserAvailability}) => {
+    setChatStatus: (state, action: PayloadAction<UserAvailability>) => {
       state.chatStatus = action.payload;
     },
-    setIsLoadingUser: (state, action: {type: string, payload: boolean}) => {
+    setIsLoadingUser: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
-    setIsDisconnected: (state, action: {type: string, payload: boolean}) => {
+    setIsDisconnected: (state, action: PayloadAction<boolean>) => {
       state.isDisconnected = action.payload
     }
   }

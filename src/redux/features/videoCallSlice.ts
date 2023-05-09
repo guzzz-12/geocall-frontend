@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { MediaConnection } from "peerjs";
 
 export interface VideoCall {
@@ -43,16 +43,16 @@ const videoCallSlice = createSlice({
   name: "videoCall",
   initialState,
   reducers: {
-    setVideoCall: (state, action: {type: string, payload: VideoCall | null}) => {
+    setVideoCall: (state, action: PayloadAction<VideoCall | null>) => {
       state.videoCall = action.payload;
     },
-    setLocalStream: (state, action: {type: string, payload: MediaStream | null}) => {
+    setLocalStream: (state, action: PayloadAction<MediaStream | null>) => {
       state.localStream = action.payload;
     },
-    setRemoteStream: (state, action: {type: string, payload: MediaStream | null}) => {
+    setRemoteStream: (state, action: PayloadAction<MediaStream | null>) => {
       state.remoteStream = action.payload;
     },
-    setActiveVideoCallData: (state, action: {type:string, payload: ActiveCallWith | null}) => {
+    setActiveVideoCallData: (state, action: PayloadAction<ActiveCallWith | null>) => {
       state.activeCallWith = action.payload;
     }
   }
