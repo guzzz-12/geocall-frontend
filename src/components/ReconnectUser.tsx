@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -27,8 +27,6 @@ const ReconnectUser = () => {
   const {currentUser, videoCallStatus, hasMediaDevice, peerId} = useSelector((state: UserRootState) => state.user);
   const {myLocation} = useSelector((state: MapRootState) => state.map);
   const {videoCall, localStream} = useSelector((state: VideoCallRootState) => state.videoCall);
-
-  const [disconnected, setDisconnected] = useState(false);
 
   // Obtener la ubicación del usuario
   useGetUserLocation();
@@ -66,26 +64,6 @@ const ReconnectUser = () => {
         console.log(err);
         dispatch(setHasMediaDevice(false));
       });
-    };
-
-    // Escuchar evento de usuarios online
-    // para actualizar el state en tiempo real
-    socketClient.socket.on(SocketEvents.GET_ONLINE_USERS, (users: OnlineUser[]) => {
-      dispatch(setOnlineUsers(users));
-    });
-
-    // Escuchar evento de desconexión con el servidor de socket
-    socketClient.socket.on("disconnect", () => {
-      console.log("User disconnected");
-      dispatch(setIsDisconnected(true));
-      dispatch(openAlert({
-        message: "Your realtime connection is currently offline. <br /> Refresh the page to go back online."
-      }))
-    });
-
-    return () => {
-      socketClient.socket.off(SocketEvents.GET_ONLINE_USERS);
-      socketClient.socket.off("disconnect");
     };
   }, []);
 
@@ -171,13 +149,28 @@ const ReconnectUser = () => {
   }, [videoCall, localStream]);
 
 
-  /*------------------------------------------------*/
-  // Eventos de mensajes entrantes y notificaciones
-  /*------------------------------------------------*/
+  /*----------------------------------------------------------------*/
+  // Eventos de usuarios online, mensajes entrantes y notificaciones
+  /*----------------------------------------------------------------*/
   useEffect(() => {
-    // Escuchar el evento de nuevo mensaje entrante
-    // y actualizar el state de los mensajes del chat correspondiente
     if (currentUser){
+      // Escuchar evento de usuarios online
+      // para actualizar el state en tiempo real
+      socketClient.socket.on(SocketEvents.GET_ONLINE_USERS, (users: OnlineUser[]) => {
+        dispatch(setOnlineUsers(users));
+      });
+
+      // Escuchar evento de desconexión con el servidor de socket
+      socketClient.socket.on("disconnect", () => {
+        console.log("User disconnected");
+        dispatch(setIsDisconnected(true));
+        dispatch(openAlert({
+          message: "Your realtime connection is currently offline. <br /> Refresh the page to go back online."
+        }))
+      });
+
+      // Escuchar el evento de nuevo mensaje entrante
+      // y actualizar el state de los mensajes del chat correspondiente
       socketClient.socket.on(SocketEvents.NEW_MESSAGE, (newMessage: Message) => {
         const {senderData: {avatar, firstName}} = newMessage;
         
@@ -223,6 +216,8 @@ const ReconnectUser = () => {
       // Remover los listener al desmontar el componente
       // para evitar disparar los eventos múltiples veces
       return () => {
+        socketClient.socket.off(SocketEvents.GET_ONLINE_USERS);
+        socketClient.socket.off("disconnect");
         socketClient.socket.off(SocketEvents.NEW_MESSAGE);
         socketClient.socket.off(SocketEvents.DELETED_MESSAGE);
         socketClient.socket.off(SocketEvents.NEW_NOTIFICATION);

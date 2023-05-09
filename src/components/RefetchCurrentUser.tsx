@@ -40,7 +40,14 @@ const RefetchCurrentUser = () => {
     
     if (!currentUser) {
       dispatch(setIsLoadingUser(false));
-    }
+    };
+
+    // Agregar el header de autorización de Socket.io
+    if (currentUser) {
+      socketClient.socket.io.opts.extraHeaders = {auth: currentUser.token};
+      socketClient.socket.disconnect().connect();
+    };
+
   }, [isError, currentUser]);
 
 
