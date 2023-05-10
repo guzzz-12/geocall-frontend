@@ -76,6 +76,18 @@ export const api = createApi({
         },
         invalidatesTags: ["User"]
       }),
+      googleLogin: build.mutation<User, {googleTokenId: string}>({
+        query: ({googleTokenId}) => ({
+          url: "/users/google-signin",
+          method: "POST",
+          body: {googleTokenId}
+        }),
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        },
+        invalidatesTags: ["User"]
+      }),
       logoutUser: build.mutation<void, void>({
         query: () => ({
           url: "/users/logout",
@@ -169,6 +181,7 @@ export const {
   useGetCurrentUserQuery,
   useLoginUserMutation,
   useSignupUserMutation,
+  useGoogleLoginMutation,
   useLogoutUserMutation,
   useGetUserQuery,
   useGetUsersMutation,

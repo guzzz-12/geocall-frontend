@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -14,10 +14,12 @@ import Input from "../components/AuthFormInputs/Input";
 import Alert from "../components/Alert";
 import Logo from "../components/Logo";
 import withoutAuthentication from "../components/HOC/withoutAuthentication";
-import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
+import useGoogleAuth from "../hooks/useGoogleAuth";
 import { useLoginUserMutation } from "../redux/api";
 import { RootState } from "../redux/store";
 import { setCurrentUser } from "../redux/features/userSlice";
+import { PASSWORD_REGEX, INVALID_PASSWORD_MSG } from "../utils/consts";
+
 
 const FormSchema = z.object({
   email: z
@@ -36,13 +38,20 @@ export type LoginFormSchemaType = z.infer<typeof FormSchema>;
 const LoginPage = () => {
   document.title = "GeoCall App | Login";
 
+  const googleBtnRef = useRef<HTMLButtonElement>(null);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {myLocation} = useSelector((state: RootState) => state.map);
 
   const [loginError, setLoginError] = useState<string | null>(null);
 
+  // Iniciar sesión con credenciales
   const [loginUser, {isLoading}] = useLoginUserMutation();
+
+  // Iniciar sesión con Google
+  const {googleAuthError, loadingGoogleAuth} = useGoogleAuth({btnRef: googleBtnRef});
+
   const methods = useForm<LoginFormSchemaType>({resolver: zodResolver(FormSchema)});
 
   /*------------------------------*/
@@ -85,7 +94,7 @@ const LoginPage = () => {
           </h1>
 
           <AnimatePresence>
-            {loginError && (
+            {(loginError || googleAuthError) && (
               <motion.div
                 key="alert"
                 className="-z-1"
@@ -97,7 +106,7 @@ const LoginPage = () => {
                 <Alert
                   key="alert"
                   type="error"
-                  message={loginError}
+                  message={loginError ? loginError : googleAuthError!}
                   dismissAlert={() => setLoginError(null)}
                 />
               </motion.div>
@@ -110,7 +119,7 @@ const LoginPage = () => {
             type="email"
             name="email"
             placeholder="Your email address"
-            disabled={isLoading}
+            disabled={isLoading || loadingGoogleAuth}
             Icon={AiOutlineMail}
           />
           {/* Password input */}
@@ -119,18 +128,31 @@ const LoginPage = () => {
             type="password"
             name="password"
             placeholder="Your password"
-            disabled={isLoading}
+            disabled={isLoading || loadingGoogleAuth}
             Icon={HiOutlineKey}
           />
           <button
             className="auth-btn"
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || loadingGoogleAuth}
           >
             <span className="block mx-auto">
               Login
             </span>
           </button>
+
+          <div className="flex justify-between items-center gap-5 w-full">
+            <div className="w-full h-[1px] bg-gray-300" />
+            <p className="text-gray-700">OR</p>
+            <div className="w-full h-[1px] bg-gray-300" />
+          </div>
+          
+          <button
+            ref={googleBtnRef}
+            className="mx-auto"
+            type="button"
+            disabled={loadingGoogleAuth}
+          />
         </form>
       </FormProvider>
 
@@ -140,7 +162,7 @@ const LoginPage = () => {
           <Link 
             className="underline"
             to="/signup"
-            onClick={(e) => isLoading && e.preventDefault()}
+            onClick={(e) => (isLoading || loadingGoogleAuth) && e.preventDefault()}
           >
             Create account
           </Link>
@@ -150,7 +172,7 @@ const LoginPage = () => {
           <Link
             className="underline"
             to="/forgot-password"
-            onClick={(e) => isLoading && e.preventDefault()}
+            onClick={(e) => (isLoading || loadingGoogleAuth) && e.preventDefault()}
           >
             Reset your password
           </Link>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom"
 import { useForm, FormProvider } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -18,6 +18,7 @@ import { NAME_REGEX, PASSWORD_REGEX, INVALID_PASSWORD_MSG, USERNAME_REGEX } from
 import { useSignupUserMutation } from "../redux/api";
 import { RootState } from "../redux/store";
 import { setCurrentUser } from "../redux/features/userSlice";
+import useGoogleAuth from "../hooks/useGoogleAuth";
 
 const FormSchema = z.object({
   firstName: z
@@ -56,6 +57,8 @@ export type SignupFormSchemaType = z.infer<typeof FormSchema>;
 const SignupPage = () => {
   document.title = "GeoCall App | Signup";
 
+  const googleBtnRef = useRef<HTMLButtonElement>(null);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {myLocation} = useSelector((state: RootState) => state.map);
@@ -64,7 +67,11 @@ const SignupPage = () => {
 
   const methods = useForm<SignupFormSchemaType>({resolver: zodResolver(FormSchema)});
 
+  // Registrarse con email/password
   const [signupUser, {isLoading}] = useSignupUserMutation();
+
+  // Iniciar sesión con Google
+  const {googleAuthError, loadingGoogleAuth} = useGoogleAuth({btnRef: googleBtnRef});
 
 
   /*----------------------------------*/
@@ -107,7 +114,7 @@ const SignupPage = () => {
           </h1>
 
           <AnimatePresence>
-            {signupError && (
+            {(signupError || googleAuthError) && (
               <motion.div
                 key="alert"
                 className="-z-1"
@@ -119,7 +126,7 @@ const SignupPage = () => {
               <Alert
                 key="alert"
                 type="error"
-                message={signupError}
+                message={signupError ? signupError : googleAuthError!}
                 dismissAlert={() => setSignupError(null)}
               />
             </motion.div>
@@ -131,7 +138,7 @@ const SignupPage = () => {
             type="text"
             name="firstName"
             placeholder="Your first name"
-            disabled={isLoading}
+            disabled={isLoading || loadingGoogleAuth}
             Icon={AiOutlineUser}
           />
 
@@ -140,7 +147,7 @@ const SignupPage = () => {
             type="text"
             name="lastName"
             placeholder="Your last name"
-            disabled={isLoading}
+            disabled={isLoading || loadingGoogleAuth}
             Icon={AiOutlineUser}
           />
 
@@ -149,7 +156,7 @@ const SignupPage = () => {
             type="text"
             name="username"
             placeholder="Your username"
-            disabled={isLoading}
+            disabled={isLoading || loadingGoogleAuth}
             Icon={AiOutlineUser}
           />
 
@@ -158,7 +165,7 @@ const SignupPage = () => {
             type="email"
             name="email"
             placeholder="Your email address"
-            disabled={isLoading}
+            disabled={isLoading || loadingGoogleAuth}
             Icon={AiOutlineMail}
           />
 
@@ -167,7 +174,7 @@ const SignupPage = () => {
             type="password"
             name="password"
             placeholder="Your password"
-            disabled={isLoading}
+            disabled={isLoading || loadingGoogleAuth}
             Icon={HiOutlineKey}
           />
 
@@ -176,19 +183,32 @@ const SignupPage = () => {
             type="password"
             name="passwordConfirm"
             placeholder="Confirm your password"
-            disabled={isLoading}
+            disabled={isLoading || loadingGoogleAuth}
             Icon={HiOutlineKey}
           />
 
           <button
             className="auth-btn"
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || loadingGoogleAuth}
           >
             <span className="block mx-auto">
               Sign up
             </span>
           </button>
+
+          <div className="flex justify-between items-center gap-5 w-full">
+            <div className="w-full h-[1px] bg-gray-300" />
+            <p className="text-gray-700">OR</p>
+            <div className="w-full h-[1px] bg-gray-300" />
+          </div>
+          
+          <button
+            ref={googleBtnRef}
+            className="mx-auto"
+            type="button"
+            disabled={loadingGoogleAuth}
+          />
         </form>
       </FormProvider>
 
@@ -198,7 +218,7 @@ const SignupPage = () => {
           <Link
             className="underline"
             to="/login"
-            onClick={(e) => isLoading && e.preventDefault()}
+            onClick={(e) => (isLoading || loadingGoogleAuth) && e.preventDefault()}
           >
             Login instead
           </Link>
