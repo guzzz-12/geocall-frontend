@@ -119,6 +119,7 @@ const SelectedUserCard = ({selectedUserId}: Props) => {
                 className="block w-full h-full object-cover object-center hover:opacity-75 transition-opacity cursor-pointer"
                 src={selectedUser.user.avatar}
                 alt={selectedUser.user.firstName}
+                referrerPolicy="no-referrer"
                 data-tooltip-id="open-image-tooltip"
                 data-tooltip-content="Open image"
               />

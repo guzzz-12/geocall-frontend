@@ -30,8 +30,9 @@ const NavItems = (props: Props) => {
       >
         <span className="block w-11 h-11 xs:w-8 xs:h-8 flex-shrink-0 rounded-full border-2 border-gray-400 overflow-hidden">
           <img
+            className="block w-full h-full object-cover object-center"
             src={currentUser!.avatar}
-            className="block w-full h-full object-cover object-center "
+            referrerPolicy="no-referrer"
           />
         </span>
         <p className="max-w-[100%] text-base font-bold text-gray-600 text-ellipsis whitespace-nowrap">

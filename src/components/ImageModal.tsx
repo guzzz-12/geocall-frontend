@@ -134,6 +134,7 @@ const ImageModal = () => {
           className="absolute block w-full h-full object-contain object-center origin-center transition-transform"
           src={image}
           alt="File attachment"
+          referrerPolicy="no-referrer"
           draggable={false}
           onMouseDown={onMouseDownHandler}
           onMouseUp={() => setIsDragging(false)}

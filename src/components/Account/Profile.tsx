@@ -200,6 +200,7 @@ const Profile = ({currentUser}: Props) => {
                 className="block w-full h-full object-cover object-center cursor-pointer transition-opacity hover:opacity-75"
                 src={imagePreview || avatar}
                 alt={username}
+                referrerPolicy="no-referrer"
               />
             </div>
 
