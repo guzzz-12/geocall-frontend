@@ -207,7 +207,7 @@ const SignupPage = () => {
             ref={googleBtnRef}
             className="mx-auto"
             type="button"
-            disabled={loadingGoogleAuth}
+            disabled={isLoading || loadingGoogleAuth}
           />
         </form>
       </FormProvider>
