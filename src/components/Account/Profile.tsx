@@ -261,7 +261,7 @@ const Profile = ({currentUser}: Props) => {
 
           {/* Contenedor del texto */}
           <div className="flex flex-col justify-start items-start gap-1">
-            <div className="flex justify-start items-baseline gap-2 mb-2 text-3xl font-bold">
+            <div className="flex justify-center items-baseline gap-2 w-full mb-2 text-3xl font-bold">
               <span>{firstName}</span>
               <span>{lastName}</span>
               <GoVerified
