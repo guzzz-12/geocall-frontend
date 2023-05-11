@@ -12,7 +12,7 @@ import DeleteChatsForm from "./DeleteChatsForm";
 import DeleteAccountForm from "./DeleteAccountForm";
 import EmailChangeForm from "./EmailChangeForm";
 import { INVALID_PASSWORD_MSG, PASSWORD_REGEX } from "../../utils/consts";
-import { useChangeEmailMutation, useChangePasswordMutation, useDeleteAccountMutation } from "../../redux/accountApi";
+import { useChangeEmailMutation, useChangePasswordMutation, useDeleteAccountMutation, useDeleteGoogleAccountMutation } from "../../redux/accountApi";
 import { setCurrentUser, removeCurrentUser } from "../../redux/features/userSlice";
 import { socketClient } from "../../socket/socketClient";
 import { User, useCheckPasswordMutation } from "../../redux/api";
@@ -100,6 +100,7 @@ const Security = ({currentUser}: Props) => {
   const [changePassword] = useChangePasswordMutation();
   const [checkPassword] = useCheckPasswordMutation();
   const [deleteAccount] = useDeleteAccountMutation();
+  const [deleteGoogleAccount] = useDeleteGoogleAccountMutation();
 
   const passwordMethods = useForm<PasswordFormSchemaType>({resolver: zodResolver(PasswordFormSchema)});
   const emailMethods = useForm<EmailFormSchemaType>({resolver: zodResolver(EmailFormSchema)});
@@ -154,12 +155,14 @@ const Security = ({currentUser}: Props) => {
   /**
    * Eliminar todo el historial de chats del usuario.
    */
-  const onDeleteChatsHandler = async (values: DeleteChatsFormSchemaType) => {
+  const onDeleteChatsHandler = async (values?: DeleteChatsFormSchemaType) => {
     setDeletingChats(true);
     setDeleteChatsError(null);
 
     try {
-      await checkPassword(values).unwrap();
+      if (currentUser.provider === "credentials" && values) {
+        await checkPassword(values).unwrap();
+      };
 
       await db.chats.where("localUser").equals(currentUser._id).delete();
 
@@ -177,12 +180,20 @@ const Security = ({currentUser}: Props) => {
   /**
    * Confirmar la eliminación de la cuenta.
    */
-  const onDeleteAccountHandler = async (values: DeleteAccountFormSchemaType) => {
+  const onDeleteAccountHandler = async (values?: DeleteAccountFormSchemaType) => {
     setDeletingAccount(true);
     setDeleteAccountError(null);
 
     try {
-      await deleteAccount(values).unwrap();
+      // Borrar la cuenta si es de tipo credentials
+      if (currentUser.provider === "credentials" && values) {
+        await deleteAccount(values).unwrap();
+      }
+      
+      // Borrar la cuenta si es de tipo Google
+      if (currentUser.provider === "google") {
+        await deleteGoogleAccount().unwrap();
+      };
 
       socketClient.userLogout(currentUser!._id);
 
@@ -200,6 +211,7 @@ const Security = ({currentUser}: Props) => {
     <ContentWrapper sectionTitle="Security settings">
       {/* Formulario de cambio de contraseña */}
       <PasswordChangeForm
+        authProvider={currentUser.provider}
         animationProps={animationProps}
         methods={passwordMethods}
         success={passwordChangeSuccess}
@@ -212,6 +224,7 @@ const Security = ({currentUser}: Props) => {
 
       {/* Formulario de cambio de email */}
       <EmailChangeForm
+        authProvider={currentUser.provider}
         animationProps={animationProps}
         methods={emailMethods}
         success={emailChangeSuccess}
@@ -224,6 +237,7 @@ const Security = ({currentUser}: Props) => {
 
       {/* Formulario de eliminación de cuenta */}
       <DeleteChatsForm
+        authProvider={currentUser.provider}
         animationProps={animationProps}
         methods={deleteChatsMethods}
         error={deleteChatsError}
@@ -234,6 +248,7 @@ const Security = ({currentUser}: Props) => {
 
       {/* Formulario de eliminación de cuenta */}
       <DeleteAccountForm
+        authProvider={currentUser.provider}
         animationProps={animationProps}
         methods={deleteAccountMethods}
         error={deleteAccountError}
