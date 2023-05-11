@@ -260,10 +260,11 @@ const Profile = ({currentUser}: Props) => {
           </div>
 
           {/* Contenedor del texto */}
-          <div className="flex flex-col justify-start items-start gap-1">
-            <div className="flex justify-center items-baseline gap-2 w-full mb-2 text-3xl font-bold">
-              <span>{firstName}</span>
-              <span>{lastName}</span>
+          <div className="flex flex-col justify-start items-center gap-1 w-full">
+            <div className="flex justify-center items-baseline gap-2 w-full mb-2 text-3xl font-bold overflow-hidden">
+              <p className="max-w-[75%] text-ellipsis">
+                {firstName} {lastName}
+              </p>
               <GoVerified
                 style={{display: emailVerified ? "block" : "none"}}
                 className="w-6 h-6 fill-blue-600"
@@ -271,16 +272,18 @@ const Profile = ({currentUser}: Props) => {
                 data-tooltip-content="Account verified"
               />
             </div>
-            <p className="flex justify-start items-center gap-2 text-base text-gray-900">
-              <HiAtSymbol className="w-4 h-4 opacity-60" /> {username}
-            </p>
-            <p className="flex justify-start items-center gap-2 text-base text-gray-900">
-              <FiMail className="w-4 h-4 opacity-60" /> {email}
-            </p>
-            <p className="flex justify-start items-center gap-2 text-base text-gray-900">
-              <BsCalendarDay className="w-4 h-4 opacity-60" />
-              {`In GeoCall since ${dayjs(createdAt).format("MMM DD, YYYY")}`}
-            </p>
+            <div className="flex flex-col justify-center items-center w-[300px]">
+              <p className="w-full flex-shrink-0 mb-2 text-base text-left text-gray-900 text-ellipsis">
+                <HiAtSymbol className="inline-block w-5 h-5 mr-2 opacity-50" /> {username}
+              </p>
+              <p className="w-full flex-shrink-0 mb-2 text-base text-left text-gray-900 text-ellipsis">
+                <FiMail className="inline-block w-5 h-5 mr-2 opacity-50" /> {email}
+              </p>
+              <p className="w-full flex-shrink-0 mb-2 text-base text-left text-gray-900 text-ellipsis">
+                <BsCalendarDay className="inline-block w-5 h-5 mr-2 opacity-50" />
+                {`In GeoCall since ${dayjs(createdAt).format("MMM DD, YYYY")}`}
+              </p>
+            </div>
           </div>
 
           <div className="flex justify-center items-center gap-10 w-full max-[500px]:flex-col max-[500px]:gap-2">
