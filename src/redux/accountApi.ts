@@ -93,6 +93,16 @@ export const accountApi = createApi({
           const message = (response.data as {message: string}).message;
           throw Error(message);
         }
+      }),
+      deleteGoogleAccount: build.mutation<void, void>({
+        query: () => ({
+          url: "/delete-google-account",
+          method: "DELETE"
+        }),
+        transformErrorResponse: (response) => {
+          const message = (response.data as {message: string}).message;
+          throw Error(message);
+        }
       })
     }
   }
@@ -103,5 +113,6 @@ export const {
   useUpdateProfileMutation,
   useChangeEmailMutation,
   useChangePasswordMutation,
-  useDeleteAccountMutation
+  useDeleteAccountMutation,
+  useDeleteGoogleAccountMutation
 } = accountApi;

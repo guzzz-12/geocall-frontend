@@ -7,6 +7,8 @@ import { DeleteChatsFormSchemaType } from "../components/Account/Security";
 
 const IS_DEV = import.meta.env.DEV;
 
+export type AuthProvider = "credentials" | "google";
+
 export interface User {
   _id: string;
   firstName: string;
@@ -16,6 +18,7 @@ export interface User {
   emailVerified: boolean;
   avatar: string;
   avatarPublicId: string;
+  provider: AuthProvider;
   socialLinks: [{
     _id: string;
     name: "instagram" | "facebook" | "twitter";
