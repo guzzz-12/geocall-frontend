@@ -6,8 +6,10 @@ import FormWrapper from "./FormWrapper";
 import Alert from "../Alert";
 import Input from "../AuthFormInputs/Input";
 import { PasswordFormSchemaType } from "./Security";
+import { AuthProvider } from "../../redux/api";
 
 interface Props {
+  authProvider: AuthProvider;
   success: string | null;
   error: string | null;
   loading: boolean;
@@ -18,7 +20,12 @@ interface Props {
   setError: Dispatch<SetStateAction<string | null>>;
 };
 
-const PasswordChangeForm = ({success, error, setSuccess, setError, loading, animationProps, methods, onSubmitHandler}: Props) => {
+const PasswordChangeForm = ({authProvider, success, error, setSuccess, setError, loading, animationProps, methods, onSubmitHandler}: Props) => {
+  // No mostrar el formulario si no es usuario registrado con email/password
+  if (authProvider !== "credentials") {
+    return null;
+  };
+
   return (
     <FormProvider {...methods}>
       <FormWrapper onSubmitHandler={methods.handleSubmit(onSubmitHandler)}>
