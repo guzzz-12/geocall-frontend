@@ -24,6 +24,7 @@ const AccountPage = lazy(() => import("./pages/AccountPage"));
 const VerifiAccountPage = lazy(() => import("./pages/VerifyAccountPage"));
 const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const NotFoundPage = lazy(() => import("./pages/404"));
 
 const App = () => {
   // Verificar la cantidad de espacio consumido y disponible
@@ -62,7 +63,7 @@ const App = () => {
                   <Route path="/verify-account" element={<VerifiAccountPage />} />
                   <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                   <Route path="/reset-password" element={<ResetPasswordPage />} />
-                  <Route path="*" element={<h1>Page not found...</h1>} />
+                  <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </BrowserRouter>
               <ChatWindow />
