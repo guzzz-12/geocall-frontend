@@ -101,11 +101,11 @@ const SignupPage = () => {
     <FormsWrapper>
       <FormProvider {...methods}>
         <div className="mb-5">
-          <Logo size="lg" />
+          <Logo size="md" />
         </div>
 
         <form
-          className="flex flex-col justify-between gap-5 w-[450px] p-5 rounded bg-white shadow-lg"
+          className="flex flex-col justify-between gap-5 w-full max-w-[450px] p-5 rounded bg-white shadow-lg"
           noValidate
           onSubmit={methods.handleSubmit(onSubmitHandler)}
         >
