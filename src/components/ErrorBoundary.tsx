@@ -24,7 +24,7 @@ class ErrorBoundary extends Component<Props, State> {
     if(this.state.hasError) {
       return (
         <section
-          style={{backgroundImage: "url(/img/error-boundary-bg.jpg)"}}
+          style={{backgroundImage: "url(/img/error-boundary-bg.webp)"}}
           className="flex flex-col justify-end items-center w-screen h-screen px-5 bg-cover bg-top bg-no-repeat"
         >
           <div className="flex flex-col justify-center items-center gap-4 max-w-[500px] h-[40vh] text-center -translate-y-4">

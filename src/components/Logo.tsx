@@ -31,7 +31,7 @@ const Logo = ({size="sm"}: Props) => {
       <img
         style={{width: dimensions.img, height: dimensions.img}}
         className="block"
-        src="/world-map.png"
+        src="/world-map.webp"
         alt="World map icon"
       />
       <h1
