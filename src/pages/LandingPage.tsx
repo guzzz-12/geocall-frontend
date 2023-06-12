@@ -38,20 +38,20 @@ const LandingPage = () => {
             <p className="mb-2 text-4xl sm:text-5xl text-left font-bold leading-none text-gray-800">
               Connect with anyone, anywhere in the world!
             </p>
-            <p className="mb-4 text-lg font-normal text-black xs:mb-8 xs:text-xl tablet:text-gray-800">
+            <p className="mb-4 text-base font-normal text-black xs:mb-8 xs:text-xl tablet:text-gray-800">
               Connect with people from all over the world and experience new cultures, languages and ideas. Meet new people and stay in touch with friends and family, no matter where they are.
             </p>
             
             <div className="flex flex-col justify-start items-center gap-3 w-full xs:hidden">
               <Link
                 to="/signup"
-                className="w-full py-3 text-base text-center text-white font-bold uppercase bg-orange-600 rounded-full tracking-[1px] hover:bg-orange-900 transition-colors xs:w-[180px]"
+                className="w-full py-3 text-sm text-center text-white font-bold uppercase bg-orange-600 rounded-full tracking-[1px] hover:bg-orange-900 transition-colors"
               >
                 Signup
               </Link>
               <Link
                 to="/login"
-                className="w-full py-3 text-base text-center font-bold text-gray-800 uppercase border-2 border-orange-600 bg-white rounded-full hover:bg-orange-50 transition-colors xs:w-[180px]"
+                className="w-full py-3 text-sm text-center font-bold text-gray-800 uppercase border-2 border-orange-600 bg-white rounded-full hover:bg-orange-50 transition-colors"
               >
                 Login
               </Link>
