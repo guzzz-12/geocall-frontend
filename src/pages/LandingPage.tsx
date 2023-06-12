@@ -12,16 +12,37 @@ const LandingPage = () => {
       {/* Columna izquierda */}
       <header className="relative flex flex-col justify-between items-center gap-5 w-screen tablet:w-[55%] px-3 py-4 z-10 min-[350px]:px-6">
         <div className="flex flex-col justify-start items-start flex-grow gap-12">
-          <Logo size="sm" />
+          <nav className="flex justify-between items-center w-full">
+            <Logo size="sm" />
+            <ul className="hidden justify-end items-center flex-grow gap-4 xs:flex">
+              <li className="block min-w-[120px]">
+                <Link
+                  to="/signup"
+                  className="block w-full py-2 text-base text-center text-white font-bold uppercase border-2 border-orange-600 bg-orange-600 rounded-full tracking-[1px] hover:bg-orange-900 transition-colors"
+                >
+                  Signup
+                </Link>
+              </li>
+              <li className="block min-w-[120px]">
+                <Link
+                  to="/login"
+                  className="block w-full py-2 text-base text-center font-bold text-gray-800 uppercase border-2 border-orange-600 bg-white rounded-full hover:bg-orange-50 transition-colors"
+                >
+                  Login
+                </Link>
+              </li>
+            </ul>
+          </nav>
 
-          <div className="self-center my-auto tablet:my-0">
+          <div className="my-auto">
             <p className="mb-2 text-4xl sm:text-5xl text-left font-bold leading-none text-gray-800">
-              Connect with anyone, anytime, anywhere in the world!
+              Connect with anyone, anywhere in the world!
             </p>
             <p className="mb-4 text-lg font-normal text-black xs:mb-8 xs:text-xl tablet:text-gray-800">
               Connect with people from all over the world and experience new cultures, languages and ideas. Meet new people and stay in touch with friends and family, no matter where they are.
             </p>
-            <div className="flex flex-col justify-start items-center gap-3 w-full xs:flex-row">
+            
+            <div className="flex flex-col justify-start items-center gap-3 w-full xs:hidden">
               <Link
                 to="/signup"
                 className="w-full py-3 text-base text-center text-white font-bold uppercase bg-orange-600 rounded-full tracking-[1px] hover:bg-orange-900 transition-colors xs:w-[180px]"
