@@ -8,34 +8,33 @@ const LandingPage = () => {
   document.title = "GeoCall App";
 
   return (
-    <section className="flex w-screen h-screen bg-gray-100">
+    <section className="flex w-screen h-screen lg:pl-8 bg-gray-100">
       {/* Columna izquierda */}
-      <header className="relative flex flex-col justify-between items-center gap-5 w-screen tablet:w-[55%] px-6 py-4 z-10">
-        <div className="self-start">
+      <header className="relative flex flex-col justify-between items-center gap-5 w-screen tablet:w-[55%] px-3 py-4 z-10 min-[350px]:px-6">
+        <div className="flex flex-col justify-start items-start flex-grow gap-12">
           <Logo size="sm" />
-        </div>
 
-        <div className="flex flex-col justify-center items-start">
-          <p className="mb-2 text-4xl md:text-5xl text-left font-bold leading-none text-gray-800">
-            Connect with anyone, anytime, anywhere in the world!
-          </p>
-          <p className="mb-8 text-xl font-normal text-gray-800">
-            Connect with people from all over the world and experience new cultures, languages and ideas. Meet new people and stay in touch with friends and family, no matter where they are.
-          </p>
-
-          <div className="flex justify-center items-center gap-3">
-            <Link
-              to="/signup"
-              className="w-[180px] py-3 text-base text-center text-white font-bold uppercase bg-orange-600 rounded-full tracking-[1px] hover:bg-orange-900 transition-colors"
-            >
-              Signup
-            </Link>
-            <Link
-              to="/login"
-              className="w-[180px] py-3 text-base text-center font-bold text-gray-800 uppercase border-2 border-orange-600 bg-white rounded-full hover:bg-orange-50 transition-colors"
-            >
-              Login
-            </Link>
+          <div className="self-center my-auto tablet:my-0">
+            <p className="mb-2 text-4xl sm:text-5xl text-left font-bold leading-none text-gray-800">
+              Connect with anyone, anytime, anywhere in the world!
+            </p>
+            <p className="mb-4 text-lg font-normal text-black xs:mb-8 xs:text-xl tablet:text-gray-800">
+              Connect with people from all over the world and experience new cultures, languages and ideas. Meet new people and stay in touch with friends and family, no matter where they are.
+            </p>
+            <div className="flex flex-col justify-start items-center gap-3 w-full xs:flex-row">
+              <Link
+                to="/signup"
+                className="w-full py-3 text-base text-center text-white font-bold uppercase bg-orange-600 rounded-full tracking-[1px] hover:bg-orange-900 transition-colors xs:w-[180px]"
+              >
+                Signup
+              </Link>
+              <Link
+                to="/login"
+                className="w-full py-3 text-base text-center font-bold text-gray-800 uppercase border-2 border-orange-600 bg-white rounded-full hover:bg-orange-50 transition-colors xs:w-[180px]"
+              >
+                Login
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -63,7 +62,7 @@ const LandingPage = () => {
 
       {/* Columna derecha */}
       <div
-        style={{backgroundImage: "url(/img/connected-world.png)"}}
+        style={{backgroundImage: "url(/img/connected-world.webp)"}}
         className="absolute tablet:static w-screen tablet:w-[45%] flex-shrink-[2] bg-left bg-cover bg-no-repeat top-0 left-0 h-screen opacity-25 tablet:opacity-100 z-0"
       />
     </section>
