@@ -31,4 +31,8 @@ const store = configureStore({
 
 export type RootState = ReturnType<typeof store.getState>;
 
+// Necesario tipar el hook useDispatch con este type
+// para usar actions asíncronas creadas con createAsyncThunk
+export type AppDispatch = typeof store.dispatch;
+
 export default store;
